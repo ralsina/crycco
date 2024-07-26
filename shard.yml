@@ -1,0 +1,19 @@
+name: crycco
+version: 0.1.0
+
+authors:
+  - Roberto Alsina <roberto.alsina@gmail.com>
+
+targets:
+  crycco:
+    main: src/crycco.cr
+
+dependencies:
+  markd:
+    github: icyleaf/markd
+  crustache:
+    github: MakeNowJust/crustache
+    
+crystal: '>= 1.13.0'
+
+license: MIT

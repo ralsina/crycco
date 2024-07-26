@@ -1,3 +1,5 @@
+require "crustache"
+
 module Crycco
   CSS = <<-CSS
 /*--------------------- Layout and Typography ----------------------------*/
@@ -124,10 +126,9 @@ div.code {
 div.clearall {
     clear: both;
 }
-
 CSS
 
-  html = <<-HTML
+  TEMPLATE = Crustache.parse(<<-HTML
 <!DOCTYPE html>
 <html>
 <head>
@@ -171,15 +172,10 @@ CSS
 </div>
 </body>
 HTML
-
-  def self.template(source)
-    # FIXME: implement template
-    # return lambda context: pystache.render(source, context)
-    "FOO"
-  end
+  )
 
   # Create the template that we will use to generate the Pycco HTML page.
   def self.render_with_template(args)
-    "FOO"
+    Crustache.render(TEMPLATE, args)
   end
 end

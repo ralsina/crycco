@@ -29,8 +29,7 @@ module Crycco
     # Helper to allow documentation generation without file handling
     language = get_language(file_path, code, language_name: language)
     sections = parse(code, language)
-    # FIXME: implement highlight function
-    # highlight(sections, language, preserve_pathsL preserve_paths, outdir: outdir)
+    highlight(sections, language, preserve_paths: preserve_paths, outdir: outdir)
     generate_html(file_path, sections, preserve_paths: preserve_paths, outdir: outdir)
   end
 
@@ -78,8 +77,7 @@ module Crycco
           save.call(docs_text, code_text)
           has_code = docs_text = code_text = ""
         end
-        docs_text +=
-          docs_text += line.gsub(comment_matcher, "") + "\n"
+        docs_text += line.gsub(comment_matcher, "") + "\n"
       else
         process_as_code = true
       end
@@ -108,12 +106,12 @@ module Crycco
     raise Exception.new("Missing outdir") unless outdir
 
     sanitize_section_name = ->(name : String) : String {
-      "-".join(name.downcase.strip.split(" "))
+      (name.downcase.strip.split(" ")).join("-")
     }
 
     replace_crossref = ->(match : Regex::MatchData) : String {
       # Check if the match contains an anchor
-      if match[1].contains "#"
+      if match[1].includes? "#"
         name, anchor = match[1].split "#"
         path = File.basename(destination(name, preserve_paths: preserve_paths, outdir: outdir))
         " [#{name}](#{path}##{anchor})"
@@ -125,7 +123,7 @@ module Crycco
 
     replace_section_name = ->(match : Regex::MatchData) : String {
       # Replace equals-sign-formatted section names with anchor links
-      lvl = match[1].replace("=", "#")
+      lvl = match[1].gsub("=", "#")
       id = sanitize_section_name.call(match[2])
       name = match[2]
       %(#{lvl} <span id="#{id}" href="#{id}">#{name}</span>)
@@ -137,8 +135,23 @@ module Crycco
   end
 
   # === Highlighting the source code ===
-  #
-  # FIXME: won't implement, trust markdown and fenced code to do it
+
+  # Highlights a single chunk of code using fenced codeblocks + Markdown, and runs
+  # the text of its corresponding comment through **Markdown**.
+
+  def highlight(sections, language, preserve_paths = true, outdir = nil)
+    raise Exception.new("Missing outdir") unless outdir
+
+    sections.each_with_index do |section, i|
+      section["docs_html"] = Markd.to_html(
+        preprocess(section["docs_text"], preserve_paths: preserve_paths, outdir: outdir)
+      )
+      section["num"] = i.to_s
+      section["code_html"] = Markd.to_html(
+        "```#{language["name"]}\n#{section["code_text"]}\n```"
+      )
+    end
+  end
 
   # === HTML Code generation ===
 
@@ -156,7 +169,7 @@ module Crycco
 
     title = File.basename(source)
     dest = destination(source, preserve_paths: preserve_paths, outdir: outdir)
-    css_path = Path[File.join(outdir, "pycco.css")].relative_to(File.dirname(dest)).to_s
+    css_path = Path[File.join(outdir, "crycco.css")].relative_to(File.dirname(dest)).to_s
 
     sections.each do |sect|
       sect["code_html"] = sect["code_html"].gsub("{{", "__DOUBLE_OPEN_STACHE__")
@@ -263,9 +276,9 @@ module Crycco
   end
 
   # FIXME: implement monitor
-  
+
   # FIXME: do a real main
-  
+
   def self.main
     preserve_paths = true
     outdir = ARGV[-1]
@@ -277,5 +290,4 @@ module Crycco
   end
 end
 
-
-Crycco.main()
+Crycco.main
