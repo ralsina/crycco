@@ -64,7 +64,7 @@ module Crycco
           # and start a new one
           sections.push({
             "docs_text" => docs_text.rstrip,
-            "code_text" => code_text.rstrip,
+            "code_text" => code_text.rstrip.lstrip("\n"),
           })
           in_docs = true
           code_text = ""
@@ -80,7 +80,7 @@ module Crycco
     end
     sections.push({
       "docs_text" => docs_text.rstrip,
-      "code_text" => code_text.rstrip,
+      "code_text" => code_text.rstrip.lstrip("\n"),
     })
     sections.reject! { |section|
       section["docs_text"].empty? && section["code_text"].empty?
@@ -149,17 +149,17 @@ module Crycco
   end
 
   # === HTML Code generation ===
+  
+  # Generate the HTML file and write out the documentation. Pass
+  # the completed sections into the template found in
+  # `resources/pycco.html`
+  #
+  # Crustache will attempt to recursively render context variables,
+  # so we must replace any occurences of `{{`, which is valid in some
+  # languages, with a "unique enough" identifier before rendering and
+  # then post-process the output to restore the `{{`s.
 
   def self.generate_html(source, sections, preserve_paths : Bool, outdir : String)
-    # Generate the HTML file and write out the documentation. Pass
-    # the completed sections into the template found in
-    # `resources/pycco.html`
-    #
-    # Crustache will attempt to recursively render context variables,
-    # so we must replace any occurences of `{{`, which is valid in some
-    # languages, with a "unique enough" identifier before rendering and
-    # then post-process the output to restore the `{{`s.
-
     title = File.basename(source)
     dest = destination(source, preserve_paths: preserve_paths, outdir: outdir)
     css_path = Path[File.join(outdir, "crycco.css")].relative_to(File.dirname(dest)).to_s
@@ -201,7 +201,6 @@ module Crycco
   # Compute the destination HTML path for an input source file path.
   # If the source is `lib/example.py`, the HTML will be at `docs/example.html`.
   def self.destination(filepath, preserve_paths : Bool, outdir : String)
-
     dirname = File.dirname(filepath)
     basename = File.basename(filepath)
     return File.join(dirname, "#{basename}.html") if preserve_paths
@@ -230,7 +229,7 @@ module Crycco
   end
 
   # For each source file passed as argument, generate the documentation.
-  def self.process(sources, preserve_paths : Bool , outdir : String, language = nil, index = false, skip = false)
+  def self.process(sources, preserve_paths : Bool, outdir : String, language = nil, index = false, skip = false)
     # Make a copy of sources given on the command line. `main()` needs the
     # original list when monitoring for changed files.
     sources = _flatten_sources(sources).sort
@@ -248,7 +247,7 @@ module Crycco
         dest = destination(source, preserve_paths: preserve_paths, outdir: outdir)
         ensure_directory(File.dirname(dest))
         File.open(dest, "w") do |outf|
-          outf << generate_documentation(s, preserve_paths: preserve_paths,
+          outf << generate_documentation(source, preserve_paths: preserve_paths,
             outdir: outdir, language: language)
           puts "crycco: #{source} -> #{dest}"
         end
@@ -270,14 +269,14 @@ module Crycco
 
   # FIXME: do a real main
 
-  def self.main(dummy = true)
-    return if dummy
+  def self.main
     preserve_paths = true
     outdir = ARGV[-1]
     index = true
     skip = false
     sources = ARGV[0...-1]
 
+    puts "Starting"
     process(sources, preserve_paths: preserve_paths, outdir: outdir, index: index, skip: skip)
   end
 end
