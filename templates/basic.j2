@@ -7,12 +7,16 @@
 </div>
 {% for section in sections %}
 <div id="section-{{loop.index}}">
+    {% if section.doc != "" %}
     <div class="doc">
         {{ section.docs_html}}
     </div>
+    {% endif %}
+    {% if section.code != "" %}
     <div class="code">
         {{ section.code_html}}
     </div>
+    {% endif %}
 </div>
 {% endfor %}
 {% endblock %}

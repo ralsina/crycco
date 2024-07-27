@@ -1,0 +1,51 @@
+{% extends "page.j2" %}
+{% block body %}
+<div id="background" class="background">
+</div>
+<div id="title">
+    <h1>
+        {{title}}
+    </h1>
+</div>
+{% for section in sections %}
+<div id="section-{{loop.index}}" class="grid">
+    <div class="doc">
+        {{ section.docs_html}}
+    </div>
+    <div class="code">
+        {{ section.code_html}}
+    </div>
+</div>
+{% endfor %}
+{% endblock %}
+
+{% block CSS %}
+html * {
+    font-family: 'Quicksand', sans-serif;
+    overflow: visible !important;
+}
+
+code,
+code>* {
+    font-family: monospace !important;
+    padding-top: 0 !important;
+}
+
+div.doc>pre>code {
+    background-color: var(--pico-color-slate-800);
+    border: solid 1 var(--pico-color-slate-700)
+}
+
+.background {
+    background: linear-gradient(to right, var(--pico-color-slate-900) 50%, #011627 50%);
+    height: 100vh;
+    /* Set the desired height of the div */
+    width: 100vw;
+    /* Set the desired width of the div */
+    position: fixed;
+    z-index: -1;
+    margin: 0;
+    top: 0px;
+    left: 0px;
+}
+{% endblock %}

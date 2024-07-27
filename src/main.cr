@@ -20,4 +20,7 @@ HELP
 
 options = Docopt.docopt(HELP, ARGV)
 
-Crycco.process(options["SOURCE"].as(Array(String)), "out")
+Crycco.process(
+  options["SOURCE"].as(Array(String)),
+  options.fetch("-o", "docs").as(String),
+)
