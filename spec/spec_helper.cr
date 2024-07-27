@@ -1,2 +1,2 @@
 require "spec"
-require "../src/crycco"
+require "../src/crycco.cr"

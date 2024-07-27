@@ -33,62 +33,58 @@ module Crycco
     generate_html(file_path, sections, preserve_paths: preserve_paths, outdir: outdir)
   end
 
-  def self.parse(code, language)
-    # Given a string of source code, parse out each comment and the code
-    # that follows it, and create an individual **section** for it.
-    #
-    # Sections take the form:
-    #
-    # { "docs_text": ...,
-    #   "docs_html": ...,
-    #   "code_text": ...,
-    #   "code_html": ...,
-    #   "num":       ...
-    # }
+  def matches_comment?(line, language) : Regex::MatchData | Nil
+    # Check if a line of code is a comment
+    /^\s*#{language["comment_symbol"]}\s?/.match(line)
+  end
 
+  # Given a string of source code, parse out each comment and the code
+  # that follows it, and create an individual **section** for it.
+  #
+  # Sections take the form:
+  # ```
+  # {"docs_text" => ...,
+  #  "docs_html" => ...,
+  #  "code_text" => ...,
+  #  "code_html" => ...,
+  #  "num"       => ...,
+  # }
+  # ```
+  def self.parse(code, language)
     lines = code.split("\n")
     sections = [] of Hash(String, String)
-    has_code = docs_text = code_text = ""
 
-    lines.shift 1 if lines[0].starts_with?("#!")
+    in_docs = matches_comment?(lines[0], language)
+    code_text = docs_text = ""
 
-    # FIXME: not implementing the encoding comment skipping for python
-
-    save = ->(docs : String, code : String) {
-      sections.push({
-        "docs_text" => docs,
-        "code_text" => code,
-      }) unless docs.empty? && code.empty?
-    }
-
-    multi_line = false
-    multi_string = false
-    multistart = language.fetch("multistart", nil)
-    multiend = language.fetch("multiend", nil)
-    comment_matcher = /^\s*#{language["comment_symbol"]}\s?/
     lines.each do |line|
-      process_as_code = false
-      # Only go into multiline comments senction when one of the delimiters
-      # is foind to be at the start of a line
-      # FIXME: implement multiline logic
-
-      if comment_matcher.match(line)
-        if !has_code
-          save.call(docs_text, code_text)
-          has_code = docs_text = code_text = ""
+      if matches_comment?(line, language)
+        if !in_docs
+          # We were in a code section, push the previous section
+          # and start a new one
+          sections.push({
+            "docs_text" => docs_text.rstrip,
+            "code_text" => code_text.rstrip,
+          })
+          in_docs = true
+          code_text = ""
+          docs_text = line.gsub(/^\s*#{language["comment_symbol"]}\s?/, "") + "\n"
+        else
+          # In a docs section, just append to the docs
+          docs_text += line.gsub(/^\s*#{language["comment_symbol"]}\s?/, "") + "\n"
         end
-        docs_text += line.gsub(comment_matcher, "") + "\n"
-      else
-        process_as_code = true
-      end
-
-      if process_as_code
-        has_code = true
+      else # Doesn't match comment, we are in code
+        in_docs = false
         code_text += line + "\n"
       end
     end
-    save.call(docs_text, code_text)
-    sections
+    sections.push({
+      "docs_text" => docs_text.rstrip,
+      "code_text" => code_text.rstrip,
+    })
+    sections.reject! { |section|
+      section["docs_text"].empty? && section["code_text"].empty?
+    }
   end
 
   # === Preprocessing the comments ===
@@ -103,14 +99,26 @@ module Crycco
   # `=== like this ===`
 
   def self.preprocess(comment, preserve_paths = true, outdir = nil)
-    raise Exception.new("Missing outdir") unless outdir
-
     sanitize_section_name = ->(name : String) : String {
       (name.downcase.strip.split(" ")).join("-")
     }
 
-    replace_crossref = ->(match : Regex::MatchData) : String {
+    # Replace sections with markdown headings
+    comment = comment.gsub(/^([=]+)([^=]+)[=]*\s*$/) do |_|
+      match = /^([=]+)([^=]+)[=]*\s*$/.match comment
+      return "" unless match
+      lvl = match[1].gsub("=", "#")
+      id = sanitize_section_name.call(match[2])
+      name = match[2]
+      result = %(#{lvl} <span id="#{id}" href="#{id}">#{name}</span>)
+      result
+    end
+
+    # Replace cross-references with markdown links
+    comment = comment.gsub(/(?<!`)\[\[(.+?)\]\]/) do |_|
       # Check if the match contains an anchor
+      match = /(?<!`)\[\[(.+?)\]\]/.match comment
+      return "" unless match
       if match[1].includes? "#"
         name, anchor = match[1].split "#"
         path = File.basename(destination(name, preserve_paths: preserve_paths, outdir: outdir))
@@ -119,25 +127,14 @@ module Crycco
         path = File.basename(destination(match[1], preserve_paths: preserve_paths, outdir: outdir))
         " [#{match[1]}](#{path})"
       end
-    }
-
-    replace_section_name = ->(match : Regex::MatchData) : String {
-      # Replace equals-sign-formatted section names with anchor links
-      lvl = match[1].gsub("=", "#")
-      id = sanitize_section_name.call(match[2])
-      name = match[2]
-      %(#{lvl} <span id="#{id}" href="#{id}">#{name}</span>)
-    }
-
-    comment = comment.sub(/^([=]+)([^=]+)[=]*\s*$/, replace_section_name)
-    comment = comment.sub(/(?<!`)\[\[(.+?)\]\]/, replace_crossref)
+    end
     comment
   end
 
-  # === Highlighting the source code ===
+  # === Processing text into HTML ===
 
-  # Highlights a single chunk of code using fenced codeblocks + Markdown, and runs
-  # the text of its corresponding comment through **Markdown**.
+  # Pass docs via preprocessor and then from markdown to HTML
+  # Code just put fences around and pass through markdown to HTML too
 
   def highlight(sections, language, preserve_paths = true, outdir = nil)
     raise Exception.new("Missing outdir") unless outdir
@@ -212,8 +209,6 @@ module Crycco
 
     dirname = File.dirname(filepath)
     basename = File.basename(filepath)
-    # FIXME: not implementing weird replacement
-
     return File.join(dirname, "#{basename}.html") if preserve_paths
     File.join(outdir, "#{basename}.html")
   end
@@ -254,24 +249,27 @@ module Crycco
         css << CSS
       end
 
-      generated_files = [] of String
+      _generated_files = [] of String
 
-      sources.each do |s|
-        dest = destination(s, preserve_paths: preserve_paths, outdir: outdir)
+      sources.each do |source|
+        dest = destination(source, preserve_paths: preserve_paths, outdir: outdir)
         ensure_directory(File.dirname(dest))
-        File.open(dest, "w") do |f|
-          f << generate_documentation(s, preserve_paths: preserve_paths,
+        File.open(dest, "w") do |outf|
+          outf << generate_documentation(s, preserve_paths: preserve_paths,
             outdir: outdir, language: language)
-          puts "crycco: #{s} -> #{dest}"
+          puts "crycco: #{source} -> #{dest}"
         end
       end
 
       # FIXME: implement generate_index
+      #
+      # ```python
       # if index
       #   File.open(File.join(outdir, "index.html"), "w") do |f|
       #     f << generate_index(generated_files, outdir)
       #   end
       # end
+      # ```
     end
   end
 
@@ -279,7 +277,8 @@ module Crycco
 
   # FIXME: do a real main
 
-  def self.main
+  def self.main(dummy = true)
+    return if dummy
     preserve_paths = true
     outdir = ARGV[-1]
     index = true
@@ -289,5 +288,3 @@ module Crycco
     process(sources, preserve_paths: preserve_paths, outdir: outdir, index: index, skip: skip)
   end
 end
-
-Crycco.main
