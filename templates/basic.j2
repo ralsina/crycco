@@ -20,3 +20,21 @@
 </div>
 {% endfor %}
 {% endblock %}
+
+{% block CSS %}
+html * {
+    font-family: 'Quicksand', sans-serif;
+    overflow: visible !important;
+}
+
+code,
+code>* {
+    font-family: monospace !important;
+    padding-top: 0 !important;
+}
+
+div.doc>pre>code {
+    background-color: var(--pico-color-slate-800);
+    border: solid 1 var(--pico-color-slate-700)
+}
+{% endblock %}

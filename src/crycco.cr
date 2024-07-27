@@ -1,4 +1,4 @@
-# # A Crystal version of docco/pycco/etc.
+# # Crycco: A Crystal Remix of Docco.
 #
 # Crycco is a quick and dirty documentation generator in the mold
 # of and directly inspired by [Docco](http://jashkenas.github.com/docco/).
@@ -36,6 +36,7 @@
 #
 # This is the main file of the project. It contains the main logic
 # for parsing the source files and generating the output.
+#
 # ----
 # Import our dependencies
 require "./templates"
@@ -172,10 +173,12 @@ module Crycco
 
     # Save the document to a file using the desired format
     # and template.
-    def save(path, format = "html", template = "sidebyside")
+    def save(out_file, format = "html", template = "sidebyside")
       FileUtils.mkdir_p(File.dirname(path))
       template = Templates.get("#{template}.j2")
-      File.open(path, "w") do |outf|
+      puts "#{self.path} -> #{out_file}"
+      FileUtils.mkdir_p(File.dirname(out_file))
+      File.open(out_file, "w") do |outf|
         outf << template.render({
           "title"    => File.basename(path),
           "sections" => sections.map(&.to_h),
@@ -188,11 +191,11 @@ module Crycco
   #
   # Given a list of source files, create documents for each one
   # and save them to the output directory.
-  def process(sources : Array(String), out_dir : String)
+  def process(sources : Array(String), out_dir : String, template : String)
     sources.each do |source|
       doc = Document.new(source)
       out_file = File.join(out_dir, File.basename(source) + ".html")
-      doc.save(out_file)
+      doc.save(out_file, template: template)
     end
   end
 

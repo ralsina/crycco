@@ -10,17 +10,21 @@ Usage:
 
 Options:
   -V, --version           output the version number
-  -L, --languages <file>  use a custom languages.yml file
-  -l, --layout <name>     choose a layout (parallel, linear or classic) [default: "parallel"]
+  -l, --languages <file>  use a custom languages.yml file
   -o, --output <path>     output to a given folder [default: "docs"]
-  -c, --css <file>        use a custom css file
-  -t, --template <file>   use a custom .jst template
+  -t, --template <name>   template for layout (sidebyside, basic or a filename)
   -h, --help              this help message
 HELP
 
 options = Docopt.docopt(HELP, ARGV)
 
+if options["--version"]
+  puts "Crycco #{Crycco::VERSION}"
+  exit 0
+end
+
 Crycco.process(
-  options["SOURCE"].as(Array(String)),
-  options.fetch("-o", "docs").as(String),
+  sources: options["SOURCE"].as(Array(String)),
+  out_dir: options.fetch("--output", "docs").as(String),
+  template: options.fetch("--template", "sidebyside").as(String),
 )
