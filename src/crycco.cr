@@ -16,7 +16,7 @@ module Crycco
   }
 
   # Generate the documentation for a source file by reading
-  # it in, splitting it up iunto comment/code sections,
+  # it in, splitting it up into comment/code sections,
   # and merging them into an HTML template.
   def self.generate_documentation(
     source, outdir : String, preserve_paths = true, language = nil
@@ -136,9 +136,7 @@ module Crycco
   # Pass docs via preprocessor and then from markdown to HTML
   # Code just put fences around and pass through markdown to HTML too
 
-  def highlight(sections, language, preserve_paths = true, outdir = nil)
-    raise Exception.new("Missing outdir") unless outdir
-
+  def highlight(sections, language, preserve_paths = true, outdir : String)
     sections.each_with_index do |section, i|
       section["docs_html"] = Markd.to_html(
         preprocess(section["docs_text"], preserve_paths: preserve_paths, outdir: outdir)
@@ -152,7 +150,7 @@ module Crycco
 
   # === HTML Code generation ===
 
-  def self.generate_html(source, sections, preserve_paths = true, outdir = nil)
+  def self.generate_html(source, sections, preserve_paths = true, outdir : String)
     # Generate the HTML file and write out the documentation. Pass
     # the completed sections into the template found in
     # `resources/pycco.html`
@@ -161,8 +159,6 @@ module Crycco
     # so we must replace any occurences of `{{`, which is valid in some
     # languages, with a "unique enough" identifier before rendering and
     # then post-process the output to restore the `{{`s.
-
-    raise Exception.new("Missing outdir") unless outdir
 
     title = File.basename(source)
     dest = destination(source, preserve_paths: preserve_paths, outdir: outdir)
@@ -204,8 +200,7 @@ module Crycco
 
   # Compute the destination HTML path for an input source file path.
   # If the source is `lib/example.py`, the HTML will be at `docs/example.html`.
-  def self.destination(filepath, preserve_paths = true, outdir = nil)
-    raise Exception.new("Missing outdir") unless outdir
+  def self.destination(filepath, preserve_paths = true, outdir : String)
 
     dirname = File.dirname(filepath)
     basename = File.basename(filepath)
@@ -235,9 +230,7 @@ module Crycco
   end
 
   # For each source file passed as argument, generate the documentation.
-  def self.process(sources, preserve_paths = true, outdir = nil, language = nil, index = false, skip = false)
-    raise Exception.new("Missing outdir") unless outdir
-
+  def self.process(sources, preserve_paths = true, outdir : String, language = nil, index = false, skip = false)
     # Make a copy of sources given on the command line. `main()` needs the
     # original list when monitoring for changed files.
     sources = _flatten_sources(sources).sort
