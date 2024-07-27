@@ -21,15 +21,15 @@ sample2 = %(
 describe Crycco do
   describe "parse" do
     it "should split code from comments" do
-      sections = Crycco.parse sample1, Crycco::LANGUAGES["cr"]
+      sections = Crycco.parse sample1, Crycco::LANGUAGES[".cr"]
       sections.size.should eq(2)
     end
     it "should remove comment markers from doc" do
-      sections = Crycco.parse sample1, Crycco::LANGUAGES["cr"]
+      sections = Crycco.parse sample1, Crycco::LANGUAGES[".cr"]
       sections[0].docs.should eq("This is a comment\nMore comment\n")
     end
     it "should break sections in HR" do
-      sections = Crycco.parse sample2, Crycco::LANGUAGES["cr"]
+      sections = Crycco.parse sample2, Crycco::LANGUAGES[".cr"]
       sections.size.should eq(3)
     end
   end
@@ -43,7 +43,7 @@ describe Crycco do
     it "should convert code to html" do
       section = Crycco::Section.new
       section.code = "code\ncode\n"
-      section.code_html(Crycco::LANGUAGES["cr"]).should eq("<pre><code class=\"crystal\">code\ncode\n</code></pre>")
+      section.code_html(Crycco::LANGUAGES[".cr"]).should eq("<pre><code class=\"crystal\">code\ncode\n</code></pre>")
     end
   end
 end

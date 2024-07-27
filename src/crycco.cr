@@ -13,7 +13,7 @@ module Crycco
   # FIXME: read from data/languages.yml
   # and add match
   def self.load_languages(file : String)
-    LANGUAGES["cr"] = {
+    LANGUAGES[".cr"] = {
       "name"           => "crystal",
       "comment_symbol" => "#",
       "match"          => /^\s*#\s?/,
@@ -67,7 +67,7 @@ module Crycco
   def process(sources : Array(String), out_dir : String)
     sources.each do |source|
       language = LANGUAGES.fetch(File.extname(source), nil)
-      raise "Language not supported" if language.nil?
+      raise "Language not found for extension #{File.extname(source)}" if language.nil?
       sections = parse(File.read(source), language)
 
       # Destination file
