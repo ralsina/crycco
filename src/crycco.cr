@@ -175,7 +175,7 @@ module Crycco
     # and template.
     def save(out_file, format = "html", template = "sidebyside")
       FileUtils.mkdir_p(File.dirname(path))
-      template = Templates.get("#{template}.j2")
+      template = Templates.get("#{template}")
       puts "#{self.path} -> #{out_file}"
       FileUtils.mkdir_p(File.dirname(out_file))
       File.open(out_file, "w") do |outf|
