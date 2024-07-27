@@ -1,0 +1,20 @@
+<ul class="sections">
+    <li id="title">
+        <div class="annotation">
+            <h1>
+                {{title}}
+            </h1>
+        </div>
+    </li>
+    {% for section in sections %}
+    <li id="section-{{loop.index}}">
+        <div class="annotation">
+            {{ section.docs_html}}
+        </div>
+        <div class="content">
+            {{ section.code_html}}
+        </div>
+    </li>
+    {% endfor %}
+</ul>
+</div>

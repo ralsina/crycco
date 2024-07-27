@@ -11,8 +11,8 @@ targets:
 dependencies:
   markd:
     github: icyleaf/markd
-  crustache:
-    github: MakeNowJust/crustache
+  crinja:
+    github: straight-shoota/crinja
   docopt:
     github: chenkovsky/docopt.cr    
 crystal: '>= 1.13.0'

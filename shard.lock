@@ -1,8 +1,8 @@
 version: 2.0
 shards:
-  crustache:
-    git: https://github.com/makenowjust/crustache.git
-    version: 2.4.4
+  crinja:
+    git: https://github.com/straight-shoota/crinja.git
+    version: 0.8.1
 
   docopt:
     git: https://github.com/chenkovsky/docopt.cr.git

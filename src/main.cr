@@ -4,7 +4,7 @@ require "./crycco"
 HELP = <<-HELP
 Crycco, a Crystal version of docco/pycco/etc.
 
-Usage: 
+Usage:
     crycco -V
     crycco SOURCE... [-L <file>][-l <name>][-o <path>][-c <file>][-t <file>]
 
@@ -19,6 +19,5 @@ Options:
 HELP
 
 options = Docopt.docopt(HELP, ARGV)
-pp! options
 
 Crycco.process(options["SOURCE"].as(Array(String)), "out")

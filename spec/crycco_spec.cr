@@ -1,9 +1,5 @@
 require "./spec_helper"
 
-
-sample2 = %(
-)
-
 describe Crycco do
   describe "parse" do
     it "should split code from comments" do
