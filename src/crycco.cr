@@ -136,7 +136,7 @@ module Crycco
   # Pass docs via preprocessor and then from markdown to HTML
   # Code just put fences around and pass through markdown to HTML too
 
-  def highlight(sections, language, preserve_paths = true, outdir : String)
+  def highlight(sections, language, preserve_paths : Bool, outdir : String)
     sections.each_with_index do |section, i|
       section["docs_html"] = Markd.to_html(
         preprocess(section["docs_text"], preserve_paths: preserve_paths, outdir: outdir)
@@ -150,7 +150,7 @@ module Crycco
 
   # === HTML Code generation ===
 
-  def self.generate_html(source, sections, preserve_paths = true, outdir : String)
+  def self.generate_html(source, sections, preserve_paths : Bool, outdir : String)
     # Generate the HTML file and write out the documentation. Pass
     # the completed sections into the template found in
     # `resources/pycco.html`
@@ -200,7 +200,7 @@ module Crycco
 
   # Compute the destination HTML path for an input source file path.
   # If the source is `lib/example.py`, the HTML will be at `docs/example.html`.
-  def self.destination(filepath, preserve_paths = true, outdir : String)
+  def self.destination(filepath, preserve_paths : Bool, outdir : String)
 
     dirname = File.dirname(filepath)
     basename = File.basename(filepath)
@@ -230,7 +230,7 @@ module Crycco
   end
 
   # For each source file passed as argument, generate the documentation.
-  def self.process(sources, preserve_paths = true, outdir : String, language = nil, index = false, skip = false)
+  def self.process(sources, preserve_paths : Bool , outdir : String, language = nil, index = false, skip = false)
     # Make a copy of sources given on the command line. `main()` needs the
     # original list when monitoring for changed files.
     sources = _flatten_sources(sources).sort
