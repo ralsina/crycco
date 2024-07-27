@@ -13,7 +13,8 @@ dependencies:
     github: icyleaf/markd
   crustache:
     github: MakeNowJust/crustache
-    
+  docopt:
+    github: chenkovsky/docopt.cr    
 crystal: '>= 1.13.0'
 
 license: MIT

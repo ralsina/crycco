@@ -4,6 +4,10 @@ shards:
     git: https://github.com/makenowjust/crustache.git
     version: 2.4.4
 
+  docopt:
+    git: https://github.com/chenkovsky/docopt.cr.git
+    version: 0.2.0+git.commit.620fce4f334ff15d7321e5ecb6665ad258fe9297
+
   markd:
     git: https://github.com/icyleaf/markd.git
     version: 0.5.0

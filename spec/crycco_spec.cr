@@ -9,26 +9,41 @@ sample1 = %(
 
     # More comments)
 
+sample2 = %(
+    # This is a comment
+    # ---
+    # More comment
+    code
+    code
+
+    # More comments)
+
 describe Crycco do
-  it "should split code from comments" do
-    sections = Crycco.parse sample1, Crycco::LANGUAGES[".cr"]
-    sections.size.should eq(2)
+  describe "parse" do
+    it "should split code from comments" do
+      sections = Crycco.parse sample1, Crycco::LANGUAGES["cr"]
+      sections.size.should eq(2)
+    end
+    it "should remove comment markers from doc" do
+      sections = Crycco.parse sample1, Crycco::LANGUAGES["cr"]
+      sections[0].docs.should eq("This is a comment\nMore comment\n")
+    end
+    it "should break sections in HR" do
+      sections = Crycco.parse sample2, Crycco::LANGUAGES["cr"]
+      sections.size.should eq(3)
+    end
   end
 
-  it "should remove comment markers from doc" do
-    sections = Crycco.parse sample1, Crycco::LANGUAGES[".cr"]
-    Crycco.highlight(sections, Crycco::LANGUAGES[".cr"], outdir: "tmp")
-    sections[0]["docs_text"].should eq("This is a comment\nMore comment")
-  end
-
-  it "should wrap code in pre tags" do
-    sections = Crycco.parse sample1, Crycco::LANGUAGES[".cr"]
-    Crycco.highlight(sections, Crycco::LANGUAGES[".cr"], outdir: "tmp")
-    sections[0]["code_html"].should start_with("<pre><code class=\"language-crystal")
-  end
-
-  it "should replace heading with markdown headings" do
-    result = Crycco.preprocess("=== foo === ")
-    result.should eq %(### <span id="foo" href="foo"> foo </span>)
+  describe "Section" do
+    it "should convert docs to html" do
+      section = Crycco::Section.new
+      section.docs = "This is a comment\nMore comment\n"
+      section.docs_html.should eq("<p>This is a comment\nMore comment</p>\n")
+    end
+    it "should convert code to html" do
+      section = Crycco::Section.new
+      section.code = "code\ncode\n"
+      section.code_html(Crycco::LANGUAGES["cr"]).should eq("<pre><code class=\"crystal\">code\ncode\n</code></pre>")
+    end
   end
 end
