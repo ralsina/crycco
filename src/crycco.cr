@@ -101,6 +101,10 @@ module Crycco
     end
   end
 
+  # This matches shebangs and things that only LOOK like comments,
+  # such as string interpolations.
+  NOT_COMMENT = /(^#!|^\s*#\{)/
+
   # Document contents are organized in sections, which have docs and code.
   # The docs are markdown extracted from comments and the code is the actual code.
   #
@@ -122,9 +126,12 @@ module Crycco
     # a `<pre><code>` block with the right class so it's properly highlighted.
     #
     # It should also have the HTML escaped (or else this function would nest two pre tags
-    # when passed through itself 😂)
+    # when passed through itself 😂). Finally, it has to be in a single line because
+    # spaces are significant in code fragments.
     def code_html
-      %(<pre class="code"><code class="#{language["name"]}">#{HTML.escape(code.lstrip("\n"))}</code></pre>)
+      %(
+<pre class="code"><code class="#{language["name"]}">#{HTML.escape(code.lstrip("\n"))}</code></pre>
+      )
     end
 
     # Te `to_h` method is used to turn the section into something that can be
@@ -152,10 +159,10 @@ module Crycco
     # language
     def initialize(@path : String)
       key = File.extname(@path)
-      raise "Language not found for extension #{File.extname(@path)}" unless LANGUAGES.has_key?(key)
       @language = LANGUAGES[key]
-
       parse(File.read(@path))
+    rescue ex : KeyError
+      raise Exception.new "Unknown file extension #{File.extname(@path)}"
     end
 
     # Given a string of source code, parse out each block of prose
@@ -167,15 +174,15 @@ module Crycco
       lines = source.split("\n")
       @sections = [Section.new language]
 
-      # Handle empty files and files with shebangs
+      # Handle empty files
       return if lines.empty?
-      lines.shift if lines[0].starts_with? "#!"
 
+      is_comment = language["match"].as(Regex)
       # This loop is the core of the parser. It goes line by line
       # and decides if the line is a comment or code, and depending
       # on that either starts a new section, or adds to the current one.
       lines.each do |line|
-        if language["match"].as(Regex).match(line)
+        if is_comment.match(line) && !NOT_COMMENT.match(line)
           # Break section if we find docs after code
           @sections << Section.new(language) unless sections[-1].code.empty?
           line = line.sub(language["match"], "")

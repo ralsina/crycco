@@ -5,6 +5,15 @@
 # [Crinja](https://straight-shoota.github.io/crinja/)
 # template engine.
 
+require "crinja"
+require "crinja/loader/baked_file_loader"
+
+# This module bakes the default templates into the binary
+# so we don't have to carry them around
+module MyBakedTemplateFileSystem
+  BakedFileSystem.load("../templates", __DIR__)
+end
+
 # The Templates module is a singleton that provides access
 # to the templates. The loader will look for templates in
 # several places:
@@ -19,16 +28,6 @@
 # [Github](https://github.com/ralsina/crycco/tree/main/templates)
 # and adapt them to your needs: make a copy and pass it in the
 # `-t` option to Crycco.
-
-require "crinja"
-require "crinja/loader/baked_file_loader"
-
-# This module bakes the default templates into the binary
-# so we don't have to carry them around
-module MyBakedTemplateFileSystem
-  BakedFileSystem.load("../templates", __DIR__)
-end
-
 module Templates
   extend self
   Env = Crinja.new
