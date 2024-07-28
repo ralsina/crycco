@@ -16,9 +16,20 @@ describe Crycco do
       doc = Crycco::Document.new "#{__DIR__}/fixtures/2.cr"
       doc.sections.size.should eq(3)
     end
-    it "should split code from comments in literate style" do
+  end
+  describe "parse in literate style" do
+    it "should split code from comments" do
       doc = Crycco::Document.new "#{__DIR__}/fixtures/1.cr.md"
       doc.sections.size.should eq(2)
+    end
+    it "should take unindented text as docs" do
+      doc = Crycco::Document.new "#{__DIR__}/fixtures/1.cr.md"
+      doc.sections[0].docs.should eq("This is a comment\nMore comment\n\n")
+    end
+    it "should add comment markers when converting to code" do
+      doc = Crycco::Document.new "#{__DIR__}/fixtures/1.cr.md"
+      doc.sections[0].to_source.should eq(
+        "# This is a comment\n" + "# More comment\n" + "    code\n" + "    code\n")
     end
   end
 
@@ -38,7 +49,7 @@ describe Crycco do
       section.code = "code\ncode\n"
       section.docs = "This is a comment\nMore comment\n"
       section.to_source.strip.should eq(
-        "# This is a comment\n" + "# More comment\n" + "# \n" + "code\n" + "code"
+        "# This is a comment\n" + "# More comment\n" + "code\n" + "code"
       )
     end
   end

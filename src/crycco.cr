@@ -143,10 +143,10 @@ module Crycco
     # and comments from it and save it to a file.
     def to_source : String
       lines = [] of String
-      docs.split("\n").each do |line|
+      docs.rstrip("\n").split("\n").each do |line|
         lines << "#{language["symbol"]} #{line}"
       end
-      lines << code
+      lines << code.rstrip("\n")
       lines.join("\n")
     end
 
@@ -194,8 +194,9 @@ module Crycco
       end
 
       # In the literate versions, everything is doc except
-      # indented things, which are code.
-      @language["match"] = /^([ ]{4}|[ ]{0,3}\t)/ if @literate
+      # indented things, which are code. So we change the
+      # match regex to match everything except 4 spaces or a tab.
+      @language["match"] = /^(?![ ]{4}|\t).*/ if @literate
       parse(File.read(@path))
     end
 
@@ -219,7 +220,8 @@ module Crycco
         if is_comment.match(line) && !NOT_COMMENT.match(line)
           # Break section if we find docs after code
           @sections << Section.new(language) unless sections[-1].code.empty?
-          line = line.sub(language["match"], "")
+          # Remove comment markers if it's not literate
+          line = line.sub(language["match"], "") unless @literate
           @sections[-1].docs += line + "\n"
           # Also break section if we find a line of dashes (HR in markdown)
           @sections << Section.new(language) if /^(---+|===+)$/.match line

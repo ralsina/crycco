@@ -367,10 +367,10 @@ and comments from it and save it to a file.</p>
         
 <pre class="code"><code class="crystal">    def to_source : String
       lines = [] of String
-      docs.split(&quot;\n&quot;).each do |line|
+      docs.rstrip(&quot;\n&quot;).split(&quot;\n&quot;).each do |line|
         lines &lt;&lt; &quot;#{language[&quot;symbol&quot;]} #{line}&quot;
       end
-      lines &lt;&lt; code
+      lines &lt;&lt; code.rstrip(&quot;\n&quot;)
       lines.join(&quot;\n&quot;)
     end
 
@@ -470,12 +470,13 @@ definition a bit.</p>
             <a href="#section-16" class="anchor">↦</a>
         </span>
         <p>In the literate versions, everything is doc except
-indented things, which are code.</p>
+indented things, which are code. So we change the
+match regex to match everything except 4 spaces or a tab.</p>
 
     </div>
     <div class="code">
         
-<pre class="code"><code class="crystal">      @language[&quot;match&quot;] = /^([ ]{4}|[ ]{0,3}\t)/ if @literate
+<pre class="code"><code class="crystal">      @language[&quot;match&quot;] = /^(?![ ]{4}|\t).*/ if @literate
       parse(File.read(@path))
     end
 
@@ -555,8 +556,6 @@ one.</p>
     <div class="code">
         
 <pre class="code"><code class="crystal">          @sections &lt;&lt; Section.new(language) unless sections[-1].code.empty?
-          line = line.sub(language[&quot;match&quot;], &quot;&quot;)
-          @sections[-1].docs += line + &quot;\n&quot;
 </code></pre>
       
     </div>
@@ -566,6 +565,23 @@ one.</p>
     <div class="doc" id="section-21">
         <span class="anchor">
             <a href="#section-21" class="anchor">↦</a>
+        </span>
+        <p>Remove comment markers if it's not literate</p>
+
+    </div>
+    <div class="code">
+        
+<pre class="code"><code class="crystal">          line = line.sub(language[&quot;match&quot;], &quot;&quot;) unless @literate
+          @sections[-1].docs += line + &quot;\n&quot;
+</code></pre>
+      
+    </div>
+</div>
+
+<div id="section-22" class="grid">
+    <div class="doc" id="section-22">
+        <span class="anchor">
+            <a href="#section-22" class="anchor">↦</a>
         </span>
         <p>Also break section if we find a line of dashes (HR in markdown)</p>
 
@@ -582,10 +598,10 @@ one.</p>
     </div>
 </div>
 
-<div id="section-22" class="grid">
-    <div class="doc" id="section-22">
+<div id="section-23" class="grid">
+    <div class="doc" id="section-23">
         <span class="anchor">
-            <a href="#section-22" class="anchor">↦</a>
+            <a href="#section-23" class="anchor">↦</a>
         </span>
         <p>Sections with no code or docs are pointless.</p>
 
@@ -600,10 +616,10 @@ one.</p>
     </div>
 </div>
 
-<div id="section-23" class="grid">
-    <div class="doc" id="section-23">
+<div id="section-24" class="grid">
+    <div class="doc" id="section-24">
         <span class="anchor">
-            <a href="#section-23" class="anchor">↦</a>
+            <a href="#section-24" class="anchor">↦</a>
         </span>
         <p>Save the document to a file using the desired format
 and template. If you want to learn more about the templates
@@ -639,10 +655,10 @@ source code.</p>
     </div>
 </div>
 
-<div id="section-24" class="grid">
-    <div class="doc" id="section-24">
+<div id="section-25" class="grid">
+    <div class="doc" id="section-25">
         <span class="anchor">
-            <a href="#section-24" class="anchor">↦</a>
+            <a href="#section-25" class="anchor">↦</a>
         </span>
         <p>The <code>process</code> function is the entry point to the whole thing.</p>
 <p>Given a list of source files, create documents for each one
@@ -670,10 +686,10 @@ end
     </div>
 </div>
 
-<div id="section-25" class="grid">
-    <div class="doc" id="section-25">
+<div id="section-26" class="grid">
+    <div class="doc" id="section-26">
         <span class="anchor">
-            <a href="#section-25" class="anchor">↦</a>
+            <a href="#section-26" class="anchor">↦</a>
         </span>
         <p>🏁 That's it!</p>
 
