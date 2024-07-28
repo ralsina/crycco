@@ -17,7 +17,7 @@
     <link id="hljscss" rel="stylesheet"
         href="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/styles/night-owl.min.css" />
     <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/highlight.min.js"></script>
-    <!-- Custom style-->
+    <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/languages/crystal.min.js"></script>    <!-- Custom style-->
     
 <style>
 html * {
@@ -560,6 +560,7 @@ you can check out <a href="templates.cr.html">templates.cr</a></p>
         outf &lt;&lt; template.render({
           &quot;title&quot;    =&gt; File.basename(path),
           &quot;sections&quot; =&gt; sections.map(&amp;.to_h),
+          &quot;language&quot; =&gt; language[&quot;name&quot;],
         })
       end
     end

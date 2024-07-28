@@ -209,6 +209,7 @@ module Crycco
         outf << template.render({
           "title"    => File.basename(path),
           "sections" => sections.map(&.to_h),
+          "language" => language["name"],
         })
       end
     end
