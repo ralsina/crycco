@@ -18,8 +18,8 @@
         href="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/styles/night-owl.min.css" />
     <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/highlight.min.js"></script>
     <!-- Custom style-->
-    <style>
     
+<style>
 html * {
     font-family: Chivo, sans-serif;
     font-variant-ligatures: none;
@@ -49,14 +49,29 @@ div.doc>pre>code {
     display: block;
 }
 
-@media screen and (max-width: 768px) {
-  div.background {
-    display: none;
-  }
+span.anchor {
+    position: relative;
 }
 
+a.anchor {
+    position: absolute;
+    text-decoration: none;
+    left: -1em;
+    opacity: 0;
+    -webkit-transition: opacity 0.2s linear;
+}
 
-    </style>
+div.doc:hover .anchor {
+    opacity: 1;
+}
+
+@media screen and (max-width: 768px) {
+    div.background {
+        display: none;
+    }
+}
+</style>
+
 </head>
 
 <body>
@@ -66,7 +81,10 @@ div.doc>pre>code {
 </div>
 
 <div id="section-1" class="grid">
-    <div class="doc">
+    <div class="doc" id="section-1">
+        <span class="anchor">
+            <a href="#section-1" class="anchor">»</a>
+        </span>
         <h1>main.cr</h1>
 <p>This is the entrypoint to use Crycco as a command line tool.
 as you can see by the dependencies, we are using <code>docopt</code> to
@@ -86,7 +104,10 @@ require &quot;./crycco&quot;
 </div>
 
 <div id="section-2" class="grid">
-    <div class="doc">
+    <div class="doc" id="section-2">
+        <span class="anchor">
+            <a href="#section-2" class="anchor">»</a>
+        </span>
         <p>Crycco is not a very complicated tool, really, so the options are
 few and simple.</p>
 
@@ -119,7 +140,10 @@ options = Docopt.docopt(HELP, ARGV)
 </div>
 
 <div id="section-3" class="grid">
-    <div class="doc">
+    <div class="doc" id="section-3">
+        <span class="anchor">
+            <a href="#section-3" class="anchor">»</a>
+        </span>
         <p>Handle version manually</p>
 
     </div>
@@ -136,7 +160,10 @@ end
 </div>
 
 <div id="section-4" class="grid">
-    <div class="doc">
+    <div class="doc" id="section-4">
+        <span class="anchor">
+            <a href="#section-4" class="anchor">»</a>
+        </span>
         <p>First we initialize the languages list from <code>languages.yml</code> or
 a custom file.</p>
 
@@ -151,7 +178,10 @@ a custom file.</p>
 </div>
 
 <div id="section-5" class="grid">
-    <div class="doc">
+    <div class="doc" id="section-5">
+        <span class="anchor">
+            <a href="#section-5" class="anchor">»</a>
+        </span>
         <p>And just call <code>Crycco.process</code> with the options we got, casted to
 the types it expects. If there is an error, we can just crash with
 an exception and a backtrace.</p>

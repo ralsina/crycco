@@ -18,8 +18,8 @@
         href="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/styles/night-owl.min.css" />
     <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/highlight.min.js"></script>
     <!-- Custom style-->
-    <style>
     
+<style>
 html * {
     font-family: Chivo, sans-serif;
     font-variant-ligatures: none;
@@ -49,14 +49,29 @@ div.doc>pre>code {
     display: block;
 }
 
-@media screen and (max-width: 768px) {
-  div.background {
-    display: none;
-  }
+span.anchor {
+    position: relative;
 }
 
+a.anchor {
+    position: absolute;
+    text-decoration: none;
+    left: -1em;
+    opacity: 0;
+    -webkit-transition: opacity 0.2s linear;
+}
 
-    </style>
+div.doc:hover .anchor {
+    opacity: 1;
+}
+
+@media screen and (max-width: 768px) {
+    div.background {
+        display: none;
+    }
+}
+</style>
+
 </head>
 
 <body>
@@ -66,7 +81,10 @@ div.doc>pre>code {
 </div>
 
 <div id="section-1" class="grid">
-    <div class="doc">
+    <div class="doc" id="section-1">
+        <span class="anchor">
+            <a href="#section-1" class="anchor">»</a>
+        </span>
         <h1>templates.cr</h1>
 <p>This is the code that handles loading the templates which
 are used to generate the final HTML files. It uses the
@@ -85,7 +103,10 @@ require &quot;crinja/loader/baked_file_loader&quot;
 </div>
 
 <div id="section-2" class="grid">
-    <div class="doc">
+    <div class="doc" id="section-2">
+        <span class="anchor">
+            <a href="#section-2" class="anchor">»</a>
+        </span>
         <p>This module bakes the default templates into the binary
 so we don't have to carry them around</p>
 
@@ -102,7 +123,10 @@ end
 </div>
 
 <div id="section-3" class="grid">
-    <div class="doc">
+    <div class="doc" id="section-3">
+        <span class="anchor">
+            <a href="#section-3" class="anchor">»</a>
+        </span>
         <p>The Templates module is a singleton that provides access
 to the templates. The loader will look for templates in
 several places:</p>
