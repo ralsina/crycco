@@ -16,6 +16,10 @@ describe Crycco do
       doc = Crycco::Document.new "#{__DIR__}/fixtures/2.cr"
       doc.sections.size.should eq(3)
     end
+    it "should handle an empty file" do
+      doc = Crycco::Document.new "#{__DIR__}/fixtures/empty.cr"
+      doc.sections.size.should eq(0)
+    end
   end
   describe "parse in literate style" do
     it "should split code from comments" do
@@ -29,7 +33,7 @@ describe Crycco do
     it "should add comment markers when converting to code" do
       doc = Crycco::Document.new "#{__DIR__}/fixtures/1.cr.md"
       doc.sections[0].to_source.should eq(
-        "# This is a comment\n" + "# More comment\n" + "    code\n" + "    code\n")
+        "# This is a comment\n" + "# More comment\n" + "    code\n" + "    code")
     end
   end
 

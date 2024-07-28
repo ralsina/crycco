@@ -209,8 +209,6 @@ module Crycco
       lines = source.split("\n")
       @sections = [Section.new language]
 
-      # Handle empty files
-      return if lines.empty?
       # This loop is the core of the parser. It goes line by line
       # and decides if the line is a comment or code, and depending
       # on that either starts a new section, or adds to the current
