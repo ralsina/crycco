@@ -159,10 +159,10 @@ module Crycco
     # language
     def initialize(@path : String)
       key = File.extname(@path)
+      raise Exception.new "Unknown file extension #{File.extname(@path)}" \
+         unless LANGUAGES.has_key?(key)
       @language = LANGUAGES[key]
       parse(File.read(@path))
-    rescue ex : KeyError
-      raise Exception.new "Unknown file extension #{File.extname(@path)}"
     end
 
     # Given a string of source code, parse out each block of prose

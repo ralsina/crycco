@@ -11,8 +11,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Chivo+Mono:ital,wght@0,100..900;1,100..900&family=Chivo:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">    
     <!-- Pico CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.colors.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.colors.min.css" />
     <!-- Highlight.js -->
     <link id="hljscss" rel="stylesheet"
         href="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/styles/night-owl.min.css" />
@@ -95,7 +95,9 @@ so if you keep reading we'll see how it works (it's short!).</p>
 
     </div>
     <div class="code">
-        <pre class="code"><code class="crystal"></code></pre>
+        
+<pre class="code"><code class="crystal"></code></pre>
+      
     </div>
 </div>
 
@@ -108,7 +110,9 @@ for parsing the source files and generating the output.</p>
 
     </div>
     <div class="code">
-        <pre class="code"><code class="crystal"></code></pre>
+        
+<pre class="code"><code class="crystal"></code></pre>
+      
     </div>
 </div>
 
@@ -118,13 +122,15 @@ for parsing the source files and generating the output.</p>
 
     </div>
     <div class="code">
-        <pre class="code"><code class="crystal">require &quot;./templates&quot;
+        
+<pre class="code"><code class="crystal">require &quot;./templates&quot;
 require &quot;file_utils&quot;
 require &quot;html&quot;
 require &quot;markd&quot;
 require &quot;yaml&quot;
 
 </code></pre>
+      
     </div>
 </div>
 
@@ -144,11 +150,13 @@ of this file.</p>
 
     </div>
     <div class="code">
-        <pre class="code"><code class="crystal">module Crycco
+        
+<pre class="code"><code class="crystal">module Crycco
   extend self
   VERSION = &quot;0.1.0&quot;
 
 </code></pre>
+      
     </div>
 </div>
 
@@ -160,10 +168,12 @@ language, such as the comment symbol and a regex to match it.</p>
 
     </div>
     <div class="code">
-        <pre class="code"><code class="crystal">  alias Language = Hash(String, String | Regex)
+        
+<pre class="code"><code class="crystal">  alias Language = Hash(String, String | Regex)
   LANGUAGES = Hash(String, Language).new
 
 </code></pre>
+      
     </div>
 </div>
 
@@ -174,12 +184,14 @@ in the actual binary so we don't have to carry it around.</p>
 
     </div>
     <div class="code">
-        <pre class="code"><code class="crystal">  class BakedLanguages
+        
+<pre class="code"><code class="crystal">  class BakedLanguages
     extend BakedFileSystem
     bake_file &quot;languages.yml&quot;, File.read(&quot;languages.yml&quot;)
   end
 
 </code></pre>
+      
     </div>
 </div>
 
@@ -192,7 +204,8 @@ it defaults to the embedded one.</p>
 
     </div>
     <div class="code">
-        <pre class="code"><code class="crystal">  def self.load_languages(file : String?)
+        
+<pre class="code"><code class="crystal">  def self.load_languages(file : String?)
     if file.nil?
       data = YAML.parse(BakedLanguages.get(&quot;/languages.yml&quot;))
     else
@@ -208,10 +221,26 @@ it defaults to the embedded one.</p>
   end
 
 </code></pre>
+      
     </div>
 </div>
 
 <div id="section-8" class="grid">
+    <div class="doc">
+        <p>This matches shebangs and things that only LOOK like comments,
+such as string interpolations.</p>
+
+    </div>
+    <div class="code">
+        
+<pre class="code"><code class="crystal">  NOT_COMMENT = /(^#!|^\s*#\{)/
+
+</code></pre>
+      
+    </div>
+</div>
+
+<div id="section-9" class="grid">
     <div class="doc">
         <p>Document contents are organized in sections, which have docs and code.
 The docs are markdown extracted from comments and the code is the actual code.</p>
@@ -219,7 +248,8 @@ The docs are markdown extracted from comments and the code is the actual code.</
 
     </div>
     <div class="code">
-        <pre class="code"><code class="crystal">  class Section
+        
+<pre class="code"><code class="crystal">  class Section
     property docs : String = &quot;&quot;
     property code : String = &quot;&quot;
     property language : Language
@@ -228,41 +258,49 @@ The docs are markdown extracted from comments and the code is the actual code.</
     end
 
 </code></pre>
-    </div>
-</div>
-
-<div id="section-9" class="grid">
-    <div class="doc">
-        <p><code>docs_html</code> converts the docs to HTML using the Markd library</p>
-
-    </div>
-    <div class="code">
-        <pre class="code"><code class="crystal">    def docs_html
-      Markd.to_html(docs)
-    end
-
-</code></pre>
+      
     </div>
 </div>
 
 <div id="section-10" class="grid">
     <div class="doc">
-        <p>Since the generated HTML uses HighlightJS, we need to wrap the code in
-a <code>&lt;pre&gt;&lt;code&gt;</code> block with the right class so it's properly highlighted.</p>
-<p>It should also have the HTML escaped (or else this function would nest two pre tags
-when passed through itself 😂)</p>
+        <p><code>docs_html</code> converts the docs to HTML using the Markd library</p>
 
     </div>
     <div class="code">
-        <pre class="code"><code class="crystal">    def code_html
-      %(&lt;pre class=&quot;code&quot;&gt;&lt;code class=&quot;#{language[&quot;name&quot;]}&quot;&gt;#{HTML.escape(code.lstrip(&quot;\n&quot;))}&lt;/code&gt;&lt;/pre&gt;)
+        
+<pre class="code"><code class="crystal">    def docs_html
+      Markd.to_html(docs)
     end
 
 </code></pre>
+      
     </div>
 </div>
 
 <div id="section-11" class="grid">
+    <div class="doc">
+        <p>Since the generated HTML uses HighlightJS, we need to wrap the code in
+a <code>&lt;pre&gt;&lt;code&gt;</code> block with the right class so it's properly highlighted.</p>
+<p>It should also have the HTML escaped (or else this function would nest two pre tags
+when passed through itself 😂). Finally, it has to be in a single line because
+spaces are significant in code fragments.</p>
+
+    </div>
+    <div class="code">
+        
+<pre class="code"><code class="crystal">    def code_html
+      %(
+&lt;pre class=&quot;code&quot;&gt;&lt;code class=&quot;#{language[&quot;name&quot;]}&quot;&gt;#{HTML.escape(code.lstrip(&quot;\n&quot;))}&lt;/code&gt;&lt;/pre&gt;
+      )
+    end
+
+</code></pre>
+      
+    </div>
+</div>
+
+<div id="section-12" class="grid">
     <div class="doc">
         <p>Te <code>to_h</code> method is used to turn the section into something that can be
 handled by the Crinja template engine. Just takes the data and put it in
@@ -270,7 +308,8 @@ a hash.</p>
 
     </div>
     <div class="code">
-        <pre class="code"><code class="crystal">    def to_h : Hash(String, String)
+        
+<pre class="code"><code class="crystal">    def to_h : Hash(String, String)
       {
         &quot;docs&quot;      =&gt; docs,
         &quot;code&quot;      =&gt; code,
@@ -281,10 +320,11 @@ a hash.</p>
   end
 
 </code></pre>
+      
     </div>
 </div>
 
-<div id="section-12" class="grid">
+<div id="section-13" class="grid">
     <div class="doc">
         <p>A Document takes a path as input and reads the file,
 parses its contents and is able to generate whatever
@@ -292,35 +332,39 @@ output is needed.</p>
 
     </div>
     <div class="code">
-        <pre class="code"><code class="crystal">  class Document
+        
+<pre class="code"><code class="crystal">  class Document
     property path : String
     property sections = Array(Section).new
     property language : Language
 
 </code></pre>
+      
     </div>
 </div>
 
-<div id="section-13" class="grid">
+<div id="section-14" class="grid">
     <div class="doc">
         <p>On initialization we read the file and parse it in the correct
 language</p>
 
     </div>
     <div class="code">
-        <pre class="code"><code class="crystal">    def initialize(@path : String)
+        
+<pre class="code"><code class="crystal">    def initialize(@path : String)
       key = File.extname(@path)
-      raise &quot;Language not found for extension #{File.extname(@path)}&quot; unless LANGUAGES.has_key?(key)
+      raise Exception.new &quot;Unknown file extension #{File.extname(@path)}&quot; \
+         unless LANGUAGES.has_key?(key)
       @language = LANGUAGES[key]
-
       parse(File.read(@path))
     end
 
 </code></pre>
+      
     </div>
 </div>
 
-<div id="section-14" class="grid">
+<div id="section-15" class="grid">
     <div class="doc">
         <p>Given a string of source code, parse out each block of prose
 and the code that follows it — by detecting which is which,
@@ -330,28 +374,32 @@ which can later be converted to HTML.</p>
 
     </div>
     <div class="code">
-        <pre class="code"><code class="crystal">    def parse(source : String)
+        
+<pre class="code"><code class="crystal">    def parse(source : String)
       lines = source.split(&quot;\n&quot;)
       @sections = [Section.new language]
 
 </code></pre>
-    </div>
-</div>
-
-<div id="section-15" class="grid">
-    <div class="doc">
-        <p>Handle empty files and files with shebangs</p>
-
-    </div>
-    <div class="code">
-        <pre class="code"><code class="crystal">      return if lines.empty?
-      lines.shift if lines[0].starts_with? &quot;#!&quot;
-
-</code></pre>
+      
     </div>
 </div>
 
 <div id="section-16" class="grid">
+    <div class="doc">
+        <p>Handle empty files</p>
+
+    </div>
+    <div class="code">
+        
+<pre class="code"><code class="crystal">      return if lines.empty?
+
+      is_comment = language[&quot;match&quot;].as(Regex)
+</code></pre>
+      
+    </div>
+</div>
+
+<div id="section-17" class="grid">
     <div class="doc">
         <p>This loop is the core of the parser. It goes line by line
 and decides if the line is a comment or code, and depending
@@ -359,54 +407,62 @@ on that either starts a new section, or adds to the current one.</p>
 
     </div>
     <div class="code">
-        <pre class="code"><code class="crystal">      lines.each do |line|
-        if language[&quot;match&quot;].as(Regex).match(line)
+        
+<pre class="code"><code class="crystal">      lines.each do |line|
+        if is_comment.match(line) &amp;&amp; !NOT_COMMENT.match(line)
 </code></pre>
-    </div>
-</div>
-
-<div id="section-17" class="grid">
-    <div class="doc">
-        <p>Break section if we find docs after code</p>
-
-    </div>
-    <div class="code">
-        <pre class="code"><code class="crystal">          @sections &lt;&lt; Section.new(language) unless sections[-1].code.empty?
-          line = line.sub(language[&quot;match&quot;], &quot;&quot;)
-          @sections[-1].docs += line + &quot;\n&quot;
-</code></pre>
+      
     </div>
 </div>
 
 <div id="section-18" class="grid">
     <div class="doc">
-        <p>Also break section if we find a line of dashes (HR in markdown)</p>
+        <p>Break section if we find docs after code</p>
 
     </div>
     <div class="code">
-        <pre class="code"><code class="crystal">          @sections &lt;&lt; Section.new(language) if /^(---+|===+)$/.match line
-        else
-          @sections[-1].code += &quot;#{line}\n&quot;
-        end
-      end
+        
+<pre class="code"><code class="crystal">          @sections &lt;&lt; Section.new(language) unless sections[-1].code.empty?
+          line = line.sub(language[&quot;match&quot;], &quot;&quot;)
+          @sections[-1].docs += line + &quot;\n&quot;
 </code></pre>
+      
     </div>
 </div>
 
 <div id="section-19" class="grid">
     <div class="doc">
-        <p>Sections with no code or docs are pointless.</p>
+        <p>Also break section if we find a line of dashes (HR in markdown)</p>
 
     </div>
     <div class="code">
-        <pre class="code"><code class="crystal">      @sections.reject! { |section| section.code.strip.empty? &amp;&amp; section.docs.strip.empty? }
-    end
-
+        
+<pre class="code"><code class="crystal">          @sections &lt;&lt; Section.new(language) if /^(---+|===+)$/.match line
+        else
+          @sections[-1].code += &quot;#{line}\n&quot;
+        end
+      end
 </code></pre>
+      
     </div>
 </div>
 
 <div id="section-20" class="grid">
+    <div class="doc">
+        <p>Sections with no code or docs are pointless.</p>
+
+    </div>
+    <div class="code">
+        
+<pre class="code"><code class="crystal">      @sections.reject! { |section| section.code.strip.empty? &amp;&amp; section.docs.strip.empty? }
+    end
+
+</code></pre>
+      
+    </div>
+</div>
+
+<div id="section-21" class="grid">
     <div class="doc">
         <p>Save the document to a file using the desired format
 and template. If you want to learn more about the templates
@@ -414,7 +470,8 @@ you can check out <a href="templates.cr.html">templates.cr</a></p>
 
     </div>
     <div class="code">
-        <pre class="code"><code class="crystal">    def save(out_file, format = &quot;html&quot;, template = &quot;sidebyside&quot;)
+        
+<pre class="code"><code class="crystal">    def save(out_file, format = &quot;html&quot;, template = &quot;sidebyside&quot;)
       FileUtils.mkdir_p(File.dirname(path))
       template = Templates.get(&quot;#{template}&quot;)
       puts &quot;#{self.path} -&gt; #{out_file}&quot;
@@ -429,10 +486,11 @@ you can check out <a href="templates.cr.html">templates.cr</a></p>
   end
 
 </code></pre>
+      
     </div>
 </div>
 
-<div id="section-21" class="grid">
+<div id="section-22" class="grid">
     <div class="doc">
         <p>The <code>process</code> function is the entry point to the whole thing.</p>
 <p>Given a list of source files, create documents for each one
@@ -440,7 +498,8 @@ and save them to the output directory.</p>
 
     </div>
     <div class="code">
-        <pre class="code"><code class="crystal">  def process(sources : Array(String), out_dir : String, template : String)
+        
+<pre class="code"><code class="crystal">  def process(sources : Array(String), out_dir : String, template : String)
     sources.each do |source|
       doc = Document.new(source)
       out_file = File.join(out_dir, File.basename(source) + &quot;.html&quot;)
@@ -450,22 +509,25 @@ and save them to the output directory.</p>
 end
 
 </code></pre>
+      
     </div>
 </div>
 
-<div id="section-22" class="grid">
+<div id="section-23" class="grid">
     <div class="doc">
         <p>🏁 That's it!</p>
 
     </div>
     <div class="code">
-        <pre class="code"><code class="crystal"></code></pre>
+        
+<pre class="code"><code class="crystal"></code></pre>
+      
     </div>
 </div>
 
 
     </main>
-    <footer style="text-align: center;" class="pico-background-purple-700">
+    <footer style="text-align: center;" class="pico-background-purple-800">
     » Generated by <a href="https://crycco.ralsina.me">Crycco</a> »	Layout 
 sidebyside
  » Powered by <a href="https://picocss.com">PicoCSS</a> and <a href="https://www.omnibus-type.com/">Chivo Font Family</a> 
