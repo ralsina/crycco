@@ -7,6 +7,10 @@
 * Autolinks to other pages?
 * Other layouts?
 * Allow light/dark switch?
-* Support other outputs (literate version, markdown, nocomments, etc)
+* Support other outputs
+  * ✅ source code
+  * literate version
+  * markdown
+  * nocomments
 * Support custom title? Extract title from doc? Use filename?
 * Enclosing comments (need them for templates!)
