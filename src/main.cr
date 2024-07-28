@@ -30,7 +30,7 @@ Options:
   --code                  output source code instead of HTML [default: false]
   -h, --help              this help message
 
-Crycco comes with two templates for HTML documents which you can 
+Crycco comes with two templates for HTML documents which you can
 use in the -t option when generating docs:
 
 sidebyside (default)

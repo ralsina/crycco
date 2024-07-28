@@ -171,7 +171,7 @@ module Crycco
     property path : String
     property sections = Array(Section).new
     property language : Language
-    property literate : Bool = false
+    @literate : Bool = false
 
     # On initialization we read the file and parse it in the correct
     # language. Also, if rather than a `.yml` file we have a `.yml.md`
@@ -195,7 +195,7 @@ module Crycco
 
       # In the literate versions, everything is doc except
       # indented things, which are code.
-      @language["match"] = /^([ ]{4}|[ ]{0,3}\t)/ if literate
+      @language["match"] = /^([ ]{4}|[ ]{0,3}\t)/ if @literate
       parse(File.read(@path))
     end
 
@@ -234,10 +234,12 @@ module Crycco
     # Save the document to a file using the desired format
     # and template. If you want to learn more about the templates
     # you can check out [templates.cr](templates.cr.html)
+    #
+    # If this is a literate document, remove any final .md
+    # from the output file name because we are outputting
+    # source code.
+    #
     def save(out_file, template = "sidebyside")
-      # If this is a literate file, remove the final .md
-      # from the output file name.
-      p! @literate , File.extname(out_file)
       if @literate && File.extname(out_file) == ".md"
         out_file = out_file[...-3]
       end

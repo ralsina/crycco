@@ -130,11 +130,21 @@ Options:
   -l, --languages &lt;file&gt;  use a custom languages.yml file
   -o, --output &lt;path&gt;     output to a given folder [default: docs/]
   -t, --template &lt;name&gt;   template for doc layout [default: sidebyside]
-  --doc                   output documentation in HTML [default: true]
-  --code                  output a source code file [default: false]
+  --code                  output source code instead of HTML [default: false]
   -h, --help              this help message
 
-  Crycco comes with two templates by default: sidebyside and basic.
+Crycco comes with two templates for HTML documents which you can
+use in the -t option when generating docs:
+
+sidebyside (default)
+  Shows the docs and code in two columns, matching docs to the code
+  they are about.
+basic
+  Single columns, docs then code, then docs then code.
+
+If you use the --code option, the output will be machine-readable
+source code instead of HTML.
+
 HELP
 
 options = Docopt.docopt(HELP, ARGV)
@@ -198,6 +208,7 @@ an exception and a backtrace. The interesting code is in <a href="./crycco.cr.ht
   sources: options[&quot;FILE&quot;].as(Array(String)),
   out_dir: options[&quot;--output&quot;].as(String),
   template: options[&quot;--template&quot;].as(String),
+  as_source: options[&quot;--code&quot;] != &quot;false&quot;,
 )
 
 </code></pre>
