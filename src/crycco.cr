@@ -27,8 +27,9 @@
 # tradition of literate programming and turns it into its minimal
 # expression, a tiny, simple tool that does one thing well.
 #
-# This document is the output of running Crycco on its own source code,
-# so if you keep reading it should explain how it works.
+# This document is the output of running Crycco on 
+# [its own source code](https://github.com/ralsina/crycco/blob/main/src/crycco.cr),
+# so if you keep reading we'll see how it works (it's short!).
 #
 # ----
 #
