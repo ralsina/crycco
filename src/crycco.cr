@@ -159,6 +159,7 @@ module Crycco
         "code"      => code,
         "docs_html" => docs_html,
         "code_html" => code_html,
+        "source"    => to_source,
       }
     end
   end
@@ -170,19 +171,19 @@ module Crycco
     property path : String
     property sections = Array(Section).new
     property language : Language
+    property literate : Bool = false
 
     # On initialization we read the file and parse it in the correct
-    # language. Also, if rather than a `.py` file we have a `.py.md`
-    # we consider that "literate python" and tweak the language
+    # language. Also, if rather than a `.yml` file we have a `.yml.md`
+    # we consider that "literate YAML" and tweak the language
     # definition a bit.
     def initialize(@path : String)
-      literate = false
       key = File.extname(@path)
       if key == ".md" # It may be literate!
         lang_key = File.extname(File.basename(@path, ".md"))
         if LANGUAGES.has_key?(lang_key)
           key = lang_key
-          literate = true
+          @literate = true
         end
       end
 
@@ -233,9 +234,16 @@ module Crycco
     # Save the document to a file using the desired format
     # and template. If you want to learn more about the templates
     # you can check out [templates.cr](templates.cr.html)
-    def save(out_file, format = "html", template = "sidebyside")
+    def save(out_file, template = "sidebyside")
+      # If this is a literate file, remove the final .md
+      # from the output file name.
+      p! @literate , File.extname(out_file)
+      if @literate && File.extname(out_file) == ".md"
+        out_file = out_file[...-3]
+      end
+
       FileUtils.mkdir_p(File.dirname(path))
-      template = Templates.get("#{template}")
+      template = Templates.get(template)
       puts "#{self.path} -> #{out_file}"
       FileUtils.mkdir_p(File.dirname(out_file))
       File.open(out_file, "w") do |outf|
@@ -253,10 +261,14 @@ module Crycco
   # Given a list of source files, create documents for each one
   # and save them to the output directory. You can see it being used
   # in [main.cr](main.cr.html)
-  def process(sources : Array(String), out_dir : String, template : String)
+  def process(sources : Array(String), out_dir : String, template : String, as_source = false)
     sources.each do |source|
       doc = Document.new(source)
       out_file = File.join(out_dir, File.basename(source) + ".html")
+      if as_source
+        template = "source"
+        out_file = out_file[...-5]
+      end
       doc.save(out_file, template: template)
     end
   end

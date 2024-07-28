@@ -1,425 +1,230 @@
-<!DOCTYPE html>
 
-<html lang="en" data-theme="dark">
+# # Crycco: A Crystal Remix of Docco.
+# 
+# Crycco is a quick and dirty documentation generator in the mold
+# of and directly inspired by [Docco](http://jashkenas.github.com/docco/).
+# 
+# It creates HTML output that displays your comments alongside or
+# intermingled with your code. All comments are passed through Markdown
+# so they are nicely formatted and all code goes through a syntax
+# highlighter before being fed to [templates](templates.cr.html).
+# 
+# Crycco also supports the "literate" variant of languages, where
+# everything is a comment except things indented 4 spaces or more,
+# which are code. Those files should have a double `.ext.md` extension.
+# 
+# It's a very simple tool but it can be used to good effect in a number
+# of situations. Consider a tool that uses a YAML file as configuration.
+# 
+# Usually, one would have to write a README file to explain the format
+# of the config file, or worse, have the user read the YAML file itself
+# which will have a bunch of comments in there.
+# 
+# With crycco (or docco, or one of its many offshoots) you can generate
+# a nice HTML file that explains the config file in a much more readable
+# fashion, [**from the YAML itself**](languages.yml.html)
+# 
+# Crycco also will let you do other manipulations on the code and docs,
+# like generating "literate YAML" out of YAML and viceversa. It says
+# "it will" because [it doesn't yet](TODO.md.html)
+# 
+# One of the best things about Docco in my opinion is that it takes the
+# tradition of literate programming and turns it into its minimal
+# expression, a tiny, simple tool that does one thing well.
+# 
+# This document is the output of running Crycco on
+# [its own source code](https://github.com/ralsina/crycco/blob/main/src/crycco.cr),
+# so if you keep reading we'll see how it works (it's short!).
+# 
+# ----
+# 
 
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>crycco.cr</title>
-    <!-- Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Chivo+Mono:ital,wght@0,100..900;1,100..900&family=Chivo:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">    
-    <!-- Pico CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css" />
-    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.colors.min.css" />
-    <!-- Highlight.js -->
-    <link id="hljscss" rel="stylesheet"
-        href="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/styles/night-owl.min.css" />
-    <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/highlight.min.js"></script>
-    <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/languages/crystal.min.js"></script>    <!-- Custom style-->
-    
-<style>
-html * {
-    font-family: Chivo, sans-serif;
-    font-variant-ligatures: none;
-    font-weight: 300;
-    overflow: visible !important;
-}
 
-code,
-code>* {
-    font-family: 'Chivo Mono', monospace !important;
-    padding-top: 0 !important;
-}
+# 
+# # crycco.cr
+# 
+# This is the main file of the project. It contains the main logic
+# for parsing the source files and generating the output.
+# 
+# ----
+# 
 
-div.doc>pre>code {
-    background-color: var(--pico-color-slate-800);
-    border: solid 1 var(--pico-color-slate-700)
-}
 
-.background {
-    background: linear-gradient(to right, var(--pico-color-slate-900) 50%, #011627 50%);
-    height: 100vh;
-    width: 100vw;
-    position: fixed;
-    z-index: -1;
-    margin: 0;
-    top: 0px;
-    left: 0px;
-    display: block;
-}
-@media screen and (max-width: 768px) {
-    div.background {
-        display: none;
-    }
-}
+# Import our dependencies
+# 
+require "./templates"
+require "file_utils"
+require "html"
+require "markd"
+require "yaml"
 
-span.anchor {
-    position: relative;
-}
 
-a.anchor {
-    position: absolute;
-    text-decoration: none;
-    left: -1.2em;
-    opacity: 0;
-    -webkit-transition: opacity 0.2s linear;
-    
-}
 
-div.doc:hover .anchor {
-    opacity: 1;
-}
-
-</style>
-
-</head>
-
-<body>
-    <main class="container">
-        
-<div id="background" class="background">
-</div>
-
-<div id="section-1" class="grid">
-    <div class="doc" id="section-1">
-        <span class="anchor">
-            <a href="#section-1" class="anchor">↦</a>
-        </span>
-        <h1>Crycco: A Crystal Remix of Docco.</h1>
-<p>Crycco is a quick and dirty documentation generator in the mold
-of and directly inspired by <a href="http://jashkenas.github.com/docco/">Docco</a>.</p>
-<p>It creates HTML output that displays your comments alongside or
-intermingled with your code. All comments are passed through Markdown
-so they are nicely formatted and all code goes through a syntax
-highlighter before being fed to <a href="templates.cr.html">templates</a>.</p>
-<p>Crycco also supports the &quot;literate&quot; variant of languages, where
-everything is a comment except things indented 4 spaces or more,
-which are code. Those files should have a double <code>.ext.md</code> extension.</p>
-<p>It's a very simple tool but it can be used to good effect in a number
-of situations. Consider a tool that uses a YAML file as configuration.</p>
-<p>Usually, one would have to write a README file to explain the format
-of the config file, or worse, have the user read the YAML file itself
-which will have a bunch of comments in there.</p>
-<p>With crycco (or docco, or one of its many offshoots) you can generate
-a nice HTML file that explains the config file in a much more readable
-fashion, <a href="languages.yml.html"><strong>from the YAML itself</strong></a></p>
-<p>Crycco also will let you do other manipulations on the code and docs,
-like generating &quot;literate YAML&quot; out of YAML and viceversa. It says
-&quot;it will&quot; because <a href="TODO.md.html">it doesn't yet</a></p>
-<p>One of the best things about Docco in my opinion is that it takes the
-tradition of literate programming and turns it into its minimal
-expression, a tiny, simple tool that does one thing well.</p>
-<p>This document is the output of running Crycco on
-<a href="https://github.com/ralsina/crycco/blob/main/src/crycco.cr">its own source code</a>,
-so if you keep reading we'll see how it works (it's short!).</p>
-<hr />
-
-    </div>
-    <div class="code">
-        
-<pre class="code"><code class="crystal"></code></pre>
-      
-    </div>
-</div>
-
-<div id="section-2" class="grid">
-    <div class="doc" id="section-2">
-        <span class="anchor">
-            <a href="#section-2" class="anchor">↦</a>
-        </span>
-        <h1>crycco.cr</h1>
-<p>This is the main file of the project. It contains the main logic
-for parsing the source files and generating the output.</p>
-<hr />
-
-    </div>
-    <div class="code">
-        
-<pre class="code"><code class="crystal"></code></pre>
-      
-    </div>
-</div>
-
-<div id="section-3" class="grid">
-    <div class="doc" id="section-3">
-        <span class="anchor">
-            <a href="#section-3" class="anchor">↦</a>
-        </span>
-        <p>Import our dependencies</p>
-
-    </div>
-    <div class="code">
-        
-<pre class="code"><code class="crystal">require &quot;./templates&quot;
-require &quot;file_utils&quot;
-require &quot;html&quot;
-require &quot;markd&quot;
-require &quot;yaml&quot;
-
-</code></pre>
-      
-    </div>
-</div>
-
-<div id="section-4" class="grid">
-    <div class="doc" id="section-4">
-        <span class="anchor">
-            <a href="#section-4" class="anchor">↦</a>
-        </span>
-        <p>In Crystal it's good to use modules to namespace the code. Specially since
-Crycco also works as a library!</p>
-<p>You can add it to a project and use it by adding it as a dependency in <code>shard.yml</code></p>
-<pre><code class="language-yaml">dependencies:
-  crycco:
-    github: ralsina/crycco
-</code></pre>
-<p>And then in your code just <code>require &quot;crycco&quot;</code> and use it. I intend to do it in my
-<a href="https://nicolino.ralsina.me">Nicolino</a> project.</p>
-<p>For an example of how to use it, you can look at the <code>process</code> method at the end
-of this file.</p>
-
-    </div>
-    <div class="code">
-        
-<pre class="code"><code class="crystal">module Crycco
+# In Crystal it's good to use modules to namespace the code. Specially since
+# Crycco also works as a library!
+# 
+# You can add it to a project and use it by adding it as a dependency in `shard.yml`
+# 
+# ```yaml
+# dependencies:
+#   crycco:
+#     github: ralsina/crycco
+# ```
+# 
+# And then in your code just `require "crycco"` and use it. I intend to do it in my
+# [Nicolino](https://nicolino.ralsina.me) project.
+# 
+# For an example of how to use it, you can look at the `process` method at the end
+# of this file.
+# 
+module Crycco
   extend self
-  VERSION = &quot;0.1.0&quot;
+  VERSION = "0.1.0"
 
-</code></pre>
-      
-    </div>
-</div>
 
-<div id="section-5" class="grid">
-    <div class="doc" id="section-5">
-        <span class="anchor">
-            <a href="#section-5" class="anchor">↦</a>
-        </span>
-        <p>Languages are defined in a hash with the extension as the key</p>
-<p>Each one contains the data required to parse a document in that
-language, such as the comment symbol and a regex to match it.</p>
 
-    </div>
-    <div class="code">
-        
-<pre class="code"><code class="crystal">  alias Language = Hash(String, String | Regex)
+# Languages are defined in a hash with the extension as the key
+# 
+# Each one contains the data required to parse a document in that
+# language, such as the comment symbol and a regex to match it.
+# 
+
+  alias Language = Hash(String, String | Regex)
   LANGUAGES = Hash(String, Language).new
 
-</code></pre>
-      
-    </div>
-</div>
 
-<div id="section-6" class="grid">
-    <div class="doc" id="section-6">
-        <span class="anchor">
-            <a href="#section-6" class="anchor">↦</a>
-        </span>
-        <p>The <code>BakedLanguages</code> class embeds the languages definition file
-in the actual binary so we don't have to carry it around.</p>
 
-    </div>
-    <div class="code">
-        
-<pre class="code"><code class="crystal">  class BakedLanguages
+# The `BakedLanguages` class embeds the languages definition file
+# in the actual binary so we don't have to carry it around.
+# 
+  class BakedLanguages
     extend BakedFileSystem
-    bake_file &quot;languages.yml&quot;, File.read(&quot;languages.yml&quot;)
+    bake_file "languages.yml", File.read("languages.yml")
   end
 
-</code></pre>
-      
-    </div>
-</div>
 
-<div id="section-7" class="grid">
-    <div class="doc" id="section-7">
-        <span class="anchor">
-            <a href="#section-7" class="anchor">↦</a>
-        </span>
-        <p>The description of how to parse a language is stored in a YAML file
-which we read here in <code>Crycco.load_languages</code>. If no file is given
-it defaults to the embedded one.</p>
-<p>The <code>match</code> regex is used to detect if a line is a comment or code.</p>
 
-    </div>
-    <div class="code">
-        
-<pre class="code"><code class="crystal">  def self.load_languages(file : String?)
+# The description of how to parse a language is stored in a YAML file
+# which we read here in `Crycco.load_languages`. If no file is given
+# it defaults to the embedded one.
+# 
+# The `match` regex is used to detect if a line is a comment or code.
+# 
+  def self.load_languages(file : String?)
     if file.nil?
-      data = YAML.parse(BakedLanguages.get(&quot;/languages.yml&quot;))
+      data = YAML.parse(BakedLanguages.get("/languages.yml"))
     else
       data = YAML.parse(File.read(file))
     end
     data.as_h.each do |ext, lang|
       LANGUAGES[ext.to_s] = {
-        &quot;name&quot;   =&gt; lang[&quot;name&quot;].to_s,
-        &quot;symbol&quot; =&gt; lang[&quot;symbol&quot;].to_s,
-        &quot;match&quot;  =&gt; /^\s*#{Regex.escape(lang[&quot;symbol&quot;].to_s)}\s?/,
+        "name"   => lang["name"].to_s,
+        "symbol" => lang["symbol"].to_s,
+        "match"  => /^\s*#{Regex.escape(lang["symbol"].to_s)}\s?/,
       }
     end
   end
 
-</code></pre>
-      
-    </div>
-</div>
 
-<div id="section-8" class="grid">
-    <div class="doc" id="section-8">
-        <span class="anchor">
-            <a href="#section-8" class="anchor">↦</a>
-        </span>
-        <p>This matches shebangs and things that only LOOK like comments,
-such as string interpolations.</p>
 
-    </div>
-    <div class="code">
-        
-<pre class="code"><code class="crystal">  NOT_COMMENT = /(^#!|^\s*#\{)/
+# This matches shebangs and things that only LOOK like comments,
+# such as string interpolations.
+# 
+  NOT_COMMENT = /(^#!|^\s*#\{)/
 
-</code></pre>
-      
-    </div>
-</div>
 
-<div id="section-9" class="grid">
-    <div class="doc" id="section-9">
-        <span class="anchor">
-            <a href="#section-9" class="anchor">↦</a>
-        </span>
-        <p>Document contents are organized in sections, which have docs and code.
-The docs are markdown extracted from comments and the code is the actual code.</p>
-<p>Sections can be converted to HTML using the <code>docs_html</code> and <code>code_html</code> methods.</p>
 
-    </div>
-    <div class="code">
-        
-<pre class="code"><code class="crystal">  class Section
-    property docs : String = &quot;&quot;
-    property code : String = &quot;&quot;
+# Document contents are organized in sections, which have docs and code.
+# The docs are markdown extracted from comments and the code is the actual code.
+# 
+# Sections can be converted to HTML using the `docs_html` and `code_html` methods.
+# 
+  class Section
+    property docs : String = ""
+    property code : String = ""
     property language : Language
 
     def initialize(@language : Language)
     end
 
-</code></pre>
-      
-    </div>
-</div>
 
-<div id="section-10" class="grid">
-    <div class="doc" id="section-10">
-        <span class="anchor">
-            <a href="#section-10" class="anchor">↦</a>
-        </span>
-        <p><code>docs_html</code> converts the docs to HTML using the Markd library</p>
 
-    </div>
-    <div class="code">
-        
-<pre class="code"><code class="crystal">    def docs_html
+# `docs_html` converts the docs to HTML using the Markd library
+# 
+    def docs_html
       Markd.to_html(docs)
     end
 
-</code></pre>
-      
-    </div>
-</div>
 
-<div id="section-11" class="grid">
-    <div class="doc" id="section-11">
-        <span class="anchor">
-            <a href="#section-11" class="anchor">↦</a>
-        </span>
-        <p>Since the generated HTML uses HighlightJS, we need to wrap the code in
-a <code>&lt;pre&gt;&lt;code&gt;</code> block with the right class so it's properly highlighted.</p>
-<p>It should also have the HTML escaped (or else this function would nest two pre tags
-when passed through itself 😂). Finally, it has to be in a single line because
-spaces are significant in code fragments.</p>
 
-    </div>
-    <div class="code">
-        
-<pre class="code"><code class="crystal">    def code_html
+# Since the generated HTML uses HighlightJS, we need to wrap the code in
+# a `<pre><code>` block with the right class so it's properly highlighted.
+# 
+# It should also have the HTML escaped (or else this function would nest two pre tags
+# when passed through itself 😂). Finally, it has to be in a single line because
+# spaces are significant in code fragments.
+# 
+    def code_html
       %(
-&lt;pre class=&quot;code&quot;&gt;&lt;code class=&quot;#{language[&quot;name&quot;]}&quot;&gt;#{HTML.escape(code.lstrip(&quot;\n&quot;))}&lt;/code&gt;&lt;/pre&gt;
+<pre class="code"><code class="#{language["name"]}">#{HTML.escape(code.lstrip("\n"))}</code></pre>
       )
     end
 
-</code></pre>
-      
-    </div>
-</div>
 
-<div id="section-12" class="grid">
-    <div class="doc" id="section-12">
-        <span class="anchor">
-            <a href="#section-12" class="anchor">↦</a>
-        </span>
-        <p>The <code>to_h</code> method is used to turn the section into something that can be
-handled by the Crinja template engine. Just takes the data and put it in
-a hash.</p>
 
-    </div>
-    <div class="code">
-        
-<pre class="code"><code class="crystal">    def to_h : Hash(String, String)
+# `to_source` regenerates valid source code out of the section. This way if
+# the section was generated by a literate document, we can extract the code
+# and comments from it and save it to a file.
+# 
+    def to_source : String
+      lines = [] of String
+      docs.split("\n").each do |line|
+        lines << "#{language["symbol"]} #{line}"
+      end
+      lines << code
+      lines.join("\n")
+    end
+
+
+
+# The `to_h` method is used to turn the section into something that can be
+# handled by the Crinja template engine. Just takes the data and put it in
+# a hash.
+# 
+    def to_h : Hash(String, String)
       {
-        &quot;docs&quot;      =&gt; docs,
-        &quot;code&quot;      =&gt; code,
-        &quot;docs_html&quot; =&gt; docs_html,
-        &quot;code_html&quot; =&gt; code_html,
+        "docs"      => docs,
+        "code"      => code,
+        "docs_html" => docs_html,
+        "code_html" => code_html,
+        "source"    => to_source,
       }
     end
   end
 
-</code></pre>
-      
-    </div>
-</div>
 
-<div id="section-13" class="grid">
-    <div class="doc" id="section-13">
-        <span class="anchor">
-            <a href="#section-13" class="anchor">↦</a>
-        </span>
-        <p>A Document takes a path as input and reads the file,
-parses its contents and is able to generate whatever
-output is needed.</p>
 
-    </div>
-    <div class="code">
-        
-<pre class="code"><code class="crystal">  class Document
+# A Document takes a path as input and reads the file,
+# parses its contents and is able to generate whatever
+# output is needed.
+# 
+  class Document
     property path : String
     property sections = Array(Section).new
     property language : Language
 
-</code></pre>
-      
-    </div>
-</div>
 
-<div id="section-14" class="grid">
-    <div class="doc" id="section-14">
-        <span class="anchor">
-            <a href="#section-14" class="anchor">↦</a>
-        </span>
-        <p>On initialization we read the file and parse it in the correct
-language. Also, if rather than a <code>.py</code> file we have a <code>.py.md</code>
-we consider that &quot;literate python&quot; and tweak the language
-definition a bit.</p>
 
-    </div>
-    <div class="code">
-        
-<pre class="code"><code class="crystal">    def initialize(@path : String)
+# On initialization we read the file and parse it in the correct
+# language. Also, if rather than a `.py` file we have a `.py.md`
+# we consider that "literate python" and tweak the language
+# definition a bit.
+# 
+    def initialize(@path : String)
       literate = false
       key = File.extname(@path)
-      if key == &quot;.md&quot; # It may be literate!
-        lang_key = File.extname(File.basename(@path, &quot;.md&quot;))
+      if key == ".md" # It may be literate!
+        lang_key = File.extname(File.basename(@path, ".md"))
         if LANGUAGES.has_key?(lang_key)
           key = lang_key
           literate = true
@@ -429,234 +234,111 @@ definition a bit.</p>
       if LANGUAGES.has_key?(key)
         @language = LANGUAGES[key].clone
       else
-        raise Exception.new &quot;Unknown language for file #{@path}&quot;
+        raise Exception.new "Unknown language for file #{@path}"
       end
 
-</code></pre>
-      
-    </div>
-</div>
 
-<div id="section-15" class="grid">
-    <div class="doc" id="section-15">
-        <span class="anchor">
-            <a href="#section-15" class="anchor">↦</a>
-        </span>
-        <p>In the literate versions, everything is doc except
-indented things, which are code.</p>
 
-    </div>
-    <div class="code">
-        
-<pre class="code"><code class="crystal">      @language[&quot;match&quot;] = /^([ ]{4}|[ ]{0,3}\t)/ if literate
+# In the literate versions, everything is doc except
+# indented things, which are code.
+# 
+      @language["match"] = /^([ ]{4}|[ ]{0,3}\t)/ if literate
       parse(File.read(@path))
     end
 
-</code></pre>
-      
-    </div>
-</div>
 
-<div id="section-16" class="grid">
-    <div class="doc" id="section-16">
-        <span class="anchor">
-            <a href="#section-16" class="anchor">↦</a>
-        </span>
-        <p>Given a string of source code, parse out each block of prose
-and the code that follows it — by detecting which is which,
-line by line — and then create an individual section for it.
-Each section is an object with <code>docs</code> and <code>code</code> properties,
-which can later be converted to HTML.</p>
 
-    </div>
-    <div class="code">
-        
-<pre class="code"><code class="crystal">    def parse(source : String)
-      lines = source.split(&quot;\n&quot;)
+# Given a string of source code, parse out each block of prose
+# and the code that follows it — by detecting which is which,
+# line by line — and then create an individual section for it.
+# Each section is an object with `docs` and `code` properties,
+# which can later be converted to HTML.
+# 
+    def parse(source : String)
+      lines = source.split("\n")
       @sections = [Section.new language]
 
-</code></pre>
-      
-    </div>
-</div>
 
-<div id="section-17" class="grid">
-    <div class="doc" id="section-17">
-        <span class="anchor">
-            <a href="#section-17" class="anchor">↦</a>
-        </span>
-        <p>Handle empty files</p>
 
-    </div>
-    <div class="code">
-        
-<pre class="code"><code class="crystal">      return if lines.empty?
-</code></pre>
-      
-    </div>
-</div>
+# Handle empty files
+# 
+      return if lines.empty?
 
-<div id="section-18" class="grid">
-    <div class="doc" id="section-18">
-        <span class="anchor">
-            <a href="#section-18" class="anchor">↦</a>
-        </span>
-        <p>This loop is the core of the parser. It goes line by line
-and decides if the line is a comment or code, and depending
-on that either starts a new section, or adds to the current
-one.</p>
 
-    </div>
-    <div class="code">
-        
-<pre class="code"><code class="crystal">      is_comment = language[&quot;match&quot;].as(Regex)
+# This loop is the core of the parser. It goes line by line
+# and decides if the line is a comment or code, and depending
+# on that either starts a new section, or adds to the current
+# one.
+# 
+      is_comment = language["match"].as(Regex)
       lines.each do |line|
-        if is_comment.match(line) &amp;&amp; !NOT_COMMENT.match(line)
-</code></pre>
-      
-    </div>
-</div>
+        if is_comment.match(line) && !NOT_COMMENT.match(line)
 
-<div id="section-19" class="grid">
-    <div class="doc" id="section-19">
-        <span class="anchor">
-            <a href="#section-19" class="anchor">↦</a>
-        </span>
-        <p>Break section if we find docs after code</p>
 
-    </div>
-    <div class="code">
-        
-<pre class="code"><code class="crystal">          @sections &lt;&lt; Section.new(language) unless sections[-1].code.empty?
-          line = line.sub(language[&quot;match&quot;], &quot;&quot;)
-          @sections[-1].docs += line + &quot;\n&quot;
-</code></pre>
-      
-    </div>
-</div>
+# Break section if we find docs after code
+# 
+          @sections << Section.new(language) unless sections[-1].code.empty?
+          line = line.sub(language["match"], "")
+          @sections[-1].docs += line + "\n"
 
-<div id="section-20" class="grid">
-    <div class="doc" id="section-20">
-        <span class="anchor">
-            <a href="#section-20" class="anchor">↦</a>
-        </span>
-        <p>Also break section if we find a line of dashes (HR in markdown)</p>
 
-    </div>
-    <div class="code">
-        
-<pre class="code"><code class="crystal">          @sections &lt;&lt; Section.new(language) if /^(---+|===+)$/.match line
+# Also break section if we find a line of dashes (HR in markdown)
+# 
+          @sections << Section.new(language) if /^(---+|===+)$/.match line
         else
-          @sections[-1].code += &quot;#{line}\n&quot;
+          @sections[-1].code += "#{line}\n"
         end
       end
-</code></pre>
-      
-    </div>
-</div>
 
-<div id="section-21" class="grid">
-    <div class="doc" id="section-21">
-        <span class="anchor">
-            <a href="#section-21" class="anchor">↦</a>
-        </span>
-        <p>Sections with no code or docs are pointless.</p>
 
-    </div>
-    <div class="code">
-        
-<pre class="code"><code class="crystal">      @sections.reject! { |section| section.code.strip.empty? &amp;&amp; section.docs.strip.empty? }
+# Sections with no code or docs are pointless.
+# 
+      @sections.reject! { |section| section.code.strip.empty? && section.docs.strip.empty? }
     end
 
-</code></pre>
-      
-    </div>
-</div>
 
-<div id="section-22" class="grid">
-    <div class="doc" id="section-22">
-        <span class="anchor">
-            <a href="#section-22" class="anchor">↦</a>
-        </span>
-        <p>Save the document to a file using the desired format
-and template. If you want to learn more about the templates
-you can check out <a href="templates.cr.html">templates.cr</a></p>
 
-    </div>
-    <div class="code">
-        
-<pre class="code"><code class="crystal">    def save(out_file, format = &quot;html&quot;, template = &quot;sidebyside&quot;)
+# Save the document to a file using the desired format
+# and template. If you want to learn more about the templates
+# you can check out [templates.cr](templates.cr.html)
+# 
+    def save(out_file, template = "sidebyside")
       FileUtils.mkdir_p(File.dirname(path))
-      template = Templates.get(&quot;#{template}&quot;)
-      puts &quot;#{self.path} -&gt; #{out_file}&quot;
+      template = Templates.get(template)
+      puts "#{self.path} -> #{out_file}"
       FileUtils.mkdir_p(File.dirname(out_file))
-      File.open(out_file, &quot;w&quot;) do |outf|
-        outf &lt;&lt; template.render({
-          &quot;title&quot;    =&gt; File.basename(path),
-          &quot;sections&quot; =&gt; sections.map(&amp;.to_h),
-          &quot;language&quot; =&gt; language[&quot;name&quot;],
+      File.open(out_file, "w") do |outf|
+        outf << template.render({
+          "title"    => File.basename(path),
+          "sections" => sections.map(&.to_h),
+          "language" => language["name"],
         })
       end
     end
   end
 
-</code></pre>
-      
-    </div>
-</div>
 
-<div id="section-23" class="grid">
-    <div class="doc" id="section-23">
-        <span class="anchor">
-            <a href="#section-23" class="anchor">↦</a>
-        </span>
-        <p>The <code>process</code> function is the entry point to the whole thing.</p>
-<p>Given a list of source files, create documents for each one
-and save them to the output directory. You can see it being used
-in <a href="main.cr.html">main.cr</a></p>
 
-    </div>
-    <div class="code">
-        
-<pre class="code"><code class="crystal">  def process(sources : Array(String), out_dir : String, template : String)
+# The `process` function is the entry point to the whole thing.
+# 
+# Given a list of source files, create documents for each one
+# and save them to the output directory. You can see it being used
+# in [main.cr](main.cr.html)
+# 
+  def process(sources : Array(String), out_dir : String, template : String, as_source = false)
     sources.each do |source|
       doc = Document.new(source)
-      out_file = File.join(out_dir, File.basename(source) + &quot;.html&quot;)
+      out_file = File.join(out_dir, File.basename(source) + ".html")
+      template = "source" if as_source
+      p! as_source, template
       doc.save(out_file, template: template)
     end
   end
 end
 
-</code></pre>
-      
-    </div>
-</div>
-
-<div id="section-24" class="grid">
-    <div class="doc" id="section-24">
-        <span class="anchor">
-            <a href="#section-24" class="anchor">↦</a>
-        </span>
-        <p>🏁 That's it!</p>
-
-    </div>
-    <div class="code">
-        
-<pre class="code"><code class="crystal"></code></pre>
-      
-    </div>
-</div>
 
 
-    </main>
-    <footer style="text-align: center;" class="pico-background-purple-800">
-    » Generated by <a href="https://crycco.ralsina.me">Crycco</a> »	Layout 
-sidebyside
- » Powered by <a href="https://picocss.com">PicoCSS</a> and <a href="https://www.omnibus-type.com/">Chivo Font Family</a> 
-    </footer>
-    <script>
-        hljs.highlightAll();
-    </script>
-</body>
+# 🏁 That's it!
+# 
 
-</html>
+

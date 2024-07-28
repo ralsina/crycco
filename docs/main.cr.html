@@ -120,7 +120,8 @@ few and simple.</p>
 Crycco, a Crystal version of docco/pycco/etc.
 
 Usage:
-    crycco SOURCE... [-L &lt;file&gt;][-l &lt;name&gt;][-o &lt;path&gt;][-c &lt;file&gt;][-t &lt;file&gt;]
+    crycco FILE... [-L &lt;file&gt;][-l &lt;name&gt;][-o &lt;path&gt;][-c &lt;file&gt;]
+                     [-t &lt;file&gt;] [--doc|--code]
     crycco -v
     cryco --help
 
@@ -128,7 +129,9 @@ Options:
   -v, --version           output the version number
   -l, --languages &lt;file&gt;  use a custom languages.yml file
   -o, --output &lt;path&gt;     output to a given folder [default: docs/]
-  -t, --template &lt;name&gt;   template for layout [default: sidebyside]
+  -t, --template &lt;name&gt;   template for doc layout [default: sidebyside]
+  --doc                   output documentation in HTML [default: true]
+  --code                  output a source code file [default: false]
   -h, --help              this help message
 
   Crycco comes with two templates by default: sidebyside and basic.
@@ -192,7 +195,7 @@ an exception and a backtrace. The interesting code is in <a href="./crycco.cr.ht
     <div class="code">
         
 <pre class="code"><code class="crystal">Crycco.process(
-  sources: options[&quot;SOURCE&quot;].as(Array(String)),
+  sources: options[&quot;FILE&quot;].as(Array(String)),
   out_dir: options[&quot;--output&quot;].as(String),
   template: options[&quot;--template&quot;].as(String),
 )
