@@ -43,6 +43,7 @@ require "./templates"
 require "file_utils"
 require "html"
 require "markd"
+require "yaml"
 
 # In Crystal it's good to use modules to namespace the code. Specially since
 # Crycco also works as a library!
@@ -72,14 +73,19 @@ module Crycco
   alias Language = Hash(String, String | Regex)
   LANGUAGES = Hash(String, Language).new
 
-  # FIXME: read from data/languages.yml
-  # and add match
+  # The description of how to parse a language is stored in a YAML file
+  # which we read here in `Crycco.load_languages`
+  # 
+  # The `match` regex is used to detect if a line is a comment or code.
   def self.load_languages(file : String)
-    LANGUAGES[".cr"] = {
-      "name"           => "crystal",
-      "comment_symbol" => "#",
-      "match"          => /^\s*#\s?/,
-    }
+    data = YAML.parse(File.read(file))
+    data.as_h.each do |ext, lang|
+      LANGUAGES[ext.to_s] = {
+        "name"   => lang["name"].to_s,
+        "symbol" => lang["symbol"].to_s,
+        "match"  => /^\s*#{Regex.escape(lang["symbol"].to_s)}\s?/,
+      }
+    end
   end
 
   # Document contents are organized in sections, which have docs and code.
@@ -199,5 +205,5 @@ module Crycco
     end
   end
 
-  self.load_languages("data/languages.yml")
+  self.load_languages("languages.yml")
 end
