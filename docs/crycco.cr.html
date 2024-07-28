@@ -23,6 +23,7 @@
 html * {
     font-family: Chivo, sans-serif;
     font-variant-ligatures: none;
+    font-weight: 300;
     overflow: visible !important;
 }
 
@@ -48,6 +49,11 @@ div.doc>pre>code {
     left: 0px;
     display: block;
 }
+@media screen and (max-width: 768px) {
+    div.background {
+        display: none;
+    }
+}
 
 span.anchor {
     position: relative;
@@ -66,11 +72,6 @@ div.doc:hover .anchor {
     opacity: 1;
 }
 
-@media screen and (max-width: 768px) {
-    div.background {
-        display: none;
-    }
-}
 </style>
 
 </head>
