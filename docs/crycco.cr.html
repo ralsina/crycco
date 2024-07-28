@@ -114,13 +114,14 @@ expression, a tiny, simple tool that does one thing well.</p>
 <p>This document is the output of running Crycco on
 <a href="https://github.com/ralsina/crycco/blob/main/src/crycco.cr">its own source code</a>,
 so if you keep reading we'll see how it works (it's short!).</p>
+<p>If instead you are interested in the CLI tool, you can check out
+<a href="main.cr.html">main.cr</a> which is the entry point for the
+command line.</p>
 <hr />
 
     </div>
     <div class="code">
-        
-<pre class="code"><code class="crystal"></code></pre>
-      
+        <pre class="code"><code class="crystal"></code></pre>
     </div>
 </div>
 
@@ -136,9 +137,7 @@ for parsing the source files and generating the output.</p>
 
     </div>
     <div class="code">
-        
-<pre class="code"><code class="crystal"></code></pre>
-      
+        <pre class="code"><code class="crystal"></code></pre>
     </div>
 </div>
 
@@ -151,15 +150,13 @@ for parsing the source files and generating the output.</p>
 
     </div>
     <div class="code">
-        
-<pre class="code"><code class="crystal">require &quot;./templates&quot;
+        <pre class="code"><code class="crystal">require &quot;./templates&quot;
 require &quot;file_utils&quot;
 require &quot;html&quot;
 require &quot;markd&quot;
 require &quot;yaml&quot;
 
 </code></pre>
-      
     </div>
 </div>
 
@@ -182,13 +179,11 @@ of this file.</p>
 
     </div>
     <div class="code">
-        
-<pre class="code"><code class="crystal">module Crycco
+        <pre class="code"><code class="crystal">module Crycco
   extend self
   VERSION = &quot;0.1.0&quot;
 
 </code></pre>
-      
     </div>
 </div>
 
@@ -203,12 +198,10 @@ language, such as the comment symbol and a regex to match it.</p>
 
     </div>
     <div class="code">
-        
-<pre class="code"><code class="crystal">  alias Language = Hash(String, String | Regex)
+        <pre class="code"><code class="crystal">  alias Language = Hash(String, String | Regex)
   LANGUAGES = Hash(String, Language).new
 
 </code></pre>
-      
     </div>
 </div>
 
@@ -222,14 +215,12 @@ in the actual binary so we don't have to carry it around.</p>
 
     </div>
     <div class="code">
-        
-<pre class="code"><code class="crystal">  class BakedLanguages
+        <pre class="code"><code class="crystal">  class BakedLanguages
     extend BakedFileSystem
     bake_file &quot;languages.yml&quot;, File.read(&quot;languages.yml&quot;)
   end
 
 </code></pre>
-      
     </div>
 </div>
 
@@ -245,8 +236,7 @@ it defaults to the embedded one.</p>
 
     </div>
     <div class="code">
-        
-<pre class="code"><code class="crystal">  def self.load_languages(file : String?)
+        <pre class="code"><code class="crystal">  def self.load_languages(file : String?)
     if file.nil?
       data = YAML.parse(BakedLanguages.get(&quot;/languages.yml&quot;))
     else
@@ -262,7 +252,6 @@ it defaults to the embedded one.</p>
   end
 
 </code></pre>
-      
     </div>
 </div>
 
@@ -276,11 +265,9 @@ such as string interpolations.</p>
 
     </div>
     <div class="code">
-        
-<pre class="code"><code class="crystal">  NOT_COMMENT = /(^#!|^\s*#\{)/
+        <pre class="code"><code class="crystal">  NOT_COMMENT = /(^#!|^\s*#\{)/
 
 </code></pre>
-      
     </div>
 </div>
 
@@ -295,8 +282,7 @@ The docs are markdown extracted from comments and the code is the actual code.</
 
     </div>
     <div class="code">
-        
-<pre class="code"><code class="crystal">  class Section
+        <pre class="code"><code class="crystal">  class Section
     property docs : String = &quot;&quot;
     property code : String = &quot;&quot;
     property language : Language
@@ -305,7 +291,6 @@ The docs are markdown extracted from comments and the code is the actual code.</
     end
 
 </code></pre>
-      
     </div>
 </div>
 
@@ -318,13 +303,11 @@ The docs are markdown extracted from comments and the code is the actual code.</
 
     </div>
     <div class="code">
-        
-<pre class="code"><code class="crystal">    def docs_html
+        <pre class="code"><code class="crystal">    def docs_html
       Markd.to_html(docs)
     end
 
 </code></pre>
-      
     </div>
 </div>
 
@@ -341,15 +324,13 @@ spaces are significant in code fragments.</p>
 
     </div>
     <div class="code">
-        
-<pre class="code"><code class="crystal">    def code_html
-      %(
-&lt;pre class=&quot;code&quot;&gt;&lt;code class=&quot;#{language[&quot;name&quot;]}&quot;&gt;#{HTML.escape(code.lstrip(&quot;\n&quot;))}&lt;/code&gt;&lt;/pre&gt;
-      )
+        <pre class="code"><code class="crystal">    def code_html
+      %(&lt;pre class=&quot;code&quot;&gt;&lt;code class=&quot;#{language[&quot;name&quot;]}&quot;&gt;) +
+        %(#{HTML.escape(code.lstrip(&quot;\n&quot;))}) +
+        &quot;&lt;/code&gt;&lt;/pre&gt;&quot;
     end
 
 </code></pre>
-      
     </div>
 </div>
 
@@ -364,8 +345,7 @@ and comments from it and save it to a file.</p>
 
     </div>
     <div class="code">
-        
-<pre class="code"><code class="crystal">    def to_source : String
+        <pre class="code"><code class="crystal">    def to_source : String
       lines = [] of String
       docs.rstrip(&quot;\n&quot;).split(&quot;\n&quot;).each do |line|
         lines &lt;&lt; &quot;#{language[&quot;symbol&quot;]} #{line}&quot;
@@ -375,7 +355,6 @@ and comments from it and save it to a file.</p>
     end
 
 </code></pre>
-      
     </div>
 </div>
 
@@ -390,8 +369,7 @@ a hash.</p>
 
     </div>
     <div class="code">
-        
-<pre class="code"><code class="crystal">    def to_h : Hash(String, String)
+        <pre class="code"><code class="crystal">    def to_h : Hash(String, String)
       {
         &quot;docs&quot;      =&gt; docs,
         &quot;code&quot;      =&gt; code,
@@ -403,7 +381,6 @@ a hash.</p>
   end
 
 </code></pre>
-      
     </div>
 </div>
 
@@ -418,15 +395,13 @@ output is needed.</p>
 
     </div>
     <div class="code">
-        
-<pre class="code"><code class="crystal">  class Document
+        <pre class="code"><code class="crystal">  class Document
     property path : String
     property sections = Array(Section).new
     property language : Language
     @literate : Bool = false
 
 </code></pre>
-      
     </div>
 </div>
 
@@ -442,8 +417,7 @@ definition a bit.</p>
 
     </div>
     <div class="code">
-        
-<pre class="code"><code class="crystal">    def initialize(@path : String)
+        <pre class="code"><code class="crystal">    def initialize(@path : String)
       key = File.extname(@path)
       if key == &quot;.md&quot; # It may be literate!
         lang_key = File.extname(File.basename(@path, &quot;.md&quot;))
@@ -460,7 +434,6 @@ definition a bit.</p>
       end
 
 </code></pre>
-      
     </div>
 </div>
 
@@ -475,13 +448,11 @@ match regex to match everything except 4 spaces or a tab.</p>
 
     </div>
     <div class="code">
-        
-<pre class="code"><code class="crystal">      @language[&quot;match&quot;] = /^(?![ ]{4}|\t).*/ if @literate
+        <pre class="code"><code class="crystal">      @language[&quot;match&quot;] = /^(?![ ]{4}|\t).*/ if @literate
       parse(File.read(@path))
     end
 
 </code></pre>
-      
     </div>
 </div>
 
@@ -498,13 +469,11 @@ which can later be converted to HTML.</p>
 
     </div>
     <div class="code">
-        
-<pre class="code"><code class="crystal">    def parse(source : String)
+        <pre class="code"><code class="crystal">    def parse(source : String)
       lines = source.split(&quot;\n&quot;)
       @sections = [Section.new language]
 
 </code></pre>
-      
     </div>
 </div>
 
@@ -513,14 +482,17 @@ which can later be converted to HTML.</p>
         <span class="anchor">
             <a href="#section-18" class="anchor">↦</a>
         </span>
-        <p>Handle empty files</p>
+        <p>This loop is the core of the parser. It goes line by line
+and decides if the line is a comment or code, and depending
+on that either starts a new section, or adds to the current
+one.</p>
 
     </div>
     <div class="code">
-        
-<pre class="code"><code class="crystal">      return if lines.empty?
+        <pre class="code"><code class="crystal">      is_comment = language[&quot;match&quot;].as(Regex)
+      lines.each do |line|
+        if is_comment.match(line) &amp;&amp; !NOT_COMMENT.match(line)
 </code></pre>
-      
     </div>
 </div>
 
@@ -529,19 +501,12 @@ which can later be converted to HTML.</p>
         <span class="anchor">
             <a href="#section-19" class="anchor">↦</a>
         </span>
-        <p>This loop is the core of the parser. It goes line by line
-and decides if the line is a comment or code, and depending
-on that either starts a new section, or adds to the current
-one.</p>
+        <p>Break section if we find docs after code</p>
 
     </div>
     <div class="code">
-        
-<pre class="code"><code class="crystal">      is_comment = language[&quot;match&quot;].as(Regex)
-      lines.each do |line|
-        if is_comment.match(line) &amp;&amp; !NOT_COMMENT.match(line)
+        <pre class="code"><code class="crystal">          @sections &lt;&lt; Section.new(language) unless sections[-1].code.empty?
 </code></pre>
-      
     </div>
 </div>
 
@@ -550,14 +515,13 @@ one.</p>
         <span class="anchor">
             <a href="#section-20" class="anchor">↦</a>
         </span>
-        <p>Break section if we find docs after code</p>
+        <p>Remove comment markers if it's not literate</p>
 
     </div>
     <div class="code">
-        
-<pre class="code"><code class="crystal">          @sections &lt;&lt; Section.new(language) unless sections[-1].code.empty?
+        <pre class="code"><code class="crystal">          line = line.sub(language[&quot;match&quot;], &quot;&quot;) unless @literate
+          @sections[-1].docs += line + &quot;\n&quot;
 </code></pre>
-      
     </div>
 </div>
 
@@ -566,15 +530,16 @@ one.</p>
         <span class="anchor">
             <a href="#section-21" class="anchor">↦</a>
         </span>
-        <p>Remove comment markers if it's not literate</p>
+        <p>Also break section if we find a line of dashes (HR in markdown)</p>
 
     </div>
     <div class="code">
-        
-<pre class="code"><code class="crystal">          line = line.sub(language[&quot;match&quot;], &quot;&quot;) unless @literate
-          @sections[-1].docs += line + &quot;\n&quot;
+        <pre class="code"><code class="crystal">          @sections &lt;&lt; Section.new(language) if /^(---+|===+)$/.match line
+        else
+          @sections[-1].code += &quot;#{line}\n&quot;
+        end
+      end
 </code></pre>
-      
     </div>
 </div>
 
@@ -583,18 +548,14 @@ one.</p>
         <span class="anchor">
             <a href="#section-22" class="anchor">↦</a>
         </span>
-        <p>Also break section if we find a line of dashes (HR in markdown)</p>
+        <p>Sections with no code or docs are pointless.</p>
 
     </div>
     <div class="code">
-        
-<pre class="code"><code class="crystal">          @sections &lt;&lt; Section.new(language) if /^(---+|===+)$/.match line
-        else
-          @sections[-1].code += &quot;#{line}\n&quot;
-        end
-      end
+        <pre class="code"><code class="crystal">      @sections.reject! { |section| section.code.strip.empty? &amp;&amp; section.docs.strip.empty? }
+    end
+
 </code></pre>
-      
     </div>
 </div>
 
@@ -602,24 +563,6 @@ one.</p>
     <div class="doc" id="section-23">
         <span class="anchor">
             <a href="#section-23" class="anchor">↦</a>
-        </span>
-        <p>Sections with no code or docs are pointless.</p>
-
-    </div>
-    <div class="code">
-        
-<pre class="code"><code class="crystal">      @sections.reject! { |section| section.code.strip.empty? &amp;&amp; section.docs.strip.empty? }
-    end
-
-</code></pre>
-      
-    </div>
-</div>
-
-<div id="section-24" class="grid">
-    <div class="doc" id="section-24">
-        <span class="anchor">
-            <a href="#section-24" class="anchor">↦</a>
         </span>
         <p>Save the document to a file using the desired format
 and template. If you want to learn more about the templates
@@ -630,8 +573,7 @@ source code.</p>
 
     </div>
     <div class="code">
-        
-<pre class="code"><code class="crystal">    def save(out_file, template = &quot;sidebyside&quot;)
+        <pre class="code"><code class="crystal">    def save(out_file, template = &quot;sidebyside&quot;)
       if @literate &amp;&amp; File.extname(out_file) == &quot;.md&quot;
         out_file = out_file[...-3]
       end
@@ -651,14 +593,13 @@ source code.</p>
   end
 
 </code></pre>
-      
     </div>
 </div>
 
-<div id="section-25" class="grid">
-    <div class="doc" id="section-25">
+<div id="section-24" class="grid">
+    <div class="doc" id="section-24">
         <span class="anchor">
-            <a href="#section-25" class="anchor">↦</a>
+            <a href="#section-24" class="anchor">↦</a>
         </span>
         <p>The <code>process</code> function is the entry point to the whole thing.</p>
 <p>Given a list of source files, create documents for each one
@@ -667,8 +608,7 @@ in <a href="main.cr.html">main.cr</a></p>
 
     </div>
     <div class="code">
-        
-<pre class="code"><code class="crystal">  def process(sources : Array(String), out_dir : String, template : String, as_source = false)
+        <pre class="code"><code class="crystal">  def process(sources : Array(String), out_dir : String, template : String, as_source = false)
     sources.each do |source|
       doc = Document.new(source)
       out_file = File.join(out_dir, File.basename(source) + &quot;.html&quot;)
@@ -682,22 +622,19 @@ in <a href="main.cr.html">main.cr</a></p>
 end
 
 </code></pre>
-      
     </div>
 </div>
 
-<div id="section-26" class="grid">
-    <div class="doc" id="section-26">
+<div id="section-25" class="grid">
+    <div class="doc" id="section-25">
         <span class="anchor">
-            <a href="#section-26" class="anchor">↦</a>
+            <a href="#section-25" class="anchor">↦</a>
         </span>
         <p>🏁 That's it!</p>
 
     </div>
     <div class="code">
-        
-<pre class="code"><code class="crystal"></code></pre>
-      
+        <pre class="code"><code class="crystal"></code></pre>
     </div>
 </div>
 

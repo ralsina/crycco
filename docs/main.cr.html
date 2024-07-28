@@ -96,12 +96,10 @@ more information you can visit <a href="https://docopt.org/">docopt.org</a>.</p>
 
     </div>
     <div class="code">
-        
-<pre class="code"><code class="crystal">require &quot;docopt&quot;
+        <pre class="code"><code class="crystal">require &quot;docopt&quot;
 require &quot;./crycco&quot;
 
 </code></pre>
-      
     </div>
 </div>
 
@@ -115,8 +113,7 @@ few and simple.</p>
 
     </div>
     <div class="code">
-        
-<pre class="code"><code class="crystal">HELP = &lt;&lt;-HELP
+        <pre class="code"><code class="crystal">HELP = &lt;&lt;-HELP
 Crycco, a Crystal version of docco/pycco/etc.
 
 Usage:
@@ -150,7 +147,6 @@ HELP
 options = Docopt.docopt(HELP, ARGV)
 
 </code></pre>
-      
     </div>
 </div>
 
@@ -163,14 +159,12 @@ options = Docopt.docopt(HELP, ARGV)
 
     </div>
     <div class="code">
-        
-<pre class="code"><code class="crystal">if options[&quot;--version&quot;]
+        <pre class="code"><code class="crystal">if options[&quot;--version&quot;]
   puts &quot;Crycco #{Crycco::VERSION}&quot;
   exit 0
 end
 
 </code></pre>
-      
     </div>
 </div>
 
@@ -184,11 +178,9 @@ whatever is the default.</p>
 
     </div>
     <div class="code">
-        
-<pre class="code"><code class="crystal">Crycco.load_languages(options[&quot;--languages&quot;].try &amp;.as(String))
+        <pre class="code"><code class="crystal">Crycco.load_languages(options[&quot;--languages&quot;].try &amp;.as(String))
 
 </code></pre>
-      
     </div>
 </div>
 
@@ -203,8 +195,7 @@ an exception and a backtrace. The interesting code is in <a href="./crycco.cr.ht
 
     </div>
     <div class="code">
-        
-<pre class="code"><code class="crystal">Crycco.process(
+        <pre class="code"><code class="crystal">Crycco.process(
   sources: options[&quot;FILE&quot;].as(Array(String)),
   out_dir: options[&quot;--output&quot;].as(String),
   template: options[&quot;--template&quot;].as(String),
@@ -212,7 +203,6 @@ an exception and a backtrace. The interesting code is in <a href="./crycco.cr.ht
 )
 
 </code></pre>
-      
     </div>
 </div>
 

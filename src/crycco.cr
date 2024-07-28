@@ -35,6 +35,10 @@
 # [its own source code](https://github.com/ralsina/crycco/blob/main/src/crycco.cr),
 # so if you keep reading we'll see how it works (it's short!).
 #
+# If instead you are interested in the CLI tool, you can check out
+# [main.cr](main.cr.html) which is the entry point for the
+# command line.
+#
 # ----
 #
 # # crycco.cr
@@ -133,9 +137,9 @@ module Crycco
     # when passed through itself 😂). Finally, it has to be in a single line because
     # spaces are significant in code fragments.
     def code_html
-      %(
-<pre class="code"><code class="#{language["name"]}">#{HTML.escape(code.lstrip("\n"))}</code></pre>
-      )
+      %(<pre class="code"><code class="#{language["name"]}">) +
+        %(#{HTML.escape(code.lstrip("\n"))}) +
+        "</code></pre>"
     end
 
     # `to_source` regenerates valid source code out of the section. This way if

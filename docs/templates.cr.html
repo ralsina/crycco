@@ -95,12 +95,10 @@ template engine.</p>
 
     </div>
     <div class="code">
-        
-<pre class="code"><code class="crystal">require &quot;crinja&quot;
+        <pre class="code"><code class="crystal">require &quot;crinja&quot;
 require &quot;crinja/loader/baked_file_loader&quot;
 
 </code></pre>
-      
     </div>
 </div>
 
@@ -114,13 +112,11 @@ so we don't have to carry them around</p>
 
     </div>
     <div class="code">
-        
-<pre class="code"><code class="crystal">module MyBakedTemplateFileSystem
+        <pre class="code"><code class="crystal">module MyBakedTemplateFileSystem
   BakedFileSystem.load(&quot;../templates&quot;, __DIR__)
 end
 
 </code></pre>
-      
     </div>
 </div>
 
@@ -146,8 +142,7 @@ and adapt them to your needs: make a copy and pass it in the
 
     </div>
     <div class="code">
-        
-<pre class="code"><code class="crystal">module Templates
+        <pre class="code"><code class="crystal">module Templates
   extend self
   Env = Crinja.new
 
@@ -164,7 +159,6 @@ and adapt them to your needs: make a copy and pass it in the
 end
 
 </code></pre>
-      
     </div>
 </div>
 
