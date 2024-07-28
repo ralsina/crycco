@@ -46,7 +46,7 @@ Crycco.load_languages(options["--languages"].try &.as(String))
 
 # And here, we call `Crycco.process` with the options we got, casted to
 # the types it expects. If there is an error, we can just crash with
-# an exception and a backtrace.
+# an exception and a backtrace. The interesting code is in [crycco.cr](./crycco.cr.html#section-2).
 
 Crycco.process(
   sources: options["SOURCE"].as(Array(String)),
