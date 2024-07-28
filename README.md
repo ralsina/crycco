@@ -20,7 +20,8 @@ $ bin/crycco --help
 Crycco, a Crystal version of docco/pycco/etc.
 
 Usage:
-    crycco SOURCE... [-L <file>][-l <name>][-o <path>][-c <file>][-t <file>]
+    crycco FILE... [-L <file>][-l <name>][-o <path>][-c <file>]
+                     [-t <file>] [--doc|--code]
     crycco -v
     cryco --help
 
@@ -28,10 +29,21 @@ Options:
   -v, --version           output the version number
   -l, --languages <file>  use a custom languages.yml file
   -o, --output <path>     output to a given folder [default: docs/]
-  -t, --template <name>   template for layout [default: sidebyside]
+  -t, --template <name>   template for doc layout [default: sidebyside]
+  --code                  output source code instead of HTML [default: false]
   -h, --help              this help message
 
-  Crycco comes with two templates by default: sidebyside and basic.
+Crycco comes with two templates for HTML documents which you can
+use in the -t option when generating docs:
+
+sidebyside (default)
+  Shows the docs and code in two columns, matching docs to the code
+  they are about.
+basic
+  Single columns, docs then code, then docs then code.
+
+If you use the --code option, the output will be machine-readable
+source code instead of HTML.
 ```
 
 It can also be used as a library but not documenting it here just in case
