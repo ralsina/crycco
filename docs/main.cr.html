@@ -56,9 +56,10 @@ span.anchor {
 a.anchor {
     position: absolute;
     text-decoration: none;
-    left: -1em;
+    left: -1.2em;
     opacity: 0;
     -webkit-transition: opacity 0.2s linear;
+    
 }
 
 div.doc:hover .anchor {
@@ -83,7 +84,7 @@ div.doc:hover .anchor {
 <div id="section-1" class="grid">
     <div class="doc" id="section-1">
         <span class="anchor">
-            <a href="#section-1" class="anchor">»</a>
+            <a href="#section-1" class="anchor">↦</a>
         </span>
         <h1>main.cr</h1>
 <p>This is the entrypoint to use Crycco as a command line tool.
@@ -106,7 +107,7 @@ require &quot;./crycco&quot;
 <div id="section-2" class="grid">
     <div class="doc" id="section-2">
         <span class="anchor">
-            <a href="#section-2" class="anchor">»</a>
+            <a href="#section-2" class="anchor">↦</a>
         </span>
         <p>Crycco is not a very complicated tool, really, so the options are
 few and simple.</p>
@@ -142,7 +143,7 @@ options = Docopt.docopt(HELP, ARGV)
 <div id="section-3" class="grid">
     <div class="doc" id="section-3">
         <span class="anchor">
-            <a href="#section-3" class="anchor">»</a>
+            <a href="#section-3" class="anchor">↦</a>
         </span>
         <p>Handle version manually</p>
 
@@ -162,7 +163,7 @@ end
 <div id="section-4" class="grid">
     <div class="doc" id="section-4">
         <span class="anchor">
-            <a href="#section-4" class="anchor">»</a>
+            <a href="#section-4" class="anchor">↦</a>
         </span>
         <p>First we initialize the languages list from <code>languages.yml</code> or
 a custom file.</p>
@@ -180,7 +181,7 @@ a custom file.</p>
 <div id="section-5" class="grid">
     <div class="doc" id="section-5">
         <span class="anchor">
-            <a href="#section-5" class="anchor">»</a>
+            <a href="#section-5" class="anchor">↦</a>
         </span>
         <p>And just call <code>Crycco.process</code> with the options we got, casted to
 the types it expects. If there is an error, we can just crash with

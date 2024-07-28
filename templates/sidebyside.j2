@@ -11,7 +11,7 @@ sidebyside
 <div id="section-{{loop.index}}" class="grid">
     <div class="doc" id="section-{{loop.index}}">
         <span class="anchor">
-            <a href="#section-{{loop.index}}" class="anchor">»</a>
+            <a href="#section-{{loop.index}}" class="anchor">↦</a>
         </span>
         {{ section.docs_html}}
     </div>
@@ -60,9 +60,10 @@ span.anchor {
 a.anchor {
     position: absolute;
     text-decoration: none;
-    left: -1em;
+    left: -1.2em;
     opacity: 0;
     -webkit-transition: opacity 0.2s linear;
+    {# font-size: 150%; #}
 }
 
 div.doc:hover .anchor {

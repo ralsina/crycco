@@ -56,9 +56,10 @@ span.anchor {
 a.anchor {
     position: absolute;
     text-decoration: none;
-    left: -1em;
+    left: -1.2em;
     opacity: 0;
     -webkit-transition: opacity 0.2s linear;
+    
 }
 
 div.doc:hover .anchor {
@@ -83,7 +84,7 @@ div.doc:hover .anchor {
 <div id="section-1" class="grid">
     <div class="doc" id="section-1">
         <span class="anchor">
-            <a href="#section-1" class="anchor">»</a>
+            <a href="#section-1" class="anchor">↦</a>
         </span>
         <h1>Crycco: A Crystal Remix of Docco.</h1>
 <p>Crycco is a quick and dirty documentation generator in the mold
@@ -122,7 +123,7 @@ so if you keep reading we'll see how it works (it's short!).</p>
 <div id="section-2" class="grid">
     <div class="doc" id="section-2">
         <span class="anchor">
-            <a href="#section-2" class="anchor">»</a>
+            <a href="#section-2" class="anchor">↦</a>
         </span>
         <h1>crycco.cr</h1>
 <p>This is the main file of the project. It contains the main logic
@@ -140,7 +141,7 @@ for parsing the source files and generating the output.</p>
 <div id="section-3" class="grid">
     <div class="doc" id="section-3">
         <span class="anchor">
-            <a href="#section-3" class="anchor">»</a>
+            <a href="#section-3" class="anchor">↦</a>
         </span>
         <p>Import our dependencies</p>
 
@@ -161,7 +162,7 @@ require &quot;yaml&quot;
 <div id="section-4" class="grid">
     <div class="doc" id="section-4">
         <span class="anchor">
-            <a href="#section-4" class="anchor">»</a>
+            <a href="#section-4" class="anchor">↦</a>
         </span>
         <p>In Crystal it's good to use modules to namespace the code. Specially since
 Crycco also works as a library!</p>
@@ -190,7 +191,7 @@ of this file.</p>
 <div id="section-5" class="grid">
     <div class="doc" id="section-5">
         <span class="anchor">
-            <a href="#section-5" class="anchor">»</a>
+            <a href="#section-5" class="anchor">↦</a>
         </span>
         <p>Languages are defined in a hash with the extension as the key</p>
 <p>Each one contains the data required to parse a document in that
@@ -210,7 +211,7 @@ language, such as the comment symbol and a regex to match it.</p>
 <div id="section-6" class="grid">
     <div class="doc" id="section-6">
         <span class="anchor">
-            <a href="#section-6" class="anchor">»</a>
+            <a href="#section-6" class="anchor">↦</a>
         </span>
         <p>The <code>BakedLanguages</code> class embeds the languages definition file
 in the actual binary so we don't have to carry it around.</p>
@@ -231,7 +232,7 @@ in the actual binary so we don't have to carry it around.</p>
 <div id="section-7" class="grid">
     <div class="doc" id="section-7">
         <span class="anchor">
-            <a href="#section-7" class="anchor">»</a>
+            <a href="#section-7" class="anchor">↦</a>
         </span>
         <p>The description of how to parse a language is stored in a YAML file
 which we read here in <code>Crycco.load_languages</code>. If no file is given
@@ -264,7 +265,7 @@ it defaults to the embedded one.</p>
 <div id="section-8" class="grid">
     <div class="doc" id="section-8">
         <span class="anchor">
-            <a href="#section-8" class="anchor">»</a>
+            <a href="#section-8" class="anchor">↦</a>
         </span>
         <p>This matches shebangs and things that only LOOK like comments,
 such as string interpolations.</p>
@@ -282,7 +283,7 @@ such as string interpolations.</p>
 <div id="section-9" class="grid">
     <div class="doc" id="section-9">
         <span class="anchor">
-            <a href="#section-9" class="anchor">»</a>
+            <a href="#section-9" class="anchor">↦</a>
         </span>
         <p>Document contents are organized in sections, which have docs and code.
 The docs are markdown extracted from comments and the code is the actual code.</p>
@@ -307,7 +308,7 @@ The docs are markdown extracted from comments and the code is the actual code.</
 <div id="section-10" class="grid">
     <div class="doc" id="section-10">
         <span class="anchor">
-            <a href="#section-10" class="anchor">»</a>
+            <a href="#section-10" class="anchor">↦</a>
         </span>
         <p><code>docs_html</code> converts the docs to HTML using the Markd library</p>
 
@@ -326,7 +327,7 @@ The docs are markdown extracted from comments and the code is the actual code.</
 <div id="section-11" class="grid">
     <div class="doc" id="section-11">
         <span class="anchor">
-            <a href="#section-11" class="anchor">»</a>
+            <a href="#section-11" class="anchor">↦</a>
         </span>
         <p>Since the generated HTML uses HighlightJS, we need to wrap the code in
 a <code>&lt;pre&gt;&lt;code&gt;</code> block with the right class so it's properly highlighted.</p>
@@ -351,9 +352,9 @@ spaces are significant in code fragments.</p>
 <div id="section-12" class="grid">
     <div class="doc" id="section-12">
         <span class="anchor">
-            <a href="#section-12" class="anchor">»</a>
+            <a href="#section-12" class="anchor">↦</a>
         </span>
-        <p>Te <code>to_h</code> method is used to turn the section into something that can be
+        <p>The <code>to_h</code> method is used to turn the section into something that can be
 handled by the Crinja template engine. Just takes the data and put it in
 a hash.</p>
 
@@ -378,7 +379,7 @@ a hash.</p>
 <div id="section-13" class="grid">
     <div class="doc" id="section-13">
         <span class="anchor">
-            <a href="#section-13" class="anchor">»</a>
+            <a href="#section-13" class="anchor">↦</a>
         </span>
         <p>A Document takes a path as input and reads the file,
 parses its contents and is able to generate whatever
@@ -400,7 +401,7 @@ output is needed.</p>
 <div id="section-14" class="grid">
     <div class="doc" id="section-14">
         <span class="anchor">
-            <a href="#section-14" class="anchor">»</a>
+            <a href="#section-14" class="anchor">↦</a>
         </span>
         <p>On initialization we read the file and parse it in the correct
 language</p>
@@ -424,7 +425,7 @@ language</p>
 <div id="section-15" class="grid">
     <div class="doc" id="section-15">
         <span class="anchor">
-            <a href="#section-15" class="anchor">»</a>
+            <a href="#section-15" class="anchor">↦</a>
         </span>
         <p>Given a string of source code, parse out each block of prose
 and the code that follows it — by detecting which is which,
@@ -447,7 +448,7 @@ which can later be converted to HTML.</p>
 <div id="section-16" class="grid">
     <div class="doc" id="section-16">
         <span class="anchor">
-            <a href="#section-16" class="anchor">»</a>
+            <a href="#section-16" class="anchor">↦</a>
         </span>
         <p>Handle empty files</p>
 
@@ -465,7 +466,7 @@ which can later be converted to HTML.</p>
 <div id="section-17" class="grid">
     <div class="doc" id="section-17">
         <span class="anchor">
-            <a href="#section-17" class="anchor">»</a>
+            <a href="#section-17" class="anchor">↦</a>
         </span>
         <p>This loop is the core of the parser. It goes line by line
 and decides if the line is a comment or code, and depending
@@ -484,7 +485,7 @@ on that either starts a new section, or adds to the current one.</p>
 <div id="section-18" class="grid">
     <div class="doc" id="section-18">
         <span class="anchor">
-            <a href="#section-18" class="anchor">»</a>
+            <a href="#section-18" class="anchor">↦</a>
         </span>
         <p>Break section if we find docs after code</p>
 
@@ -502,7 +503,7 @@ on that either starts a new section, or adds to the current one.</p>
 <div id="section-19" class="grid">
     <div class="doc" id="section-19">
         <span class="anchor">
-            <a href="#section-19" class="anchor">»</a>
+            <a href="#section-19" class="anchor">↦</a>
         </span>
         <p>Also break section if we find a line of dashes (HR in markdown)</p>
 
@@ -522,7 +523,7 @@ on that either starts a new section, or adds to the current one.</p>
 <div id="section-20" class="grid">
     <div class="doc" id="section-20">
         <span class="anchor">
-            <a href="#section-20" class="anchor">»</a>
+            <a href="#section-20" class="anchor">↦</a>
         </span>
         <p>Sections with no code or docs are pointless.</p>
 
@@ -540,7 +541,7 @@ on that either starts a new section, or adds to the current one.</p>
 <div id="section-21" class="grid">
     <div class="doc" id="section-21">
         <span class="anchor">
-            <a href="#section-21" class="anchor">»</a>
+            <a href="#section-21" class="anchor">↦</a>
         </span>
         <p>Save the document to a file using the desired format
 and template. If you want to learn more about the templates
@@ -571,7 +572,7 @@ you can check out <a href="templates.cr.html">templates.cr</a></p>
 <div id="section-22" class="grid">
     <div class="doc" id="section-22">
         <span class="anchor">
-            <a href="#section-22" class="anchor">»</a>
+            <a href="#section-22" class="anchor">↦</a>
         </span>
         <p>The <code>process</code> function is the entry point to the whole thing.</p>
 <p>Given a list of source files, create documents for each one
@@ -597,7 +598,7 @@ end
 <div id="section-23" class="grid">
     <div class="doc" id="section-23">
         <span class="anchor">
-            <a href="#section-23" class="anchor">»</a>
+            <a href="#section-23" class="anchor">↦</a>
         </span>
         <p>🏁 That's it!</p>
 
