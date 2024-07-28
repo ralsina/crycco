@@ -94,6 +94,9 @@ of and directly inspired by <a href="http://jashkenas.github.com/docco/">Docco</
 intermingled with your code. All comments are passed through Markdown
 so they are nicely formatted and all code goes through a syntax
 highlighter before being fed to <a href="templates.cr.html">templates</a>.</p>
+<p>Crycco also supports the &quot;literate&quot; variant of languages, where
+everything is a comment except things indented 4 spaces or more,
+which are code. Those files should have a double <code>.ext.md</code> extension.</p>
 <p>It's a very simple tool but it can be used to good effect in a number
 of situations. Consider a tool that uses a YAML file as configuration.</p>
 <p>Usually, one would have to write a README file to explain the format
@@ -103,9 +106,8 @@ which will have a bunch of comments in there.</p>
 a nice HTML file that explains the config file in a much more readable
 fashion, <a href="languages.yml.html"><strong>from the YAML itself</strong></a></p>
 <p>Crycco also will let you do other manipulations on the code and docs,
-like generating &quot;literate YAML&quot; which is a markdown file with the YAML
-interspersed within the prose. It says &quot;it will&quot; because
-<a href="TODO.md.html">it doesn't yet</a></p>
+like generating &quot;literate YAML&quot; out of YAML and viceversa. It says
+&quot;it will&quot; because <a href="TODO.md.html">it doesn't yet</a></p>
 <p>One of the best things about Docco in my opinion is that it takes the
 tradition of literate programming and turns it into its minimal
 expression, a tiny, simple tool that does one thing well.</p>
@@ -406,18 +408,29 @@ output is needed.</p>
             <a href="#section-14" class="anchor">↦</a>
         </span>
         <p>On initialization we read the file and parse it in the correct
-language</p>
+language. Also, if rather than a <code>.py</code> file we have a <code>.py.md</code>
+we consider that &quot;literate python&quot; and tweak the language
+definition a bit.</p>
 
     </div>
     <div class="code">
         
 <pre class="code"><code class="crystal">    def initialize(@path : String)
+      literate = false
       key = File.extname(@path)
-      raise Exception.new &quot;Unknown file extension #{File.extname(@path)}&quot; \
-         unless LANGUAGES.has_key?(key)
-      @language = LANGUAGES[key]
-      parse(File.read(@path))
-    end
+      if key == &quot;.md&quot; # It may be literate!
+        lang_key = File.extname(File.basename(@path, &quot;.md&quot;))
+        if LANGUAGES.has_key?(lang_key)
+          key = lang_key
+          literate = true
+        end
+      end
+
+      if LANGUAGES.has_key?(key)
+        @language = LANGUAGES[key].clone
+      else
+        raise Exception.new &quot;Unknown language for file #{@path}&quot;
+      end
 
 </code></pre>
       
@@ -428,6 +441,26 @@ language</p>
     <div class="doc" id="section-15">
         <span class="anchor">
             <a href="#section-15" class="anchor">↦</a>
+        </span>
+        <p>In the literate versions, everything is doc except
+indented things, which are code.</p>
+
+    </div>
+    <div class="code">
+        
+<pre class="code"><code class="crystal">      @language[&quot;match&quot;] = /^([ ]{4}|[ ]{0,3}\t)/ if literate
+      parse(File.read(@path))
+    end
+
+</code></pre>
+      
+    </div>
+</div>
+
+<div id="section-16" class="grid">
+    <div class="doc" id="section-16">
+        <span class="anchor">
+            <a href="#section-16" class="anchor">↦</a>
         </span>
         <p>Given a string of source code, parse out each block of prose
 and the code that follows it — by detecting which is which,
@@ -447,10 +480,10 @@ which can later be converted to HTML.</p>
     </div>
 </div>
 
-<div id="section-16" class="grid">
-    <div class="doc" id="section-16">
+<div id="section-17" class="grid">
+    <div class="doc" id="section-17">
         <span class="anchor">
-            <a href="#section-16" class="anchor">↦</a>
+            <a href="#section-17" class="anchor">↦</a>
         </span>
         <p>Handle empty files</p>
 
@@ -463,10 +496,10 @@ which can later be converted to HTML.</p>
     </div>
 </div>
 
-<div id="section-17" class="grid">
-    <div class="doc" id="section-17">
+<div id="section-18" class="grid">
+    <div class="doc" id="section-18">
         <span class="anchor">
-            <a href="#section-17" class="anchor">↦</a>
+            <a href="#section-18" class="anchor">↦</a>
         </span>
         <p>This loop is the core of the parser. It goes line by line
 and decides if the line is a comment or code, and depending
@@ -484,10 +517,10 @@ one.</p>
     </div>
 </div>
 
-<div id="section-18" class="grid">
-    <div class="doc" id="section-18">
+<div id="section-19" class="grid">
+    <div class="doc" id="section-19">
         <span class="anchor">
-            <a href="#section-18" class="anchor">↦</a>
+            <a href="#section-19" class="anchor">↦</a>
         </span>
         <p>Break section if we find docs after code</p>
 
@@ -502,10 +535,10 @@ one.</p>
     </div>
 </div>
 
-<div id="section-19" class="grid">
-    <div class="doc" id="section-19">
+<div id="section-20" class="grid">
+    <div class="doc" id="section-20">
         <span class="anchor">
-            <a href="#section-19" class="anchor">↦</a>
+            <a href="#section-20" class="anchor">↦</a>
         </span>
         <p>Also break section if we find a line of dashes (HR in markdown)</p>
 
@@ -522,10 +555,10 @@ one.</p>
     </div>
 </div>
 
-<div id="section-20" class="grid">
-    <div class="doc" id="section-20">
+<div id="section-21" class="grid">
+    <div class="doc" id="section-21">
         <span class="anchor">
-            <a href="#section-20" class="anchor">↦</a>
+            <a href="#section-21" class="anchor">↦</a>
         </span>
         <p>Sections with no code or docs are pointless.</p>
 
@@ -540,10 +573,10 @@ one.</p>
     </div>
 </div>
 
-<div id="section-21" class="grid">
-    <div class="doc" id="section-21">
+<div id="section-22" class="grid">
+    <div class="doc" id="section-22">
         <span class="anchor">
-            <a href="#section-21" class="anchor">↦</a>
+            <a href="#section-22" class="anchor">↦</a>
         </span>
         <p>Save the document to a file using the desired format
 and template. If you want to learn more about the templates
@@ -572,10 +605,10 @@ you can check out <a href="templates.cr.html">templates.cr</a></p>
     </div>
 </div>
 
-<div id="section-22" class="grid">
-    <div class="doc" id="section-22">
+<div id="section-23" class="grid">
+    <div class="doc" id="section-23">
         <span class="anchor">
-            <a href="#section-22" class="anchor">↦</a>
+            <a href="#section-23" class="anchor">↦</a>
         </span>
         <p>The <code>process</code> function is the entry point to the whole thing.</p>
 <p>Given a list of source files, create documents for each one
@@ -599,10 +632,10 @@ end
     </div>
 </div>
 
-<div id="section-23" class="grid">
-    <div class="doc" id="section-23">
+<div id="section-24" class="grid">
+    <div class="doc" id="section-24">
         <span class="anchor">
-            <a href="#section-23" class="anchor">↦</a>
+            <a href="#section-24" class="anchor">↦</a>
         </span>
         <p>🏁 That's it!</p>
 

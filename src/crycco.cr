@@ -10,7 +10,7 @@
 #
 # Crycco also supports the "literate" variant of languages, where
 # everything is a comment except things indented 4 spaces or more,
-# which are code.
+# which are code. Those files should have a double `.ext.md` extension.
 #
 # It's a very simple tool but it can be used to good effect in a number
 # of situations. Consider a tool that uses a YAML file as configuration.
@@ -24,9 +24,8 @@
 # fashion, [**from the YAML itself**](languages.yml.html)
 #
 # Crycco also will let you do other manipulations on the code and docs,
-# like generating "literate YAML" which is a markdown file with the YAML
-# interspersed within the prose. It says "it will" because
-# [it doesn't yet](TODO.md.html)
+# like generating "literate YAML" out of YAML and viceversa. It says
+# "it will" because [it doesn't yet](TODO.md.html)
 #
 # One of the best things about Docco in my opinion is that it takes the
 # tradition of literate programming and turns it into its minimal
