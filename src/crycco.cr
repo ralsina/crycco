@@ -6,7 +6,7 @@
 # It creates HTML output that displays your comments alongside or
 # intermingled with your code. All comments are passed through Markdown
 # so they are nicely formatted and all code goes through a syntax
-# highlighter.
+# highlighter before being fed to [templates](templates.cr.html).
 #
 # It's a very simple tool but it can be used to good effect in a number
 # of situations. Consider a tool that uses a YAML file as configuration.
@@ -27,7 +27,7 @@
 # tradition of literate programming and turns it into its minimal
 # expression, a tiny, simple tool that does one thing well.
 #
-# This document is the output of running Crycco on 
+# This document is the output of running Crycco on
 # [its own source code](https://github.com/ralsina/crycco/blob/main/src/crycco.cr),
 # so if you keep reading we'll see how it works (it's short!).
 #
@@ -191,7 +191,8 @@ module Crycco
     end
 
     # Save the document to a file using the desired format
-    # and template.
+    # and template. If you want to learn more about the templates
+    # you can check out [templates.cr](templates.cr.html)
     def save(out_file, format = "html", template = "sidebyside")
       FileUtils.mkdir_p(File.dirname(path))
       template = Templates.get("#{template}")
