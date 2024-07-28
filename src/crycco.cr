@@ -134,7 +134,7 @@ module Crycco
       )
     end
 
-    # Te `to_h` method is used to turn the section into something that can be
+    # The `to_h` method is used to turn the section into something that can be
     # handled by the Crinja template engine. Just takes the data and put it in
     # a hash.
     def to_h : Hash(String, String)
