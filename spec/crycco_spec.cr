@@ -33,5 +33,13 @@ describe Crycco do
       section.code = "code\ncode\n"
       section.code_html.strip.should eq("<pre class=\"code\"><code class=\"crystal\">code\ncode\n</code></pre>")
     end
+    it "should convert the whole section to code" do
+      section = Crycco::Section.new Crycco::LANGUAGES[".cr"]
+      section.code = "code\ncode\n"
+      section.docs = "This is a comment\nMore comment\n"
+      section.to_source.strip.should eq(
+        "# This is a comment\n" + "# More comment\n" + "# \n" + "code\n" + "code"
+      )
+    end
   end
 end
