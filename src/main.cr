@@ -31,13 +31,17 @@ Options:
   -h, --help              this help message
 
 Crycco comes with two templates for HTML documents which you can 
-use in the -t option:
+use in the -t option when generating docs:
 
-sidebyside
+sidebyside (default)
   Shows the docs and code in two columns, matching docs to the code
   they are about.
 basic
   Single columns, docs then code, then docs then code.
+
+If you use the --code option, the output will be machine-readable
+source code instead of HTML.
+
 HELP
 
 options = Docopt.docopt(HELP, ARGV)
