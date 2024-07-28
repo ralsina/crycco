@@ -176,12 +176,17 @@ module Crycco
     property sections = Array(Section).new
     property language : Language
     @literate : Bool = false
+    @template : String
+    @as_source : Bool
 
     # On initialization we read the file and parse it in the correct
     # language. Also, if rather than a `.yml` file we have a `.yml.md`
     # we consider that "literate YAML" and tweak the language
     # definition a bit.
-    def initialize(@path : String)
+    def initialize(@path : String,
+                   @out_dir : String = "docs",
+                   @template : String = "sidebyside",
+                   @as_source : Bool = false)
       key = File.extname(@path)
       if key == ".md" # It may be literate!
         lang_key = File.extname(File.basename(@path, ".md"))
@@ -239,17 +244,11 @@ module Crycco
     # and template. If you want to learn more about the templates
     # you can check out [templates.cr](templates.cr.html)
     #
-    # If this is a literate document, remove any final .md
-    # from the output file name because we are outputting
-    # source code.
-    #
-    def save(out_file, template = "sidebyside")
-      if @literate && File.extname(out_file) == ".md"
-        out_file = out_file[...-3]
-      end
+    def save
+      out_file = out_path
 
       FileUtils.mkdir_p(File.dirname(path))
-      template = Templates.get(template)
+      template = Templates.get(@template)
       puts "#{self.path} -> #{out_file}"
       FileUtils.mkdir_p(File.dirname(out_file))
       File.open(out_file, "w") do |outf|
@@ -260,6 +259,26 @@ module Crycco
         })
       end
     end
+
+    # Calculate where this should be saved.
+    #
+    # It will be with the same name as `source`, under `out_dir`
+    # and with the `.html` extension added if we are generating
+    # docs.
+    #
+    # If this is a literate document, remove any final .md
+    # from the output file name because we are outputting
+    # source code for the underlying language.
+    #
+    def out_path : String
+      result = File.join(@out_dir, File.basename(@path))
+      @template = "source" if @as_source
+      result += ".html" unless @as_source
+      if @literate && File.extname(result) == ".md"
+        result = result[...-3]
+      end
+      result
+    end
   end
 
   # The `process` function is the entry point to the whole thing.
@@ -267,15 +286,12 @@ module Crycco
   # Given a list of source files, create documents for each one
   # and save them to the output directory. You can see it being used
   # in [main.cr](main.cr.html)
-  def process(sources : Array(String), out_dir : String, template : String, as_source = false)
+  def process(sources : Array(String),
+              out_dir : String,
+              template : String,
+              as_source = false)
     sources.each do |source|
-      doc = Document.new(source)
-      out_file = File.join(out_dir, File.basename(source) + ".html")
-      if as_source
-        template = "source"
-        out_file = out_file[...-5]
-      end
-      doc.save(out_file, template: template)
+      Document.new(source, out_dir, template, as_source).save
     end
   end
 end

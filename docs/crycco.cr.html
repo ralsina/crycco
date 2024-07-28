@@ -400,6 +400,8 @@ output is needed.</p>
     property sections = Array(Section).new
     property language : Language
     @literate : Bool = false
+    @template : String
+    @as_source : Bool
 
 </code></pre>
     </div>
@@ -417,7 +419,10 @@ definition a bit.</p>
 
     </div>
     <div class="code">
-        <pre class="code"><code class="crystal">    def initialize(@path : String)
+        <pre class="code"><code class="crystal">    def initialize(@path : String,
+                   @out_dir : String = &quot;docs&quot;,
+                   @template : String = &quot;sidebyside&quot;,
+                   @as_source : Bool = false)
       key = File.extname(@path)
       if key == &quot;.md&quot; # It may be literate!
         lang_key = File.extname(File.basename(@path, &quot;.md&quot;))
@@ -567,19 +572,14 @@ one.</p>
         <p>Save the document to a file using the desired format
 and template. If you want to learn more about the templates
 you can check out <a href="templates.cr.html">templates.cr</a></p>
-<p>If this is a literate document, remove any final .md
-from the output file name because we are outputting
-source code.</p>
 
     </div>
     <div class="code">
-        <pre class="code"><code class="crystal">    def save(out_file, template = &quot;sidebyside&quot;)
-      if @literate &amp;&amp; File.extname(out_file) == &quot;.md&quot;
-        out_file = out_file[...-3]
-      end
+        <pre class="code"><code class="crystal">    def save
+      out_file = out_path
 
       FileUtils.mkdir_p(File.dirname(path))
-      template = Templates.get(template)
+      template = Templates.get(@template)
       puts &quot;#{self.path} -&gt; #{out_file}&quot;
       FileUtils.mkdir_p(File.dirname(out_file))
       File.open(out_file, &quot;w&quot;) do |outf|
@@ -590,7 +590,6 @@ source code.</p>
         })
       end
     end
-  end
 
 </code></pre>
     </div>
@@ -601,25 +600,26 @@ source code.</p>
         <span class="anchor">
             <a href="#section-24" class="anchor">↦</a>
         </span>
-        <p>The <code>process</code> function is the entry point to the whole thing.</p>
-<p>Given a list of source files, create documents for each one
-and save them to the output directory. You can see it being used
-in <a href="main.cr.html">main.cr</a></p>
+        <p>Calculate where this should be saved.</p>
+<p>It will be with the same name as <code>source</code>, under <code>out_dir</code>
+and with the <code>.html</code> extension added if we are generating
+docs.</p>
+<p>If this is a literate document, remove any final .md
+from the output file name because we are outputting
+source code for the underlying language.</p>
 
     </div>
     <div class="code">
-        <pre class="code"><code class="crystal">  def process(sources : Array(String), out_dir : String, template : String, as_source = false)
-    sources.each do |source|
-      doc = Document.new(source)
-      out_file = File.join(out_dir, File.basename(source) + &quot;.html&quot;)
-      if as_source
-        template = &quot;source&quot;
-        out_file = out_file[...-5]
+        <pre class="code"><code class="crystal">    def out_path : String
+      result = File.join(@out_dir, File.basename(@path))
+      @template = &quot;source&quot; if @as_source
+      result += &quot;.html&quot; unless @as_source
+      if @literate &amp;&amp; File.extname(result) == &quot;.md&quot;
+        result = result[...-3]
       end
-      doc.save(out_file, template: template)
+      result
     end
   end
-end
 
 </code></pre>
     </div>
@@ -629,6 +629,32 @@ end
     <div class="doc" id="section-25">
         <span class="anchor">
             <a href="#section-25" class="anchor">↦</a>
+        </span>
+        <p>The <code>process</code> function is the entry point to the whole thing.</p>
+<p>Given a list of source files, create documents for each one
+and save them to the output directory. You can see it being used
+in <a href="main.cr.html">main.cr</a></p>
+
+    </div>
+    <div class="code">
+        <pre class="code"><code class="crystal">  def process(sources : Array(String),
+              out_dir : String,
+              template : String,
+              as_source = false)
+    sources.each do |source|
+      Document.new(source, out_dir, template, as_source).save
+    end
+  end
+end
+
+</code></pre>
+    </div>
+</div>
+
+<div id="section-26" class="grid">
+    <div class="doc" id="section-26">
+        <span class="anchor">
+            <a href="#section-26" class="anchor">↦</a>
         </span>
         <p>🏁 That's it!</p>
 
