@@ -89,7 +89,7 @@ div.doc:hover .anchor {
         </span>
         <h1>main.cr</h1>
 <p>This is the entrypoint to use Crycco as a command line tool.
-as you can see by the dependencies, we are using <code>docopt</code> to
+As you can see by the dependencies, we are using <code>docopt</code> to
 parse the command line arguments.</p>
 <p>It parses the arguments based on the actual help message. For
 more information you can visit <a href="https://docopt.org/">docopt.org</a>.</p>
@@ -166,8 +166,8 @@ end
         <span class="anchor">
             <a href="#section-4" class="anchor">↦</a>
         </span>
-        <p>First we initialize the languages list from <code>languages.yml</code> or
-a custom file.</p>
+        <p>First we initialize the languages list from the given file or
+whatever is the default.</p>
 
     </div>
     <div class="code">
@@ -184,7 +184,7 @@ a custom file.</p>
         <span class="anchor">
             <a href="#section-5" class="anchor">↦</a>
         </span>
-        <p>And just call <code>Crycco.process</code> with the options we got, casted to
+        <p>And here, we call <code>Crycco.process</code> with the options we got, casted to
 the types it expects. If there is an error, we can just crash with
 an exception and a backtrace.</p>
 
@@ -193,8 +193,8 @@ an exception and a backtrace.</p>
         
 <pre class="code"><code class="crystal">Crycco.process(
   sources: options[&quot;SOURCE&quot;].as(Array(String)),
-  out_dir: options.fetch(&quot;--output&quot;, &quot;docs&quot;).as(String),
-  template: options.fetch(&quot;--template&quot;, &quot;sidebyside&quot;).as(String),
+  out_dir: options[&quot;--output&quot;].as(String),
+  template: options[&quot;--template&quot;].as(String),
 )
 
 </code></pre>

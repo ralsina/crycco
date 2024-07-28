@@ -217,7 +217,8 @@ module Crycco
   # The `process` function is the entry point to the whole thing.
   #
   # Given a list of source files, create documents for each one
-  # and save them to the output directory.
+  # and save them to the output directory. You can see it being used
+  # in [main.cr](main.cr.html)
   def process(sources : Array(String), out_dir : String, template : String)
     sources.each do |source|
       doc = Document.new(source)

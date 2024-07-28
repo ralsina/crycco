@@ -1,7 +1,7 @@
 # # main.cr
 #
 # This is the entrypoint to use Crycco as a command line tool.
-# as you can see by the dependencies, we are using `docopt` to
+# As you can see by the dependencies, we are using `docopt` to
 # parse the command line arguments.
 #
 # It parses the arguments based on the actual help message. For
@@ -39,17 +39,17 @@ if options["--version"]
   exit 0
 end
 
-# First we initialize the languages list from `languages.yml` or
-# a custom file.
+# First we initialize the languages list from the given file or
+# whatever is the default.
 
 Crycco.load_languages(options["--languages"].try &.as(String))
 
-# And just call `Crycco.process` with the options we got, casted to
+# And here, we call `Crycco.process` with the options we got, casted to
 # the types it expects. If there is an error, we can just crash with
 # an exception and a backtrace.
 
 Crycco.process(
   sources: options["SOURCE"].as(Array(String)),
-  out_dir: options.fetch("--output", "docs").as(String),
-  template: options.fetch("--template", "sidebyside").as(String),
+  out_dir: options["--output"].as(String),
+  template: options["--template"].as(String),
 )
