@@ -73,12 +73,24 @@ module Crycco
   alias Language = Hash(String, String | Regex)
   LANGUAGES = Hash(String, Language).new
 
+  # The `BakedLanguages` class embeds the languages definition file
+  # in the actual binary so we don't have to carry it around.
+  class BakedLanguages
+    extend BakedFileSystem
+    bake_file "languages.yml", File.read("languages.yml")
+  end
+
   # The description of how to parse a language is stored in a YAML file
-  # which we read here in `Crycco.load_languages`
-  # 
+  # which we read here in `Crycco.load_languages`. If no file is given
+  # it defaults to the embedded one.
+  #
   # The `match` regex is used to detect if a line is a comment or code.
-  def self.load_languages(file : String)
-    data = YAML.parse(File.read(file))
+  def self.load_languages(file : String?)
+    if file.nil?
+      data = YAML.parse(BakedLanguages.get("/languages.yml"))
+    else
+      data = YAML.parse(File.read(file))
+    end
     data.as_h.each do |ext, lang|
       LANGUAGES[ext.to_s] = {
         "name"   => lang["name"].to_s,
