@@ -8,3 +8,4 @@
 * Allow light/dark switch?
 * Support other outputs (literate version, markdown, nocomments, etc)
 * Support custom title? Extract title from doc? Use filename?
+* Enclosing comments (need them for templates!)
