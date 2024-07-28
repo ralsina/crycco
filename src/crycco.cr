@@ -21,7 +21,8 @@
 #
 # Crycco also will let you do other manipulations on the code and docs,
 # like generating "literate YAML" which is a markdown file with the YAML
-# interspersed within the prose.
+# interspersed within the prose. It says "it will" because 
+# [it doesn't yet](TODO.md.html)
 #
 # One of the best things about Docco in my opinion is that it takes the
 # tradition of literate programming and turns it into its minimal
