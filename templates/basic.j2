@@ -27,19 +27,21 @@ sidebyside
 {% endblock %}
 
 {% block CSS %}
-html * {
-    font-family: 'Chivo', sans-serif;
-    overflow: visible !important;
-}
+<style>
+    html * {
+        font-family: 'Chivo', sans-serif;
+        overflow: visible !important;
+    }
 
-code,
-code>* {
-    font-family: 'Chivo Mono', monospace !important;
-    padding-top: 0 !important;
-}
+    code,
+    code>* {
+        font-family: 'Chivo Mono', monospace !important;
+        padding-top: 0 !important;
+    }
 
-div.doc>pre>code {
-    background-color: var(--pico-color-slate-800);
-    border: solid 1 var(--pico-color-slate-700)
-}
+    div.doc>pre>code {
+        background-color: var(--pico-color-slate-800);
+        border: solid 1 var(--pico-color-slate-700)
+    }
+</style>
 {% endblock %}

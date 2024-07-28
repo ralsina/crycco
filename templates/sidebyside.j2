@@ -9,7 +9,10 @@ sidebyside
 </div>
 {% for section in sections %}
 <div id="section-{{loop.index}}" class="grid">
-    <div class="doc">
+    <div class="doc" id="section-{{loop.index}}">
+        <span class="anchor">
+            <a href="#section-{{loop.index}}" class="anchor">»</a>
+        </span>
         {{ section.docs_html}}
     </div>
     <div class="code">
@@ -20,6 +23,7 @@ sidebyside
 {% endblock %}
 
 {% block CSS %}
+<style>
 html * {
     font-family: Chivo, sans-serif;
     font-variant-ligatures: none;
@@ -49,10 +53,26 @@ div.doc>pre>code {
     display: block;
 }
 
-@media screen and (max-width: 768px) {
-  div.background {
-    display: none;
-  }
+span.anchor {
+    position: relative;
 }
 
+a.anchor {
+    position: absolute;
+    text-decoration: none;
+    left: -1em;
+    opacity: 0;
+    -webkit-transition: opacity 0.2s linear;
+}
+
+div.doc:hover .anchor {
+    opacity: 1;
+}
+
+@media screen and (max-width: 768px) {
+    div.background {
+        display: none;
+    }
+}
+</style>
 {% endblock %}
