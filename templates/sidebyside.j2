@@ -16,13 +16,13 @@
 
 {% block CSS %}
 html * {
-    font-family: 'Quicksand', sans-serif;
+    font-family: Chivo, sans-serif;
     overflow: visible !important;
 }
 
 code,
 code>* {
-    font-family: monospace !important;
+    font-family: 'Chivo Mono', monospace !important;
     padding-top: 0 !important;
 }
 
@@ -34,13 +34,19 @@ div.doc>pre>code {
 .background {
     background: linear-gradient(to right, var(--pico-color-slate-900) 50%, #011627 50%);
     height: 100vh;
-    /* Set the desired height of the div */
     width: 100vw;
-    /* Set the desired width of the div */
     position: fixed;
     z-index: -1;
     margin: 0;
     top: 0px;
     left: 0px;
+    display: block;
 }
+
+@media screen and (max-width: 768px) {
+  div.background {
+    display: none;
+  }
+}
+
 {% endblock %}
