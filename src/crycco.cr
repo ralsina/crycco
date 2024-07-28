@@ -17,7 +17,7 @@
 #
 # With crycco (or docco, or one of its many offshoots) you can generate
 # a nice HTML file that explains the config file in a much more readable
-# fashion, **from the YAML itself**
+# fashion, [**from the YAML itself**](languages.yml.html)
 #
 # Crycco also will let you do other manipulations on the code and docs,
 # like generating "literate YAML" which is a markdown file with the YAML
@@ -216,6 +216,6 @@ module Crycco
       doc.save(out_file, template: template)
     end
   end
-
-  self.load_languages("languages.yml")
 end
+
+# 🏁 That's it!

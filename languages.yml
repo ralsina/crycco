@@ -16,6 +16,9 @@
 # The data currently is just the name of the language (for HighlightJS)
 # and the comment symbol.
 
+".cr":
+  name: crystal
+  symbol: "#"
 ".applescript":
   name: applescript
   symbol: "--"
