@@ -457,8 +457,6 @@ which can later be converted to HTML.</p>
     <div class="code">
         
 <pre class="code"><code class="crystal">      return if lines.empty?
-
-      is_comment = language[&quot;match&quot;].as(Regex)
 </code></pre>
       
     </div>
@@ -471,12 +469,14 @@ which can later be converted to HTML.</p>
         </span>
         <p>This loop is the core of the parser. It goes line by line
 and decides if the line is a comment or code, and depending
-on that either starts a new section, or adds to the current one.</p>
+on that either starts a new section, or adds to the current
+one.</p>
 
     </div>
     <div class="code">
         
-<pre class="code"><code class="crystal">      lines.each do |line|
+<pre class="code"><code class="crystal">      is_comment = language[&quot;match&quot;].as(Regex)
+      lines.each do |line|
         if is_comment.match(line) &amp;&amp; !NOT_COMMENT.match(line)
 </code></pre>
       

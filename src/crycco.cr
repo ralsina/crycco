@@ -176,11 +176,11 @@ module Crycco
 
       # Handle empty files
       return if lines.empty?
-
-      is_comment = language["match"].as(Regex)
       # This loop is the core of the parser. It goes line by line
       # and decides if the line is a comment or code, and depending
-      # on that either starts a new section, or adds to the current one.
+      # on that either starts a new section, or adds to the current
+      # one.
+      is_comment = language["match"].as(Regex)
       lines.each do |line|
         if is_comment.match(line) && !NOT_COMMENT.match(line)
           # Break section if we find docs after code
