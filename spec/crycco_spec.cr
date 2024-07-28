@@ -16,7 +16,7 @@ describe Crycco do
       doc = Crycco::Document.new "#{__DIR__}/fixtures/2.cr"
       doc.sections.size.should eq(3)
     end
-    pending "should split code from comments in literate style" do
+    it "should split code from comments in literate style" do
       doc = Crycco::Document.new "#{__DIR__}/fixtures/1.cr.md"
       doc.sections.size.should eq(2)
     end

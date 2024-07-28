@@ -8,6 +8,10 @@
 # so they are nicely formatted and all code goes through a syntax
 # highlighter before being fed to [templates](templates.cr.html).
 #
+# Crycco also supports the "literate" variant of languages, where
+# everything is a comment except things indented 4 spaces or more,
+# which are code.
+#
 # It's a very simple tool but it can be used to good effect in a number
 # of situations. Consider a tool that uses a YAML file as configuration.
 #
@@ -21,7 +25,7 @@
 #
 # Crycco also will let you do other manipulations on the code and docs,
 # like generating "literate YAML" which is a markdown file with the YAML
-# interspersed within the prose. It says "it will" because 
+# interspersed within the prose. It says "it will" because
 # [it doesn't yet](TODO.md.html)
 #
 # One of the best things about Docco in my opinion is that it takes the
@@ -157,12 +161,29 @@ module Crycco
     property language : Language
 
     # On initialization we read the file and parse it in the correct
-    # language
+    # language. Also, if rather than a `.py` file we have a `.py.md`
+    # we consider that "literate python" and tweak the language
+    # definition a bit.
     def initialize(@path : String)
+      literate = false
       key = File.extname(@path)
-      raise Exception.new "Unknown file extension #{File.extname(@path)}" \
-         unless LANGUAGES.has_key?(key)
-      @language = LANGUAGES[key]
+      if key == ".md" # It may be literate!
+        lang_key = File.extname(File.basename(@path, ".md"))
+        if LANGUAGES.has_key?(lang_key)
+          key = lang_key
+          literate = true
+        end
+      end
+
+      if LANGUAGES.has_key?(key)
+        @language = LANGUAGES[key].clone
+      else
+        raise Exception.new "Unknown language for file #{@path}"
+      end
+
+      # In the literate versions, everything is doc except
+      # indented things, which are code.
+      @language["match"] = /^([ ]{4}|[ ]{0,3}\t)/ if literate
       parse(File.read(@path))
     end
 
