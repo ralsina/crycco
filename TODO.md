@@ -2,8 +2,8 @@
 
 * ✅ Support the literate variants of the languages
 * ✅ Support generating code out of literate files
-* Add a page index?
-* Maybe a sidebar?
+* ✅ Add a page index
+* ✅ Add a sidebar
 * Autolinks to other pages?
 * Other layouts?
 * Allow light/dark switch?
