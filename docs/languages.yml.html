@@ -88,12 +88,6 @@ div.doc:hover .anchor {
             transition: all .5s ease;
             padding: 2em;
         }
-
-        .sidebar header {
-            font-size: 110%;
-            color: white;
-        }
-
         .sidebar a {
             display: block;
             width: 100%;
@@ -114,6 +108,7 @@ div.doc:hover .anchor {
         label #btn,
         label #cancel {
             position: absolute;
+            top: 0;
             cursor: pointer;
             color: white;
             border-radius: 5px;
@@ -198,13 +193,13 @@ div.doc:hover .anchor {
         <i id="cancel">⇤</i>
     </label>
     <div class="sidebar">
-        <header>Documents</header>
-        
-        <a href="languages.yml.html"><span>languages.yml</span></a></li>
+        <h4>Documents</h4>
         
         <a href="collection.cr.html"><span>collection.cr</span></a></li>
         
         <a href="crycco.cr.html"><span>crycco.cr</span></a></li>
+        
+        <a href="languages.yml.html"><span>languages.yml</span></a></li>
         
         <a href="main.cr.html"><span>main.cr</span></a></li>
         
