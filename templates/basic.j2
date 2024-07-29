@@ -6,11 +6,6 @@ sidebyside
 {% endblock %}
 
 {% block body %}
-<div id="title">
-    <h1>
-        {{title}}
-    </h1>
-</div>
 {% for section in sections %}
 <div id="section-{{loop.index}}">
     {% if section.doc != "" %}
@@ -33,13 +28,11 @@ sidebyside
         font-family: 'Chivo', sans-serif;
         font-variant-ligatures: none;
         font-weight: 300;
-        overflow: visible !important;
     }
 
     code,
     code>* {
         font-family: 'Chivo Mono', monospace !important;
-        padding-top: 0 !important;
     }
 
     div.doc>pre>code {
