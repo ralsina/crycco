@@ -10,7 +10,11 @@
         <ul>
             {% for k,v in links %}
             <li>
+                {% if v == "#" %}
+                <span>{{k}}</span>
+                {% else %}
                 <a href="{{ v }}"><span>{{k}}</span></a>
+                {% endif %}
             </li>
             {% endfor %}
         </ul>

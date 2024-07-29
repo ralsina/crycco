@@ -32,14 +32,15 @@ module Crycco
     # As extra context for rendering, we pass links to all
     # the documents in the collection.
     def save
-      links = {} of String => String
-      @docs.each do |doc|
-        links[doc.path.relative_to(@base_dir).to_s] = dst_path(doc).relative_to(@out_dir).to_s
-      end
       @docs.each do |doc|
         dst = dst_path doc
         puts "#{doc.path} -> #{dst}"
-
+        links = {} of String => String
+        @docs.each do |doclink|
+          target = dst_path(doclink).relative_to(@out_dir).to_s
+          target = "#" if doclink == doc
+          links[doclink.path.relative_to(@base_dir).to_s] = target
+        end
         doc.save dst, {"links" => links}
       end
     end
