@@ -87,7 +87,8 @@ div.doc:hover .anchor {
         <span class="anchor">
             <a href="#section-1" class="anchor">↦</a>
         </span>
-        <p>A Collection is a group of sources that will be processed together
+        <h1>collection.cr</h1>
+<p>A Collection is a group of sources that will be processed together
 and saved to the same output directory while preserving the directory
 structure of the sources.</p>
 <p>This way the logic for path manipulation is centrallized here and
@@ -96,6 +97,7 @@ the Document class can be simpler.</p>
     </div>
     <div class="code">
         <pre class="code"><code class="crystal">require &quot;./crycco&quot;
+
 module Crycco
   class Collection
     @docs : Array(Document)
@@ -136,15 +138,22 @@ module Crycco
         <span class="anchor">
             <a href="#section-3" class="anchor">↦</a>
         </span>
-        <p>Save the documents to the output directory</p>
+        <p>Save the documents to the output directory.</p>
+<p>As extra context for rendering, we pass links to all
+the documents in the collection.</p>
 
     </div>
     <div class="code">
         <pre class="code"><code class="crystal">    def save
+      links = {} of String =&gt; String
+      @docs.each do |doc|
+        links[doc.path.relative_to(@base_dir).to_s] = dst_path(doc).relative_to(@out_dir).to_s
+      end
       @docs.each do |doc|
         dst = dst_path doc
         puts &quot;#{doc.path} -&gt; #{dst}&quot;
-        doc.save dst
+
+        doc.save dst, {&quot;links&quot; =&gt; links}
       end
     end
 
@@ -215,6 +224,21 @@ sidebyside
     <script>
         hljs.highlightAll();
     </script>
+
+{'languages.yml' => 'languages.yml.html', 'collection.cr' => 'collection.cr.html', 'crycco.cr' => 'crycco.cr.html', 'main.cr' => 'main.cr.html', 'templates.cr' => 'templates.cr.html'}
+    <ul>
+    
+        <li><a href="languages.yml.html">languages.yml</a></li>
+    
+        <li><a href="collection.cr.html">collection.cr</a></li>
+    
+        <li><a href="crycco.cr.html">crycco.cr</a></li>
+    
+        <li><a href="main.cr.html">main.cr</a></li>
+    
+        <li><a href="templates.cr.html">templates.cr</a></li>
+    
+    </ul>
 </body>
 
 </html>

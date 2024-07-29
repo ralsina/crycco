@@ -578,7 +578,7 @@ you can check out <a href="templates.cr.html">templates.cr</a></p>
 
     </div>
     <div class="code">
-        <pre class="code"><code class="crystal">    def save(out_file : Path)
+        <pre class="code"><code class="crystal">    def save(out_file : Path, extra_context)
       FileUtils.mkdir_p(File.dirname(path))
       template = Templates.get(@template)
       FileUtils.mkdir_p(File.dirname(out_file))
@@ -587,7 +587,7 @@ you can check out <a href="templates.cr.html">templates.cr</a></p>
           &quot;title&quot;    =&gt; File.basename(path),
           &quot;sections&quot; =&gt; sections.map(&amp;.to_h),
           &quot;language&quot; =&gt; language[&quot;name&quot;],
-        })
+      }.merge extra_context)
       end
     end
   end
@@ -620,6 +620,21 @@ sidebyside
     <script>
         hljs.highlightAll();
     </script>
+
+{'languages.yml' => 'languages.yml.html', 'collection.cr' => 'collection.cr.html', 'crycco.cr' => 'crycco.cr.html', 'main.cr' => 'main.cr.html', 'templates.cr' => 'templates.cr.html'}
+    <ul>
+    
+        <li><a href="languages.yml.html">languages.yml</a></li>
+    
+        <li><a href="collection.cr.html">collection.cr</a></li>
+    
+        <li><a href="crycco.cr.html">crycco.cr</a></li>
+    
+        <li><a href="main.cr.html">main.cr</a></li>
+    
+        <li><a href="templates.cr.html">templates.cr</a></li>
+    
+    </ul>
 </body>
 
 </html>

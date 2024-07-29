@@ -247,7 +247,7 @@ module Crycco
     # and template. If you want to learn more about the templates
     # you can check out [templates.cr](templates.cr.html)
     #
-    def save(out_file : Path)
+    def save(out_file : Path, extra_context)
       FileUtils.mkdir_p(File.dirname(path))
       template = Templates.get(@template)
       FileUtils.mkdir_p(File.dirname(out_file))
@@ -256,7 +256,7 @@ module Crycco
           "title"    => File.basename(path),
           "sections" => sections.map(&.to_h),
           "language" => language["name"],
-        })
+      }.merge extra_context)
       end
     end
   end

@@ -1,3 +1,4 @@
+# # collection.cr
 # A Collection is a group of sources that will be processed together
 # and saved to the same output directory while preserving the directory
 # structure of the sources.
@@ -26,12 +27,20 @@ module Crycco
       @base_dir = Path[common_prefix]
     end
 
-    # Save the documents to the output directory
+    # Save the documents to the output directory.
+    # 
+    # As extra context for rendering, we pass links to all
+    # the documents in the collection.
     def save
+      links = {} of String => String
+      @docs.each do |doc|
+        links[doc.path.relative_to(@base_dir).to_s] = dst_path(doc).relative_to(@out_dir).to_s
+      end
       @docs.each do |doc|
         dst = dst_path doc
         puts "#{doc.path} -> #{dst}"
-        doc.save dst
+
+        doc.save dst, {"links" => links}
       end
     end
 
