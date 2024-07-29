@@ -1,3 +1,4 @@
+{% extends "sidebar.j2" %}
 {% extends "page.j2" %}
 
 {% block layoutname %}
@@ -21,7 +22,7 @@ sidebyside
 {% endfor %}
 {% endblock %}
 
-{% block CSS %}
+{% block contentcss %}
 <style>
     html * {
         font-family: Chivo, sans-serif;
@@ -80,59 +81,3 @@ sidebyside
 </style>
 {% endblock %}
 
-{% block sidebar %}
-<a id="show-sidebar" class="secondary" onclick="document.getElementById('sidebar').style.right='0em'">⬅
-</a>
-<aside id="sidebar">
-    <a id="close-sidebar" class="secondary" onclick="document.getElementById('sidebar').style.right='-20em'">✖</a>
-    <header>
-        <h2>Documents</h2>
-    </header>
-    <nav>
-        <ul>
-            {% for k,v in links %}
-            <li>
-                <a href="{{ v }}"><span>{{k}}</span></a>
-            </li>
-            {% endfor %}
-        </ul>
-    </nav>
-</aside>
-{% endblock %}
-
-{% block sidebarcss %}
-<style>
-    aside {
-        position: fixed;
-        top: 0;
-        right: -20em;
-        bottom: 0;
-        width: 20em;
-        background: var(--pico-color-slate-900);
-        color: var(--pico-color-slate-200);
-        overflow-y: auto;
-        z-index: 100;
-        padding: 1em;
-        transition: right .25s;
-        border-left: 1px solid var(--pico-color-slate-700);
-        opacity: 90%;
-    }
-
-    #show-sidebar,
-    #close-sidebar {
-        position: absolute;
-        top: 0em;
-        right: 0em;
-        padding: .5em;
-        color: var(--pico-color-slate-100);
-        text-decoration: none;
-        background-color: var(--pico-color-slate-500);
-        border-radius: 0 0 0 .5em;
-        opacity: 75%;
-    }
-
-    #show-sidebar {
-        position: fixed;
-    }
-</style>
-{% endblock %}
