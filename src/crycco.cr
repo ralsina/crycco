@@ -229,6 +229,8 @@ module Crycco
           # Break section if we find docs after code
           @sections << Section.new(language) unless sections[-1].code.empty?
           # Remove comment markers if it's not literate
+          # and stick the line at the end of the current section's
+          # docs
           line = line.sub(language["match"], "") unless @literate
           @sections[-1].docs += line + "\n"
           # Also break section if we find a line of dashes (HR in markdown)
