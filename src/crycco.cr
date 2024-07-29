@@ -48,6 +48,7 @@
 #
 # ----
 # Import our dependencies
+require "./collection"
 require "./templates"
 require "file_utils"
 require "html"
@@ -86,10 +87,11 @@ module Crycco
   # in the actual binary so we don't have to carry it around.
   class BakedLanguages
     extend BakedFileSystem
-    bake_file "languages.yml", File.read("languages.yml")
+    bake_file "languages.yml", File.read("src/languages.yml")
   end
 
-  # The description of how to parse a language is stored in a YAML file
+  # The description of how to parse a language is stored in
+  # [a YAML file](languages.yaml.html)
   # which we read here in `Crycco.load_languages`. If no file is given
   # it defaults to the embedded one.
   #
@@ -113,6 +115,7 @@ module Crycco
   # such as string interpolations.
   NOT_COMMENT = /(^#!|^\s*#\{)/
 
+  # ## Section
   # Document contents are organized in sections, which have docs and code.
   # The docs are markdown extracted from comments and the code is the actual code.
   #
@@ -168,11 +171,12 @@ module Crycco
     end
   end
 
+  # ## Document
   # A Document takes a path as input and reads the file,
   # parses its contents and is able to generate whatever
   # output is needed.
   class Document
-    property path : String
+    property path : Path
     property sections = Array(Section).new
     property language : Language
     @literate : Bool = false
@@ -183,13 +187,12 @@ module Crycco
     # language. Also, if rather than a `.yml` file we have a `.yml.md`
     # we consider that "literate YAML" and tweak the language
     # definition a bit.
-    def initialize(@path : String,
-                   @out_dir : String = "docs",
+    def initialize(@path : Path,
                    @template : String = "sidebyside",
                    @as_source : Bool = false)
-      key = File.extname(@path)
+      key = @path.extension
       if key == ".md" # It may be literate!
-        lang_key = File.extname(File.basename(@path, ".md"))
+        lang_key = File.extname(@path.basename(".md"))
         if LANGUAGES.has_key?(lang_key)
           key = lang_key
           @literate = true
@@ -244,12 +247,9 @@ module Crycco
     # and template. If you want to learn more about the templates
     # you can check out [templates.cr](templates.cr.html)
     #
-    def save
-      out_file = out_path
-
+    def save(out_file : Path)
       FileUtils.mkdir_p(File.dirname(path))
       template = Templates.get(@template)
-      puts "#{self.path} -> #{out_file}"
       FileUtils.mkdir_p(File.dirname(out_file))
       File.open(out_file, "w") do |outf|
         outf << template.render({
@@ -258,40 +258,6 @@ module Crycco
           "language" => language["name"],
         })
       end
-    end
-
-    # Calculate where this should be saved.
-    #
-    # It will be with the same name as `source`, under `out_dir`
-    # and with the `.html` extension added if we are generating
-    # docs.
-    #
-    # If this is a literate document, remove any final .md
-    # from the output file name because we are outputting
-    # source code for the underlying language.
-    #
-    def out_path : String
-      result = File.join(@out_dir, File.basename(@path))
-      @template = "source" if @as_source
-      result += ".html" unless @as_source
-      if @literate && File.extname(result) == ".md"
-        result = result[...-3]
-      end
-      result
-    end
-  end
-
-  # The `process` function is the entry point to the whole thing.
-  #
-  # Given a list of source files, create documents for each one
-  # and save them to the output directory. You can see it being used
-  # in [main.cr](main.cr.html)
-  def process(sources : Array(String),
-              out_dir : String,
-              template : String,
-              as_source = false)
-    sources.each do |source|
-      Document.new(source, out_dir, template, as_source).save
     end
   end
 end

@@ -2,5 +2,5 @@
 set -e
 ameba --fix
 make
-bin/crycco languages.yml src/*.cr TODO.md
+bin/crycco src/languages.yml src/*.cr 
 rsync -rav docs/* ralsina@pinky:/data/websites/crycco.ralsina.me/

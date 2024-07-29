@@ -5,33 +5,33 @@ Crycco.load_languages("#{__DIR__}/../languages.yml")
 describe Crycco do
   describe "parse" do
     it "should split code from comments" do
-      doc = Crycco::Document.new "#{__DIR__}/fixtures/1.cr"
+      doc = Crycco::Document.new Path["#{__DIR__}/fixtures/1.cr"]
       doc.sections.size.should eq(2)
     end
     it "should remove comment markers from doc" do
-      doc = Crycco::Document.new "#{__DIR__}/fixtures/1.cr"
+      doc = Crycco::Document.new Path["#{__DIR__}/fixtures/1.cr"]
       doc.sections[0].docs.should eq("This is a comment\nMore comment\n")
     end
     it "should break sections in HR" do
-      doc = Crycco::Document.new "#{__DIR__}/fixtures/2.cr"
+      doc = Crycco::Document.new Path["#{__DIR__}/fixtures/2.cr"]
       doc.sections.size.should eq(3)
     end
     it "should handle an empty file" do
-      doc = Crycco::Document.new "#{__DIR__}/fixtures/empty.cr"
+      doc = Crycco::Document.new Path["#{__DIR__}/fixtures/empty.cr"]
       doc.sections.size.should eq(0)
     end
   end
   describe "parse in literate style" do
     it "should split code from comments" do
-      doc = Crycco::Document.new "#{__DIR__}/fixtures/1.cr.md"
+      doc = Crycco::Document.new Path["#{__DIR__}/fixtures/1.cr.md"]
       doc.sections.size.should eq(2)
     end
     it "should take unindented text as docs" do
-      doc = Crycco::Document.new "#{__DIR__}/fixtures/1.cr.md"
+      doc = Crycco::Document.new Path["#{__DIR__}/fixtures/1.cr.md"]
       doc.sections[0].docs.should eq("This is a comment\nMore comment\n\n")
     end
     it "should add comment markers when converting to code" do
-      doc = Crycco::Document.new "#{__DIR__}/fixtures/1.cr.md"
+      doc = Crycco::Document.new Path["#{__DIR__}/fixtures/1.cr.md"]
       doc.sections[0].to_source.should eq(
         "# This is a comment\n" + "# More comment\n" + "    code\n" + "    code")
     end
@@ -59,9 +59,11 @@ describe Crycco do
   end
   describe "Collection" do
     it "should preserve relative path structure" do
-      c = Crycco::Collection.new(["a", "../b", "c/d"], "out", "template", false)
-      (c.@sources.map { |s| c.dst_path(s) }).should \
-        eq [Path["out/crycco/a"], Path["out/b"], Path["out/crycco/c/d"]]
+      c = Crycco::Collection.new(["src/crycco.cr", "TODO.md", "languages.yml"], "out", "template", false)
+      (c.@docs.map { |d| c.dst_path(d) }).should \
+        eq [Path["out/src/crycco.cr.html"],
+            Path["out/TODO.md.html"],
+            Path["out/languages.yml.html"]]
     end
   end
 end

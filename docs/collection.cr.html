@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>main.cr</title>
+    <title>collection.cr</title>
     <!-- Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -87,17 +87,18 @@ div.doc:hover .anchor {
         <span class="anchor">
             <a href="#section-1" class="anchor">↦</a>
         </span>
-        <h1>main.cr</h1>
-<p>This is the entrypoint to use Crycco as a command line tool.
-As you can see by the dependencies, we are using <code>docopt</code> to
-parse the command line arguments.</p>
-<p>It parses the arguments based on the actual help message. For
-more information you can visit <a href="https://docopt.org/">docopt.org</a>.</p>
+        <p>A Collection is a group of sources that will be processed together
+and saved to the same output directory while preserving the directory
+structure of the sources.</p>
+<p>This way the logic for path manipulation is centrallized here and
+the Document class can be simpler.</p>
 
     </div>
     <div class="code">
-        <pre class="code"><code class="crystal">require &quot;docopt&quot;
-require &quot;./collection&quot;
+        <pre class="code"><code class="crystal">require &quot;./crycco&quot;
+module Crycco
+  class Collection
+    @docs : Array(Document)
 
 </code></pre>
     </div>
@@ -108,42 +109,23 @@ require &quot;./collection&quot;
         <span class="anchor">
             <a href="#section-2" class="anchor">↦</a>
         </span>
-        <p>Crycco is not a very complicated tool, really, so the options are
-few and simple.</p>
+        <p>On initialization, we create documents for each source file</p>
 
     </div>
     <div class="code">
-        <pre class="code"><code class="crystal">HELP = &lt;&lt;-HELP
-Crycco, a Crystal version of docco/pycco/etc.
+        <pre class="code"><code class="crystal">    def initialize(sources : Array(String), out_dir : String, template : String, as_source : Bool)
+      @docs = sources.map { |source|
+        Path[source].expand.normalize
+      }.map { |source|
+        Document.new source, template, as_source
+      }
 
-Usage:
-    crycco FILE... [-l &lt;name&gt;][-o &lt;path&gt;][-t &lt;file&gt;] [--doc|--code]
-    crycco -v
-    cryco --help
-
-Options:
-  -v, --version           output the version number
-  -l, --languages &lt;file&gt;  use a custom languages.yml file
-  -o, --output &lt;path&gt;     output to a given folder [default: docs/]
-  -t, --template &lt;name&gt;   template for doc layout [default: sidebyside]
-  --code                  output source code instead of HTML [default: false]
-  -h, --help              this help message
-
-Crycco comes with two templates for HTML documents which you can
-use in the -t option when generating docs:
-
-sidebyside (default)
-  Shows the docs and code in two columns, matching docs to the code
-  they are about.
-basic
-  Single columns, docs then code, then docs then code.
-
-If you use the --code option, the output will be machine-readable
-source code instead of HTML.
-
-HELP
-
-options = Docopt.docopt(HELP, ARGV)
+      @out_dir = out_dir
+      @template = template
+      @template = &quot;source&quot; if as_source
+      @as_source = as_source
+      @base_dir = Path[common_prefix]
+    end
 
 </code></pre>
     </div>
@@ -154,14 +136,17 @@ options = Docopt.docopt(HELP, ARGV)
         <span class="anchor">
             <a href="#section-3" class="anchor">↦</a>
         </span>
-        <p>Handle version manually</p>
+        <p>Save the documents to the output directory</p>
 
     </div>
     <div class="code">
-        <pre class="code"><code class="crystal">if options[&quot;--version&quot;]
-  puts &quot;Crycco #{Crycco::VERSION}&quot;
-  exit 0
-end
+        <pre class="code"><code class="crystal">    def save
+      @docs.each do |doc|
+        dst = dst_path doc
+        puts &quot;#{doc.path} -&gt; #{dst}&quot;
+        doc.save dst
+      end
+    end
 
 </code></pre>
     </div>
@@ -172,12 +157,24 @@ end
         <span class="anchor">
             <a href="#section-4" class="anchor">↦</a>
         </span>
-        <p>First we initialize the languages list from the given file or
-whatever is the default.</p>
+        <p>Calculate destionation paths for the documents.
+If the <code>as_source</code> option is set, the output should be a source
+file, so it will have the language's extension and use the source
+template.</p>
+<p>If the source is literate (eg: <code>foo.yml.md</code>), the destination
+will have the same name as the source but without the final &quot;.md&quot;</p>
+<p>When the output is a document, &quot;.html&quot; is appended to the destination.</p>
 
     </div>
     <div class="code">
-        <pre class="code"><code class="crystal">Crycco.load_languages(options[&quot;--languages&quot;].try &amp;.as(String))
+        <pre class="code"><code class="crystal">    def dst_path(doc : Document) : Path
+      dst = (Path[@out_dir] / Path[doc.path].relative_to(@base_dir)).to_s
+      dst += &quot;.html&quot; unless @as_source
+      if doc.@literate &amp;&amp; File.extname(dst) == &quot;.md&quot;
+        dst = dst[...-3]
+      end
+      Path[dst]
+    end
 
 </code></pre>
     </div>
@@ -188,22 +185,21 @@ whatever is the default.</p>
         <span class="anchor">
             <a href="#section-5" class="anchor">↦</a>
         </span>
-        <p>We create a <code>Collection</code> object with the given options
-casted to the right types.
-This will create <code>Document</code> objects for each source file
-which are responsible for parsing the source and saving
-the generated output. You can see the <code>Collection</code> class
-in <a href="collection.cr.html">collection.cr</a> and the <code>Document</code>
-class in <a href="crycco.cr.html#document">crycco.cr</a>.</p>
+        <p>Find the common prefix of the sources, this is used to preserve the
+directory structure when saving the documents.</p>
 
     </div>
     <div class="code">
-        <pre class="code"><code class="crystal">Crycco::Collection.new(
-  sources: options[&quot;FILE&quot;].as(Array(String)),
-  out_dir: options[&quot;--output&quot;].as(String),
-  template: options[&quot;--template&quot;].as(String),
-  as_source: options[&quot;--code&quot;] != &quot;false&quot;,
-).save
+        <pre class="code"><code class="crystal">    def common_prefix : String
+      sources = @docs.map &amp;.path
+      candidate = Path[sources[0]].dirname
+      until sources.all? { |source| Path[source].dirname.starts_with? candidate }
+        candidate = Path[candidate].dirname
+      end
+      candidate
+    end
+  end
+end
 
 </code></pre>
     </div>
