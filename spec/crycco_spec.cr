@@ -57,4 +57,11 @@ describe Crycco do
       )
     end
   end
+  describe "Collection" do
+    it "should preserve relative path structure" do
+      c = Crycco::Collection.new(["a", "../b", "c/d"], "out", "template", false)
+      (c.@sources.map { |s| c.dst_path(s) }).should \
+        eq [Path["out/crycco/a"], Path["out/b"], Path["out/crycco/c/d"]]
+    end
+  end
 end
