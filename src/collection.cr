@@ -16,7 +16,7 @@ module Crycco
     def initialize(sources : Array(String), out_dir : String, template : String, as_source : Bool)
       @docs = sources.map { |source|
         Path[source].expand.normalize
-      }.map { |source|
+      }.sort.map { |source|
         Document.new source, template, as_source
       }
 
