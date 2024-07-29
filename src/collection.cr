@@ -28,7 +28,7 @@ module Crycco
     end
 
     # Save the documents to the output directory.
-    # 
+    #
     # As extra context for rendering, we pass links to all
     # the documents in the collection.
     def save
