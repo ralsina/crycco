@@ -23,46 +23,99 @@ sidebyside
 
 {% block CSS %}
 <style>
-html * {
-    font-family: Chivo, sans-serif;
-    font-variant-ligatures: none;
-    font-weight: 300;
-    overflow: visible !important;
+    html * {
+        font-family: Chivo, sans-serif;
+        font-variant-ligatures: none;
+        font-weight: 300;
+        overflow: visible !important;
+    }
+
+    html {
+        background: linear-gradient(to right, var(--pico-color-slate-900) 50%, #011627 50%);
+    }
+
+    code,
+    code>* {
+        font-family: 'Chivo Mono', monospace !important;
+        padding-top: 0 !important;
+    }
+
+    div.doc>pre>code {
+        background-color: var(--pico-color-slate-800);
+        border: solid 1 var(--pico-color-slate-700)
+    }
+
+    @media screen and (max-width: 768px) {}
+
+    span.anchor {
+        position: relative;
+    }
+
+    a.anchor {
+        position: absolute;
+        text-decoration: none;
+        left: -1.2em;
+        opacity: 0;
+        -webkit-transition: opacity 0.2s linear;
+
+            {
+            # font-size: 150%;
+            #
+        }
+    }
+
+    div.doc:hover .anchor {
+        opacity: 1;
+    }
+</style>
+{% endblock %}
+
+{% block sidebar %}
+<a id="show-sidebar" class="secondary" onclick="document.getElementById('index').hidden=false">⇨</a>
+<aside id="index" hidden=true>
+    <header>
+        <a id="close-sidebar" onclick="document.getElementById('index').hidden=true">✖</a>
+        <h2>Documents</h2>
+    </header>
+    <nav>
+        <ul>
+            {% for k,v in links %}
+            <li>
+                <a href="{{ v }}"><span>{{k}}</span></a>
+            </li>
+            {% endfor %}
+        </ul>
+    </nav>
+</aside>
+{% endblock %}
+
+{% block sidebarcss %}
+<style>
+aside {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 20em;
+    background: var(--pico-color-slate-900);
+    color: var(--pico-color-slate-100);
+    overflow-y: auto;
+    z-index: 100;
+    padding: 1em;
+    transition: transform 0.3s;
+    border-right: 1px solid var(--pico-color-slate-500);
 }
 
-html {
-    background: linear-gradient(to right, var(--pico-color-slate-900) 50%, #011627 50%);
-}
-code,
-code>* {
-    font-family: 'Chivo Mono', monospace !important;
-    padding-top: 0 !important;
-}
-
-div.doc>pre>code {
-    background-color: var(--pico-color-slate-800);
-    border: solid 1 var(--pico-color-slate-700)
-}
-
-@media screen and (max-width: 768px) {
-}
-
-span.anchor {
-    position: relative;
-}
-
-a.anchor {
+#show-sidebar, #close-sidebar {
     position: absolute;
+    right: 0em;
+    padding: .5em;
+    color: var(--pico-color-slate-100);
     text-decoration: none;
-    left: -1.2em;
-    opacity: 0;
-    -webkit-transition: opacity 0.2s linear;
-    {# font-size: 150%; #}
 }
-
-div.doc:hover .anchor {
-    opacity: 1;
+#show-sidebar {
+    left: 0em;
+    transition: transform 0.3s;
 }
-
 </style>
 {% endblock %}

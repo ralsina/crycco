@@ -1,0 +1,123 @@
+{% block sidebar %}
+    <input type="checkbox" id="check">
+    <label for="check">
+        <i id="btn">⇥</i>
+        <i id="cancel">⇤</i>
+    </label>
+    <div class="sidebar">
+        <h4>Documents</h4>
+        {% for k,v in links %}
+        <a href="{{ v }}"><span>{{k}}</span></a></li>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block sidebarcss %}
+    <style>
+        .sidebar {
+            position: fixed;
+            top: 0;
+            width: 15em;
+            left: -15em;
+            height: 100%;
+            background: #1e1e1e;
+            transition: all .5s ease;
+            padding: 2em;
+            z-index: 1;
+        }
+        .sidebar a {
+            display: block;
+            width: 100%;
+            color: white;
+            line-height: 2em;
+            box-sizing: border-box;
+            transition: all .5s ease;
+        }
+
+        a.active {
+            color: #b93632;
+        }
+
+        #check {
+            display: none;
+        }
+
+        label #btn,
+        label #cancel {
+            position: absolute;
+            top: 0;
+            cursor: pointer;
+            color: white;
+            border-radius: 5px;
+            border: 1px solid #262626;
+            margin: 15px 30px;
+            font-size: 29px;
+            background: #262626;
+            height: 45px;
+            width: 45px;
+            text-align: center;
+            line-height: 45px;
+            transition: all .5s ease;
+        }
+
+        label #cancel {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        #check:checked~.sidebar {
+            left: 0;
+        }
+
+        #check:checked~label #btn {
+            margin-left: 15em;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        #check:checked~label #cancel {
+            margin-left: 12em;
+            opacity: 1;
+            visibility: visible;
+        }
+
+        @media(max-width : 768px) {
+            .sidebar {
+                height: auto;
+                width: 70px;
+                left: 0;
+                margin: 100px 0;
+            }
+
+            #btn,
+            #cancel {
+                display: none;
+            }
+
+            span {
+                position: absolute;
+                margin-left: 23px;
+                opacity: 0;
+                visibility: hidden;
+            }
+
+            .sidebar a {
+                height: 60px;
+            }
+
+            .sidebar a i {
+                margin-left: -10px;
+            }
+
+            a:hover {
+                width: 200px;
+                background: inherit;
+            }
+
+            .sidebar a:hover span {
+                opacity: 1;
+                visibility: visible;
+            }
+        }
+    </style>
+{% endblock %}
