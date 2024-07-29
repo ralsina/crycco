@@ -18,7 +18,7 @@ Crycco, a Crystal version of docco/pycco/etc.
 
 Usage:
     crycco FILE... [-L <file>][-l <name>][-o <path>][-c <file>]
-                     [-t <file>] [--doc|--code]
+                   [-t <file>] [--doc|--code]
     crycco -v
     cryco --help
 
