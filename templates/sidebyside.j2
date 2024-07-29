@@ -67,12 +67,21 @@ sidebyside
     div.doc:hover .anchor {
         opacity: 1;
     }
+
+    @media (width < 768px) {
+        html {
+            background: var(--pico-color-slate-900);
+        }
+
+        pre.code>code {
+            overflow-x: auto !important;
+        }
+    }
 </style>
 {% endblock %}
 
 {% block sidebar %}
-<a id="show-sidebar" class="secondary" 
-    onclick="document.getElementById('sidebar').style.right='0em'">⬅
+<a id="show-sidebar" class="secondary" onclick="document.getElementById('sidebar').style.right='0em'">⬅
 </a>
 <aside id="sidebar">
     <a id="close-sidebar" class="secondary" onclick="document.getElementById('sidebar').style.right='-20em'">✖</a>
