@@ -256,7 +256,7 @@ module Crycco
           "title"    => File.basename(path),
           "sections" => sections.map(&.to_h),
           "language" => language["name"],
-      }.merge extra_context)
+        }.merge extra_context)
       end
     end
   end
