@@ -138,7 +138,8 @@ for parsing the source files and generating the output.</p>
 
     </div>
     <div class="code">
-        <pre class="code"><code class="crystal">require &quot;./templates&quot;
+        <pre class="code"><code class="crystal">require &quot;./collection&quot;
+require &quot;./templates&quot;
 require &quot;file_utils&quot;
 require &quot;html&quot;
 require &quot;markd&quot;
@@ -205,7 +206,7 @@ in the actual binary so we don't have to carry it around.</p>
     <div class="code">
         <pre class="code"><code class="crystal">  class BakedLanguages
     extend BakedFileSystem
-    bake_file &quot;languages.yml&quot;, File.read(&quot;languages.yml&quot;)
+    bake_file &quot;languages.yml&quot;, File.read(&quot;src/languages.yml&quot;)
   end
 
 </code></pre>
@@ -217,7 +218,8 @@ in the actual binary so we don't have to carry it around.</p>
         <span class="anchor">
             <a href="#section-7" class="anchor">↦</a>
         </span>
-        <p>The description of how to parse a language is stored in a YAML file
+        <p>The description of how to parse a language is stored in
+<a href="languages.yaml.html">a YAML file</a>
 which we read here in <code>Crycco.load_languages</code>. If no file is given
 it defaults to the embedded one.</p>
 <p>The <code>match</code> regex is used to detect if a line is a comment or code.</p>
@@ -264,7 +266,8 @@ such as string interpolations.</p>
         <span class="anchor">
             <a href="#section-9" class="anchor">↦</a>
         </span>
-        <p>Document contents are organized in sections, which have docs and code.
+        <h2>Section</h2>
+<p>Document contents are organized in sections, which have docs and code.
 The docs are markdown extracted from comments and the code is the actual code.</p>
 <p>Sections can be converted to HTML using the <code>docs_html</code> and <code>code_html</code> methods.</p>
 
@@ -377,14 +380,15 @@ a hash.</p>
         <span class="anchor">
             <a href="#section-14" class="anchor">↦</a>
         </span>
-        <p>A Document takes a path as input and reads the file,
+        <h2>Document</h2>
+<p>A Document takes a path as input and reads the file,
 parses its contents and is able to generate whatever
 output is needed.</p>
 
     </div>
     <div class="code">
         <pre class="code"><code class="crystal">  class Document
-    property path : String
+    property path : Path
     property sections = Array(Section).new
     property language : Language
     @literate : Bool = false
@@ -407,13 +411,12 @@ definition a bit.</p>
 
     </div>
     <div class="code">
-        <pre class="code"><code class="crystal">    def initialize(@path : String,
-                   @out_dir : String = &quot;docs&quot;,
+        <pre class="code"><code class="crystal">    def initialize(@path : Path,
                    @template : String = &quot;sidebyside&quot;,
                    @as_source : Bool = false)
-      key = File.extname(@path)
+      key = @path.extension
       if key == &quot;.md&quot; # It may be literate!
-        lang_key = File.extname(File.basename(@path, &quot;.md&quot;))
+        lang_key = File.extname(@path.basename(&quot;.md&quot;))
         if LANGUAGES.has_key?(lang_key)
           key = lang_key
           @literate = true
@@ -563,12 +566,9 @@ you can check out <a href="templates.cr.html">templates.cr</a></p>
 
     </div>
     <div class="code">
-        <pre class="code"><code class="crystal">    def save
-      out_file = out_path
-
+        <pre class="code"><code class="crystal">    def save(out_file : Path)
       FileUtils.mkdir_p(File.dirname(path))
       template = Templates.get(@template)
-      puts &quot;#{self.path} -&gt; #{out_file}&quot;
       FileUtils.mkdir_p(File.dirname(out_file))
       File.open(out_file, &quot;w&quot;) do |outf|
         outf &lt;&lt; template.render({
@@ -578,6 +578,8 @@ you can check out <a href="templates.cr.html">templates.cr</a></p>
         })
       end
     end
+  end
+end
 
 </code></pre>
     </div>
@@ -587,62 +589,6 @@ you can check out <a href="templates.cr.html">templates.cr</a></p>
     <div class="doc" id="section-24">
         <span class="anchor">
             <a href="#section-24" class="anchor">↦</a>
-        </span>
-        <p>Calculate where this should be saved.</p>
-<p>It will be with the same name as <code>source</code>, under <code>out_dir</code>
-and with the <code>.html</code> extension added if we are generating
-docs.</p>
-<p>If this is a literate document, remove any final .md
-from the output file name because we are outputting
-source code for the underlying language.</p>
-
-    </div>
-    <div class="code">
-        <pre class="code"><code class="crystal">    def out_path : String
-      result = File.join(@out_dir, File.basename(@path))
-      @template = &quot;source&quot; if @as_source
-      result += &quot;.html&quot; unless @as_source
-      if @literate &amp;&amp; File.extname(result) == &quot;.md&quot;
-        result = result[...-3]
-      end
-      result
-    end
-  end
-
-</code></pre>
-    </div>
-</div>
-
-<div id="section-25" class="grid">
-    <div class="doc" id="section-25">
-        <span class="anchor">
-            <a href="#section-25" class="anchor">↦</a>
-        </span>
-        <p>The <code>process</code> function is the entry point to the whole thing.</p>
-<p>Given a list of source files, create documents for each one
-and save them to the output directory. You can see it being used
-in <a href="main.cr.html">main.cr</a></p>
-
-    </div>
-    <div class="code">
-        <pre class="code"><code class="crystal">  def process(sources : Array(String),
-              out_dir : String,
-              template : String,
-              as_source = false)
-    sources.each do |source|
-      Document.new(source, out_dir, template, as_source).save
-    end
-  end
-end
-
-</code></pre>
-    </div>
-</div>
-
-<div id="section-26" class="grid">
-    <div class="doc" id="section-26">
-        <span class="anchor">
-            <a href="#section-26" class="anchor">↦</a>
         </span>
         <p>🏁 That's it!</p>
 

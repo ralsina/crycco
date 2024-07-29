@@ -8,7 +8,7 @@
 # more information you can visit [docopt.org](https://docopt.org/).
 
 require "docopt"
-require "./crycco"
+require "./collection"
 
 # Crycco is not a very complicated tool, really, so the options are
 # few and simple.
@@ -17,8 +17,7 @@ HELP = <<-HELP
 Crycco, a Crystal version of docco/pycco/etc.
 
 Usage:
-    crycco FILE... [-L <file>][-l <name>][-o <path>][-c <file>]
-                   [-t <file>] [--doc|--code]
+    crycco FILE... [-l <name>][-o <path>][-t <file>] [--doc|--code]
     crycco -v
     cryco --help
 
@@ -57,13 +56,17 @@ end
 
 Crycco.load_languages(options["--languages"].try &.as(String))
 
-# And here, we call `Crycco.process` with the options we got, casted to
-# the types it expects. If there is an error, we can just crash with
-# an exception and a backtrace. The interesting code is in [crycco.cr](./crycco.cr.html#section-2).
+# We create a `Collection` object with the given options
+# casted to the right types.
+# This will create `Document` objects for each source file
+# which are responsible for parsing the source and saving
+# the generated output. You can see the `Collection` class
+# in [collection.cr](collection.cr.html) and the `Document`
+# class in [crycco.cr](crycco.cr.html#document).
 
-Crycco.process(
+Crycco::Collection.new(
   sources: options["FILE"].as(Array(String)),
   out_dir: options["--output"].as(String),
   template: options["--template"].as(String),
   as_source: options["--code"] != "false",
-)
+).save

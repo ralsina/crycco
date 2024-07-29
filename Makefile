@@ -1,7 +1,7 @@
-build: src/*.cr languages.yml templates/*.j2
+build: src/*.cr src/languages.yml templates/*.j2
 	shards build -Dstrict_multi_assign -Dno_number_autocast
-release: src/*.cr languages.yml templates/*.j2
+release: src/*.cr src/languages.yml templates/*.j2
 	shards build --release
-static: src/*.cr languages.yml templates/*.j2
+static: src/*.cr src/languages.yml templates/*.j2
 	shards build --release --static
 	strip bin/crycco
