@@ -6,7 +6,6 @@
 * ✅ Add a sidebar
 * Autolinks to other pages?
 * Other layouts?
-* Allow light/dark switch?
 * Support other outputs
   * ✅ source code
   * literate version
@@ -14,3 +13,11 @@
   * nocomments
 * Support custom title? Extract title from doc? Use filename?
 * Enclosing comments (need them for templates!)
+
+# Things I am *not* doing for now
+
+* Allow light/dark switch?
+  
+  The problem: because I hardcoded a number of colors, switching via
+  Pico doesn't work well. I could switch to using CSS variables, but
+  it's boring, so maybe later.
