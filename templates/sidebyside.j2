@@ -71,10 +71,10 @@ sidebyside
 {% endblock %}
 
 {% block sidebar %}
-<a id="show-sidebar" class="secondary" onclick="document.getElementById('index').hidden=false">⇨</a>
-<aside id="index" hidden=true>
+<a id="show-sidebar" class="secondary" onclick="document.getElementById('sidebar').style.right='0em'">⬅</a>
+<aside id="sidebar">
+    <a id="close-sidebar" class="secondary" onclick="document.getElementById('sidebar').style.right='-20em'">✖</a>
     <header>
-        <a id="close-sidebar" onclick="document.getElementById('index').hidden=true">✖</a>
         <h2>Documents</h2>
     </header>
     <nav>
@@ -91,31 +91,37 @@ sidebyside
 
 {% block sidebarcss %}
 <style>
-aside {
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: 20em;
-    background: var(--pico-color-slate-900);
-    color: var(--pico-color-slate-100);
-    overflow-y: auto;
-    z-index: 100;
-    padding: 1em;
-    transition: transform 0.3s;
-    border-right: 1px solid var(--pico-color-slate-500);
-}
+    aside {
+        position: fixed;
+        top: 0;
+        right: -20em;
+        bottom: 0;
+        width: 20em;
+        background: var(--pico-color-slate-900);
+        color: var(--pico-color-slate-200);
+        overflow-y: auto;
+        z-index: 100;
+        padding: 1em;
+        transition: right .25s;
+        border-left: 1px solid var(--pico-color-slate-700);
+        opacity: 90%;
+    }
 
-#show-sidebar, #close-sidebar {
-    position: absolute;
-    right: 0em;
-    padding: .5em;
-    color: var(--pico-color-slate-100);
-    text-decoration: none;
-}
-#show-sidebar {
-    left: 0em;
-    transition: transform 0.3s;
-}
+    #show-sidebar,
+    #close-sidebar {
+        position: absolute;
+        top: 0em;
+        right: 0em;
+        padding: .5em;
+        color: var(--pico-color-slate-100);
+        text-decoration: none;
+        background-color: var(--pico-color-slate-500);
+        border-radius: 0 0 0 .5em;
+        opacity: 75%;
+    }
+
+    #show-sidebar {
+        position: fixed;
+    }
 </style>
 {% endblock %}

@@ -199,11 +199,9 @@ module Crycco
         end
       end
 
-      if LANGUAGES.has_key?(key)
-        @language = LANGUAGES[key].clone
-      else
-        raise Exception.new "Unknown language for file #{@path}"
-      end
+      raise Exception.new "Unknown language for file #{@path}" \
+        unless LANGUAGES.has_key? key
+      @language = LANGUAGES[key].clone
 
       # In the literate versions, everything is doc except
       # indented things, which are code. So we change the

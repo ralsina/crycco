@@ -1,14 +1,14 @@
 # # collection.cr
-# A Collection is a group of sources that will be processed together
-# and saved to the same output directory while preserving the directory
-# structure of the sources.
-#
-# This way the logic for path manipulation is centrallized here and
-# the Document class can be simpler.
 
 require "./crycco"
 
 module Crycco
+  # A Collection is a group of sources that will be processed together
+  # and saved to the same output directory while preserving the directory
+  # structure of the sources.
+  #
+  # This way the logic for path manipulation is centrallized here and
+  # the Document class can be simpler.
   class Collection
     @docs : Array(Document)
 
@@ -16,7 +16,7 @@ module Crycco
     def initialize(sources : Array(String), out_dir : String, template : String, as_source : Bool)
       @docs = sources.map { |source|
         Path[source].expand.normalize
-      }.sort.map { |source|
+      }.sort!.map { |source|
         Document.new source, template, as_source
       }
 
