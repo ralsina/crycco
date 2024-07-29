@@ -27,6 +27,9 @@ html * {
     overflow: visible !important;
 }
 
+html {
+    background: linear-gradient(to right, var(--pico-color-slate-900) 50%, #011627 50%);
+}
 code,
 code>* {
     font-family: 'Chivo Mono', monospace !important;
@@ -38,21 +41,7 @@ div.doc>pre>code {
     border: solid 1 var(--pico-color-slate-700)
 }
 
-.background {
-    background: linear-gradient(to right, var(--pico-color-slate-900) 50%, #011627 50%);
-    height: 100vh;
-    width: 100vw;
-    position: fixed;
-    z-index: -1;
-    margin: 0;
-    top: 0px;
-    left: 0px;
-    display: block;
-}
 @media screen and (max-width: 768px) {
-    div.background {
-        display: none;
-    }
 }
 
 span.anchor {
@@ -79,7 +68,6 @@ div.doc:hover .anchor {
 <body>
     <main class="container">
         
-<div id="background" class="background">
 </div>
 
 <div id="section-1" class="grid">
