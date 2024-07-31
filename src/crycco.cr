@@ -157,6 +157,18 @@ module Crycco
       lines.join("\n")
     end
 
+    # `to_markdown` converts the section into valid markdown with code blocks
+    # for the source code.
+    #
+    def to_markdown : String
+      lines = [] of String
+      lines << docs
+      lines << "```#{language["name"]}"
+      lines << code.rstrip("\n")
+      lines << "```"
+      lines.join("\n")
+    end
+
     # The `to_h` method is used to turn the section into something that can be
     # handled by the Crinja template engine. Just takes the data and put it in
     # a hash.
@@ -167,6 +179,7 @@ module Crycco
         "docs_html" => docs_html,
         "code_html" => code_html,
         "source"    => to_source,
+        "markdown"  => to_markdown,
       }
     end
   end
@@ -182,6 +195,7 @@ module Crycco
     @literate : Bool = false
     @template : String
     @as_source : Bool
+    @as_markdown : Bool
 
     # On initialization we read the file and parse it in the correct
     # language. Also, if rather than a `.yml` file we have a `.yml.md`
@@ -189,7 +203,8 @@ module Crycco
     # definition a bit.
     def initialize(@path : Path,
                    @template : String = "sidebyside",
-                   @as_source : Bool = false)
+                   @as_source : Bool = false,
+                   @as_markdown : Bool = false)
       key = @path.extension
       if key == ".md" # It may be literate!
         lang_key = File.extname(@path.basename(".md"))
@@ -250,6 +265,8 @@ module Crycco
     def save(out_file : Path, extra_context)
       FileUtils.mkdir_p(File.dirname(path))
       template = Templates.get(@template)
+      template = Templates.get("source") if @as_source
+      template = Templates.get("markdown") if @as_markdown
       FileUtils.mkdir_p(File.dirname(out_file))
       File.open(out_file, "w") do |outf|
         outf << template.render({

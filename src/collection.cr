@@ -13,17 +13,22 @@ module Crycco
     @docs : Array(Document)
 
     # On initialization, we create documents for each source file
-    def initialize(sources : Array(String), out_dir : String, template : String, as_source : Bool)
+    def initialize(sources : Array(String),
+                   out_dir : String,
+                   template : String,
+                   as_source : Bool,
+                   as_markdown : Bool)
       @docs = sources.map { |source|
         Path[source].expand.normalize
       }.sort!.map { |source|
-        Document.new source, template, as_source
+        Document.new source, template, as_source, as_markdown
       }
 
       @out_dir = out_dir
       @template = template
       @template = "source" if as_source
       @as_source = as_source
+      @as_markdown = as_markdown
       @base_dir = Path[common_prefix]
     end
 
@@ -56,7 +61,8 @@ module Crycco
     # When the output is a document, ".html" is appended to the destination.
     def dst_path(doc : Document) : Path
       dst = (Path[@out_dir] / Path[doc.path].relative_to(@base_dir)).to_s
-      dst += ".html" unless @as_source
+      dst += ".html" unless @as_source || @as_markdown
+      dst += ".md" if @as_markdown
       if doc.@literate && File.extname(dst) == ".md"
         dst = dst[...-3]
       end
