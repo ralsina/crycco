@@ -9,7 +9,7 @@
 * Support other outputs
   * ✅ source code
   * literate version
-  * markdown
+  * ✅ markdown
   * nocomments
 * Support custom title? Extract title from doc? Use filename?
 * Enclosing comments (need them for templates!)
