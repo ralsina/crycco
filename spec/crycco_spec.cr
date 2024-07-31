@@ -1,6 +1,6 @@
 require "./spec_helper"
 
-Crycco.load_languages("#{__DIR__}/../languages.yml")
+Crycco.load_languages("#{__DIR__}/../src/languages.yml")
 
 describe Crycco do
   describe "parse" do
@@ -59,11 +59,11 @@ describe Crycco do
   end
   describe "Collection" do
     it "should preserve relative path structure" do
-      c = Crycco::Collection.new(["src/crycco.cr", "TODO.md", "languages.yml"], "out", "template", false)
-      (c.@docs.map { |d| c.dst_path(d) }).should \
+      c = Crycco::Collection.new(["src/crycco.cr", "TODO.md", "src/languages.yml"], "out", "template", "docs")
+      (c.@docs.map { |d| c.dst_path(d) }).sort.should \
         eq [Path["out/src/crycco.cr.html"],
             Path["out/TODO.md.html"],
-            Path["out/languages.yml.html"]]
+            Path["out/src/languages.yml.html"]].sort
     end
   end
 end
