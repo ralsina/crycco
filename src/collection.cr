@@ -16,19 +16,16 @@ module Crycco
     def initialize(sources : Array(String),
                    out_dir : String,
                    template : String,
-                   as_source : Bool,
-                   as_markdown : Bool)
+                   mode : String)
       @docs = sources.map { |source|
         Path[source].expand.normalize
       }.sort!.map { |source|
-        Document.new source, template, as_source, as_markdown
+        Document.new source, template, mode
       }
 
       @out_dir = out_dir
       @template = template
-      @template = "source" if as_source
-      @as_source = as_source
-      @as_markdown = as_markdown
+      @mode = mode
       @base_dir = Path[common_prefix]
     end
 
@@ -61,8 +58,12 @@ module Crycco
     # When the output is a document, ".html" is appended to the destination.
     def dst_path(doc : Document) : Path
       dst = (Path[@out_dir] / Path[doc.path].relative_to(@base_dir)).to_s
-      dst += ".html" unless @as_source || @as_markdown
-      dst += ".md" if @as_markdown
+      case @mode
+      when "docs"
+        dst += ".html"
+      when "markdown"
+        dst += ".md"
+      end
       if doc.@literate && File.extname(dst) == ".md"
         dst = dst[...-3]
       end

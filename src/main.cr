@@ -17,7 +17,7 @@ HELP = <<-HELP
 Crycco, a Crystal version of docco/pycco/etc.
 
 Usage:
-    crycco FILE... [-l <name>][-o <path>][-t <file>] [--doc|--code|--markdown]
+    crycco FILE... [-l <name>][-o <path>][-t <file>][--mode <mode>]
     crycco -v
     cryco --help
 
@@ -26,9 +26,17 @@ Options:
   -l, --languages <file>  use a custom languages.yml file
   -o, --output <path>     output to a given folder [default: docs/]
   -t, --template <name>   template for doc layout [default: sidebyside]
-  --code                  output source code instead of HTML [default: false]
-  --markdown              output markdown instead of HTML [default: false]
+  --mode <mode>           what to output [default: docs]
   -h, --help              this help message
+
+The available modes are:
+
+* docs (default)
+  Generates HTML documentation.
+* code
+  Generates source code with comments
+* markdown
+  Generates markdown files with the code in fenced code blocks
 
 Crycco comes with two templates for HTML documents which you can
 use in the -t option when generating docs:
@@ -69,6 +77,5 @@ Crycco::Collection.new(
   sources: options["FILE"].as(Array(String)),
   out_dir: options["--output"].as(String),
   template: options["--template"].as(String),
-  as_source: options["--code"] != "false",
-  as_markdown: options["--markdown"] != "false",
+  mode: options["--mode"].as(String),
 ).save
