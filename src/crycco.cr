@@ -73,7 +73,7 @@ require "yaml"
 # of this file.
 module Crycco
   extend self
-  VERSION = "0.1.0"
+  VERSION = "0.3.0"
 
   # Languages are defined in a hash with the extension as the key
   #
