@@ -62,6 +62,8 @@ module Crycco
       when "docs"
         dst += ".html"
       when "markdown"
+        dst = Path[dst].dirname + "/" + Path[dst].stem + ".md"
+      when "literate"
         dst += ".md"
       end
       if doc.@literate && File.extname(dst) == ".md"

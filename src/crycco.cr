@@ -169,6 +169,18 @@ module Crycco
       lines.join("\n")
     end
 
+    # `to_literate` converts the section into valid markdown with code blocks
+    # as indented blocks.
+    #
+    def to_literate : String
+      lines = [] of String
+      lines << docs
+      lines << ""
+      lines += code.split("\n").map { |line| "    #{line}" }
+      lines << ""
+      lines.join("\n")
+    end
+
     # The `to_h` method is used to turn the section into something that can be
     # handled by the Crinja template engine. Just takes the data and put it in
     # a hash.
@@ -180,6 +192,7 @@ module Crycco
         "code_html" => code_html,
         "source"    => to_source,
         "markdown"  => to_markdown,
+        "literate"  => to_literate,
       }
     end
   end
@@ -267,6 +280,8 @@ module Crycco
         template = Templates.get("markdown")
       when "code"
         template = Templates.get("source")
+      when "literate"
+        template = Templates.get("literate")
       else
         template = Templates.get(@template)
       end

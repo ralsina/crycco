@@ -37,6 +37,8 @@ The available modes are:
   Generates source code with comments
 * markdown
   Generates markdown files with the code in fenced code blocks
+* literate
+  Generates markdown files with the code in indented blocks
 
 Crycco comes with two templates for HTML documents which you can
 use in the -t option when generating docs:
