@@ -8,7 +8,7 @@
 * Other layouts?
 * Support other outputs
   * ✅ source code
-  * literate version
+  * ✅ literate version
   * ✅ markdown
   * nocomments
 * Support custom title? Extract title from doc? Use filename?
