@@ -15,8 +15,9 @@
 * Enclosing comments (need them for templates!)
 * ✅ Use tartrazine for syntax highlighting
 * ✅ Use base16 for themes
-* Fix regression: code blocks in docs are not highlighted because
+* ✅ Fix regression: code blocks in docs are not highlighted because
   highlighjs is gone. Need to use tartrazine for that.
+* Make the basic layout look good
 
 # Things I am *not* doing for now
 
