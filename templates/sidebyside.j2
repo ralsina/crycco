@@ -36,6 +36,18 @@ sidebyside
         background: linear-gradient(to right, var(--pico-background-color) 50%, #{{base01_hex}} 50%);
     }
 
+    body {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    footer {
+        text-align: center;
+        border-top: solid 1px #{{base04_hex}};
+        background-color: #{{base00_hex}};
+        margin-top: auto;
+    }
     code,
     code * {
         font-family: 'Chivo Mono', monospace !important;
@@ -46,6 +58,7 @@ sidebyside
     div.doc>pre>code {
         background-color: #{{base02_hex}};
     }
+
     span.anchor {
         position: relative;
     }
@@ -78,4 +91,3 @@ sidebyside
     }
 </style>
 {% endblock %}
-
