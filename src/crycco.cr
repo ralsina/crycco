@@ -74,7 +74,7 @@ require "yaml"
 # of this file.
 module Crycco
   extend self
-  VERSION = {{ (`shards version`).chomp.stringify }}
+  VERSION = {{ `shards version #{__DIR__}`.chomp.stringify }}
 
   # Languages are defined in a hash with the extension as the key
   #

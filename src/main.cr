@@ -18,8 +18,8 @@ Crycco, a Crystal version of docco/pycco/etc.
 
 Usage:
     crycco FILE... [-l <name>][-o <path>][-t <file>][--mode <mode>][--theme <theme>]
-    crycco -v
-    cryco --help
+    crycco --version
+    crycco --help
 
 Options:
   -v, --version           output the version number
@@ -56,6 +56,7 @@ source code instead of HTML.
 HELP
 
 options = Docopt.docopt(HELP, ARGV)
+
 # Handle version manually
 if options["--version"]
   puts "Crycco #{Crycco::VERSION}"
