@@ -1,5 +1,6 @@
 # # collection.cr
 
+require "sixteen"
 require "./crycco"
 
 module Crycco
@@ -16,7 +17,8 @@ module Crycco
     def initialize(sources : Array(String),
                    out_dir : String,
                    template : String,
-                   mode : String)
+                   mode : String,
+                   theme : String = "default-dark")
       @docs = sources.map { |source|
         Path[source].expand.normalize
       }.sort!.map { |source|
@@ -27,12 +29,14 @@ module Crycco
       @template = template
       @mode = mode
       @base_dir = Path[common_prefix]
+      @theme = Sixteen.theme(theme)
     end
 
     # Save the documents to the output directory.
     #
     # As extra context for rendering, we pass links to all
-    # the documents in the collection.
+    # the documents in the collection and the theme context
+    # which contains a selection of colors from the theme.
     def save
       @docs.each do |doc|
         dst = dst_path doc
@@ -43,7 +47,7 @@ module Crycco
           target = "#" if doclink == doc
           links[doclink.path.relative_to(@base_dir).to_s] = target
         end
-        doc.save dst, {"links" => links}
+        doc.save dst, {"links" => links}.merge(@theme.context("_"))
       end
     end
 

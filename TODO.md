@@ -13,6 +13,8 @@
   * nocomments
 * Support custom title? Extract title from doc? Use filename?
 * Enclosing comments (need them for templates!)
+* Use tartrazine for syntax highlighting
+* Use base16 for themes
 
 # Things I am *not* doing for now
 

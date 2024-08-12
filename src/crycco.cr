@@ -73,7 +73,7 @@ require "yaml"
 # of this file.
 module Crycco
   extend self
-  VERSION = "0.3.0"
+  VERSION = {{ (`shards version`).chomp.stringify }}
 
   # Languages are defined in a hash with the extension as the key
   #
@@ -226,7 +226,7 @@ module Crycco
       end
 
       raise Exception.new "Unknown language for file #{@path}" \
-        unless LANGUAGES.has_key? key
+         unless LANGUAGES.has_key? key
       @language = LANGUAGES[key].clone
 
       # In the literate versions, everything is doc except

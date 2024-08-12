@@ -1,4 +1,5 @@
 {% extends "sidebar.j2" %}
+{% extends "base16.j2" %}
 {% extends "page.j2" %}
 
 {% block layoutname %}
@@ -32,22 +33,19 @@ sidebyside
     }
 
     html {
-        background: linear-gradient(to right, var(--pico-color-slate-900) 50%, #011627 50%);
+        background: linear-gradient(to right, var(--pico-background-color) 50%, #{{base01_hex}} 50%);
     }
 
     code,
     code>* {
         font-family: 'Chivo Mono', monospace !important;
         padding-top: 0 !important;
+        background-color: #{{base01_hex}} !important;
     }
 
     div.doc>pre>code {
-        background-color: var(--pico-color-slate-800);
-        border: solid 1 var(--pico-color-slate-700)
+        background-color: #{{base02_hex}};
     }
-
-    @media screen and (max-width: 768px) {}
-
     span.anchor {
         position: relative;
     }
@@ -71,7 +69,7 @@ sidebyside
 
     @media (width < 768px) {
         html {
-            background: var(--pico-color-slate-900);
+            background: var(--pico-background-color);
         }
 
         pre.code>code {

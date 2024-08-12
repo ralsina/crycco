@@ -17,6 +17,8 @@ dependencies:
     github: straight-shoota/crinja
   docopt:
     github: chenkovsky/docopt.cr
+  sixteen:
+    github: ralsina/sixteen
 
 
 crystal: '>= 1.13.0'

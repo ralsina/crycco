@@ -1,0 +1,28 @@
+{% block pico_theme %}
+<style>
+/* These are just a tiny fraction of the pico color variables,
+   will add more as I know what they do and which semantic
+   value from base16 may make sense */
+
+/* Theme: {{scheme_name}} */
+/* Author: {{scheme_author}} */
+
+:root {
+    --sarasa-var: #0000ff;
+    --pico-background-color: #{{base00_hex}}; /* Default backround */
+    --pico-color: #{{base05_hex}}; /* Default foreground */
+    --pico-text-selection-color: #{{base02_hex}}; /* Selection background */
+    --pico-primary: #{{base0D_hex}}; /* Headings */
+    --pico-primary-underline: var(--pico-primary);
+    --pico-primary-background: #{{base02_hex}};
+    --pico-primary-hover: #{{base09_hex}}; /* Link URL */
+    --pico-primary-hover-underline: var(--pico-primary-hover);
+    --pico-h1-color: var(--pico-primary); /* Default foreground */
+    --pico-h2-color: var(--pico-primary); /* Default foreground */
+    --pico-h3-color: var(--pico-primary); /* Default foreground */
+    --pico-h4-color: var(--pico-primary); /* Default foreground */
+    --pico-h5-color: var(--pico-primary); /* Default foreground */
+    --pico-h6-color: var(--pico-primary); /* Default foreground */
+}
+</style>
+{% endblock %%}

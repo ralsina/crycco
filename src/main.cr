@@ -17,7 +17,7 @@ HELP = <<-HELP
 Crycco, a Crystal version of docco/pycco/etc.
 
 Usage:
-    crycco FILE... [-l <name>][-o <path>][-t <file>][--mode <mode>]
+    crycco FILE... [-l <name>][-o <path>][-t <file>][--mode <mode>][--theme <theme>]
     crycco -v
     cryco --help
 
@@ -27,6 +27,7 @@ Options:
   -o, --output <path>     output to a given folder [default: docs/]
   -t, --template <name>   template for doc layout [default: sidebyside]
   --mode <mode>           what to output [default: docs]
+  --theme <theme>         theme for the output [default: default-dark]
   -h, --help              this help message
 
 The available modes are:
@@ -55,7 +56,6 @@ source code instead of HTML.
 HELP
 
 options = Docopt.docopt(HELP, ARGV)
-
 # Handle version manually
 if options["--version"]
   puts "Crycco #{Crycco::VERSION}"
@@ -80,4 +80,5 @@ Crycco::Collection.new(
   out_dir: options["--output"].as(String),
   template: options["--template"].as(String),
   mode: options["--mode"].as(String),
+  theme: options["--theme"].as(String),
 ).save
