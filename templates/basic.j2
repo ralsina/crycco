@@ -31,14 +31,31 @@ basic
         font-weight: 300;
     }
 
+    body {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    footer {
+        text-align: center;
+        border-top: solid 1px #{{base04_hex}};
+        background-color: #{{base00_hex}};
+        margin-top: auto;        
+    }
     code,
     code>* {
         font-family: 'Chivo Mono', monospace !important;
+        background-color: #{{base01_hex}} !important;
+        overflow-x: auto;
     }
 
-    div.doc>pre>code {
-        background-color: var(--pico-color-slate-800);
-        border: solid 1 var(--pico-color-slate-700)
+    div.doc>pre>*,  {
+        background-color: #{{base02_hex}} !important;
+    }
+
+    div.doc>p>code  {
+        display: inline !important;
     }
 </style>
 {% endblock %}

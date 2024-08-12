@@ -151,7 +151,7 @@ module Crycco
 
     # All the code is passed through the formatter to get syntax highlighting
     def code_html
-      @formatter.format(code.lstrip("\n"), @lexer, @theme)
+      @formatter.format(code.strip("\n"), @lexer, @theme)
     end
 
     # `to_source` regenerates valid source code out of the section. This way if
