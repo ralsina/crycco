@@ -52,7 +52,7 @@ require "./collection"
 require "./templates"
 require "file_utils"
 require "html"
-require "markd"
+require "./markd"
 require "tartrazine/formatters/html"
 require "yaml"
 
@@ -141,9 +141,12 @@ module Crycco
       @formatter.tab_width = 4
     end
 
-    # `docs_html` converts the docs to HTML using the Markd library
+    # `docs_html` converts the docs to HTML using the Markd library.
+    # The `md_to_html` is a thin wrapper around Markd that changes
+    # how some specific things are rendered, specifically source code.
+    # You can see the implementation in [markd.cr](markd.cr.html)
     def docs_html
-      Markd.to_html(docs)
+      Tartrazine.md_to_html(docs)
     end
 
     # All the code is passed through the formatter to get syntax highlighting

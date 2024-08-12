@@ -60,7 +60,7 @@ describe Crycco do
   describe "Collection" do
     it "should preserve relative path structure" do
       c = Crycco::Collection.new(["src/crycco.cr", "TODO.md", "src/languages.yml"], "out", "template", "docs")
-      (c.@docs.map { |d| c.dst_path(d) }).sort.should \
+      (c.@docs.map { |doc| c.dst_path(doc) }).sort.should \
         eq [Path["out/src/crycco.cr.html"],
             Path["out/TODO.md.html"],
             Path["out/src/languages.yml.html"]].sort
