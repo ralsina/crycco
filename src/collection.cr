@@ -29,7 +29,12 @@ module Crycco
       @template = template
       @mode = mode
       @base_dir = Path[common_prefix]
+      # FIXME: make the sixteen theme accessible from tartrazine
+      # to avoid setting two themes here.
       @theme = Sixteen.theme(theme)
+      @tartrazine_theme = Tartrazine.theme(theme)
+      @formatter = Tartrazine::Html.new
+      @code_css = @formatter.get_style_defs(@tartrazine_theme)
     end
 
     # Save the documents to the output directory.
@@ -47,7 +52,10 @@ module Crycco
           target = "#" if doclink == doc
           links[doclink.path.relative_to(@base_dir).to_s] = target
         end
-        doc.save dst, {"links" => links}.merge(@theme.context("_"))
+        doc.save dst, {
+          "links"    => links,
+          "code_css" => @code_css,
+        }.merge(@theme.context("_"))
       end
     end
 

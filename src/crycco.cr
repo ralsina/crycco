@@ -53,6 +53,7 @@ require "./templates"
 require "file_utils"
 require "html"
 require "markd"
+require "tartrazine/formatters/html"
 require "yaml"
 
 # In Crystal it's good to use modules to namespace the code. Specially since
@@ -124,8 +125,20 @@ module Crycco
     property docs : String = ""
     property code : String = ""
     property language : Language
+    @lexer : Tartrazine::Lexer
+    @formatter : Tartrazine::Html
+    # The theme doesn't really matter, but we need to set it to something
+    # FIXME: improve API in tartrazine so we don't need to set a theme
+    @theme : Tartrazine::Theme = Tartrazine.theme("default-dark")
 
+    # On initialization we get the language definition and create a lexer
+    # and formatter for code highlighting.
     def initialize(@language : Language)
+      @lexer = Tartrazine.lexer(@language["name"].to_s)
+      @formatter = Tartrazine::Html.new
+      @formatter.line_numbers = false
+      @formatter.wrap_long_lines = false
+      @formatter.tab_width = 4
     end
 
     # `docs_html` converts the docs to HTML using the Markd library
@@ -133,16 +146,9 @@ module Crycco
       Markd.to_html(docs)
     end
 
-    # Since the generated HTML uses HighlightJS, we need to wrap the code in
-    # a `<pre><code>` block with the right class so it's properly highlighted.
-    #
-    # It should also have the HTML escaped (or else this function would nest two pre tags
-    # when passed through itself 😂). Finally, it has to be in a single line because
-    # spaces are significant in code fragments.
+    # All the code is passed through the formatter to get syntax highlighting
     def code_html
-      %(<pre class="code"><code class="#{language["name"]}">) +
-        %(#{HTML.escape(code.lstrip("\n"))}) +
-        "</code></pre>"
+      @formatter.format(code.lstrip("\n"), @lexer, @theme)
     end
 
     # `to_source` regenerates valid source code out of the section. This way if
@@ -226,7 +232,7 @@ module Crycco
       end
 
       raise Exception.new "Unknown language for file #{@path}" \
-         unless LANGUAGES.has_key? key
+        unless LANGUAGES.has_key? key
       @language = LANGUAGES[key].clone
 
       # In the literate versions, everything is doc except

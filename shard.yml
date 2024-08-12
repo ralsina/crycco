@@ -11,16 +11,17 @@ targets:
 dependencies:
   baked_file_system:
     github: schovi/baked_file_system
-  markd:
-    github: icyleaf/markd
   crinja:
     github: straight-shoota/crinja
   docopt:
     github: chenkovsky/docopt.cr
+  markd:
+    github: icyleaf/markd
   sixteen:
     github: ralsina/sixteen
+  tartrazine:
+    github: ralsina/tartrazine
 
-
-crystal: '>= 1.13.0'
+crystal: ">= 1.13.0"
 
 license: MIT
