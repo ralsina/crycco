@@ -34,7 +34,7 @@ module Crycco
       @theme = Sixteen.theme(theme)
       @tartrazine_theme = Tartrazine.theme(theme)
       @formatter = Tartrazine::Html.new
-      @code_css = @formatter.get_style_defs(@tartrazine_theme)
+      @code_css = @formatter.style_defs
     end
 
     # Save the documents to the output directory.

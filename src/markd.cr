@@ -20,9 +20,7 @@ module Tartrazine
       # FIXME: maybe make these module globals
       formatter = Tartrazine::Html.new
       lexer = Tartrazine.lexer(lang)
-      # FIXME: fix tartrazine app not to require a theme
-      theme = Tartrazine.theme("default-dark")
-      @output_io << formatter.format(node.text.rstrip, lexer, theme)
+      @output_io << formatter.format(node.text.rstrip, lexer)
     end
   end
 end

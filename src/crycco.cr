@@ -49,10 +49,11 @@
 # ----
 # Import our dependencies
 require "./collection"
+require "./markd"
 require "./templates"
 require "file_utils"
 require "html"
-require "./markd"
+require "tartrazine"
 require "tartrazine/formatters/html"
 require "yaml"
 
@@ -127,9 +128,6 @@ module Crycco
     property language : Language
     @lexer : Tartrazine::Lexer
     @formatter : Tartrazine::Html
-    # The theme doesn't really matter, but we need to set it to something
-    # FIXME: improve API in tartrazine so we don't need to set a theme
-    @theme : Tartrazine::Theme = Tartrazine.theme("default-dark")
 
     # On initialization we get the language definition and create a lexer
     # and formatter for code highlighting.
@@ -151,7 +149,7 @@ module Crycco
 
     # All the code is passed through the formatter to get syntax highlighting
     def code_html
-      @formatter.format(code.strip("\n"), @lexer, @theme)
+      @formatter.format(code.strip("\n"), @lexer)
     end
 
     # `to_source` regenerates valid source code out of the section. This way if
