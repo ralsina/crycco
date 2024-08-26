@@ -3,7 +3,7 @@
 # This is the list of languages Crycco can process.
 #
 # I mean, I have not *tested* them but I copied this file from Docco's
-# repository, and Crycco uses more or less the same algorithm, so 
+# repository, and Crycco uses more or less the same algorithm, so
 # it should work 😀
 #
 # At the bottom you can see the entry for YAML, so if you are reading

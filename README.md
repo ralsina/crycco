@@ -3,7 +3,9 @@
 Crycco is a crystal remix of [Docco](http://jashkenas.github.com/docco/)
 a small, nice, literate programming tool.
 
-But the best way to understand it is to see it working. Here is the [Crycco documentation](https://ralsina.me/crycco/) which is ... the Crycco source code processed by Crycco 🤣
+But the best way to understand it is to see it working. Here is the
+[Crycco documentation](https://ralsina.me/crycco/) which is ... the
+Crycco source code processed by Crycco 🤣
 
 ## Installation
 
@@ -15,7 +17,7 @@ You don't need any other files or anything.
 
 ## Usage
 
-```
+```docopt
 $ bin/crycco --help
 Crycco, a Crystal version of docco/pycco/etc.
 
@@ -47,13 +49,14 @@ source code instead of HTML.
 ```
 
 It can also be used as a library but not documenting it here just in case
-I want to change it soon. I will be integrating it with 
+I want to change it soon. I will be integrating it with
 [Nicolino](https://nicolino.ralsina.me) which should give me clarity on how
 to use it.
 
 ## Development
 
-It's a tiny program, you can understand it in 15 minutes. Go to https://crycco.ralsina.me/ and read the source code.
+It's a tiny program, you can understand it in 15 minutes. Go to
+<https://crycco.ralsina.me/> and read the source code.
 
 ## Contributing
 
@@ -65,4 +68,4 @@ It's a tiny program, you can understand it in 15 minutes. Go to https://crycco.r
 
 ## Contributors
 
-- [Roberto Alsina](https://github.com/ralsina) - creator and maintainer
+* [Roberto Alsina](https://github.com/ralsina) - creator and maintainer

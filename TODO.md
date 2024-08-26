@@ -1,4 +1,6 @@
-# Things that may need doing
+# TODO
+
+## Things that may need doing
 
 * ✅ Support the literate variants of the languages
 * ✅ Support generating code out of literate files
@@ -20,10 +22,10 @@
 * ✅ Make the basic layout look good
 * Fix padding for inline code
 
-# Things I am *not* doing for now
+## Things I am *not* doing for now
 
 * Allow light/dark switch?
-  
+
   The problem: because I hardcoded a number of colors, switching via
   Pico doesn't work well. I could switch to using CSS variables, but
   it's boring, so maybe later.
