@@ -21,6 +21,7 @@ dependencies:
     github: ralsina/sixteen
   tartrazine:
     github: ralsina/tartrazine
+    branch: main
 
 crystal: ">= 1.13.0"
 
