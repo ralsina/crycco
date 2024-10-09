@@ -4,3 +4,5 @@ docs
 /.shards/
 *.dwarf
 .crystal
+coverage/
+.croupier

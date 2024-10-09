@@ -10,7 +10,7 @@ targets:
 
 dependencies:
   baked_file_system:
-    github: schovi/baked_file_system
+    github: ralsina/baked_file_system
   crinja:
     github: straight-shoota/crinja
   docopt:
@@ -21,7 +21,6 @@ dependencies:
     github: ralsina/sixteen
   tartrazine:
     github: ralsina/tartrazine
-    branch: main
 
 crystal: ">= 1.13.0"
 

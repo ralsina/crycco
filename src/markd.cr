@@ -3,7 +3,7 @@
 # rendered client-side.
 
 require "markd"
-require "tartrazine/formatters/html"
+require "tartrazine"
 
 module Tartrazine
   def self.md_to_html(source : String, options = Markd::Options.new)

@@ -1,0 +1,114 @@
+variables:
+  FLAGS: "-d --error-trace -Dstrict_multi_assign -Dno_number_autocast"
+  NAME: "crycco"
+
+tasks:
+  build:
+    default: true
+    dependencies:
+      - src
+      - shard.lock
+      - shard.yml
+      - Hacefile.yml
+    outputs:
+      - bin/{{NAME}}
+    commands: |
+      shards build {{FLAGS}}
+
+  get-deps:
+    dependencies:
+      - shard.yml
+    outputs:
+      - shard.lock
+    commands: |
+      shards install
+
+  build-release:
+    phony: true
+    always_run: true
+    commands: |
+      hace build FLAGS="--release  -Dstrict_multi_assign -Dno_number_autocast"
+
+  install:
+    phony: true
+    always_run: true
+    dependencies:
+      - bin/{{NAME}}
+    commands: |
+      rm -f ${HOME}/.local/bin/{{NAME}}
+      cp bin/{{NAME}} ${HOME}/.local/bin/{{NAME}}
+
+  static:
+    always_run: true
+    outputs:
+      - bin/{{NAME}}-static-linux-amd64
+      - bin/{{NAME}}-static-linux-arm64
+    commands: |
+      hace clean
+      ./build_static.sh
+
+  test:
+    dependencies:
+      - src
+      - spec
+      - shard.lock
+      - shard.yml
+    commands: |
+      crystal spec -v --error-trace
+    phony: true
+    always_run: true
+
+  mutation:
+    always_run: true
+    dependencies:
+      - src
+      - spec
+      - shard.lock
+      - shard.yml
+    commands: |
+      bin/crytic test -s src/hace.cr
+    phony: true
+
+  coverage:
+    dependencies:
+      - src
+      - spec
+      - shard.lock
+      - shard.yml
+    commands: |
+      shards install
+      crystal build -o bin/run_tests src/run_tests.cr
+      rm -rf coverage/
+      mkdir coverage
+      kcov --clean --include-path=./src ${PWD}/coverage ./bin/run_tests
+    outputs:
+      - coverage/index.html
+
+  lint:
+    dependencies:
+      - src
+      - spec
+      - shard.lock
+      - shard.yml
+    commands: |
+      crystal tool format src/*.cr spec/*.cr
+      ameba --fix
+    always_run: true
+    phony: true
+
+  pre-commit:
+    default: true
+    outputs:
+      - .git/hooks/commit-msg
+      - .git/hooks/pre-commit
+    dependencies:
+      - .pre-commit-config.yaml
+    commands: |
+      pre-commit install --hook-type commit-msg
+      pre-commit install
+
+  clean:
+    phony: true
+    always_run: true
+    commands: |
+      rm -rf shard.lock bin lib
