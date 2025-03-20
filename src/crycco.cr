@@ -89,7 +89,7 @@ module Crycco
   # in the actual binary so we don't have to carry it around.
   class BakedLanguages
     extend BakedFileSystem
-    bake_file "languages.yml", File.read("src/languages.yml")
+    bake_file "languages.yml", {{ read_file "#{__DIR__}/languages.yml" }}
   end
 
   # The description of how to parse a language is stored in
@@ -100,7 +100,7 @@ module Crycco
   # The `match` regex is used to detect if a line is a comment or code.
   def self.load_languages(file : String?)
     if file.nil?
-      data = YAML.parse(BakedLanguages.get("/languages.yml"))
+      data = YAML.parse(BakedLanguages.get("languages.yml"))
     else
       data = YAML.parse(File.read(file))
     end
@@ -233,7 +233,7 @@ module Crycco
       end
 
       raise Exception.new "Unknown language for file #{@path}" \
-        unless LANGUAGES.has_key? key
+         unless LANGUAGES.has_key? key
       @language = LANGUAGES[key].clone
 
       # In the literate versions, everything is doc except
