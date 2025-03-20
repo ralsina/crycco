@@ -21,6 +21,7 @@
   highlighjs is gone. Need to use tartrazine for that.
 * ✅ Make the basic layout look good
 * Fix padding for inline code
+* Update tooling, automate releases
 
 ## Things I am *not* doing for now
 
