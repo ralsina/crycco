@@ -112,3 +112,13 @@ tasks:
     always_run: true
     commands: |
       rm -rf shard.lock bin lib
+
+  deploy:
+    phony: true
+    always_run: true
+    dependencies:
+      - bin/{{NAME}}
+    commands: |
+      hace lint
+      bin/crycco src/languages.yml src/*.cr --theme phd
+      rsync -rav docs/* ralsina@rocky:/home/ralsina/web/websites/crycco.ralsina.me/
