@@ -13,8 +13,8 @@
 # The key is the extension of the file, and the value is a dictionary
 # with the data needed to process that language.
 #
-# The data currently is just the name of the language (for HighlightJS)
-# and the comment symbol.
+# The data currently is just the name of the language (for syntax
+# highlighting) and the comment symbol for that language.
 
 ".cr":
   name: crystal
