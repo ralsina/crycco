@@ -10,6 +10,47 @@ All notable changes to this project will be documented in this file.
 - Comment was wrong
 - AUR automation
 - Inline code padding
+- Font and spacing
+
+### ⚙️ Miscellaneous Tasks
+
+- Added pre-commit hooks and git-cliff
+- Updated hooks
+- Deploy to rocky server
+- Todo management
+- Move deployment to hacefile
+- Updated deps
+- Fix deploy path
+- Lint
+- Todo management
+- Pre-commit fixes
+- Todo management
+- Todo management
+- Todo management
+- Updated deps
+- Todo management
+- Todo management
+- AUR build
+- Ignore
+
+### Build
+
+- Remove Makefile
+- Make static build work without Makefile
+- Depend on templates
+
+### Bump
+
+- Release v0.3.2
+
+## [0.3.2] - 2025-06-03
+
+### 🐛 Bug Fixes
+
+- Fix #1, languages.yml was not properly embedded
+- Comment was wrong
+- AUR automation
+- Inline code padding
 
 ### ⚙️ Miscellaneous Tasks
 
