@@ -40,6 +40,10 @@
 ".c":
   name: c
   symbol: "//"
+  enclosing_symbol: ["/*", "*/"]
+".cl":
+  name: clojure
+  symbol: ";"
 ".clj":
   name: clojure
   symbol: ";"
