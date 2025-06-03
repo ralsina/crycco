@@ -24,6 +24,8 @@
 * ✅ Update tooling, automate releases
 * ✅ Package for AUR
 * Fix bug in sidebar (links are wrong, example in grafito)
+* Add custom CSS support
+* Packaged crycco is broken
 
 ## Things I am *not* doing for now
 
