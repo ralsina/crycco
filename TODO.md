@@ -23,6 +23,7 @@
 * Fix padding for inline code
 * Update tooling, automate releases
 * Package for AUR
+* Fix bug in sidebar (links are wrong, example in grafito)
 
 ## Things I am *not* doing for now
 
