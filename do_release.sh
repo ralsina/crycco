@@ -13,4 +13,5 @@ hace static
 git tag "v$VERSION"
 git push --tags
 gh release create "v$VERSION" "bin/$PKGNAME-static-linux-amd64" "bin/$PKGNAME-static-linux-arm64" --title "Release v$VERSION" --notes "$(git cliff -l -s all)"
+hace deploy
 hace aur
