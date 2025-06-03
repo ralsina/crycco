@@ -121,4 +121,4 @@ tasks:
     commands: |
       hace lint
       bin/crycco src/languages.yml src/*.cr --theme phd
-      rsync -rav docs/* ralsina@rocky:/home/ralsina/web/websites/crycco.ralsina.me/
+      rsync -rav docs/* ralsina@rocky:/data/stacks/web/websites/crycco.ralsina.me/
