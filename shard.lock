@@ -26,7 +26,7 @@ shards:
 
   sixteen:
     git: https://github.com/ralsina/sixteen.git
-    version: 0.5.1
+    version: 0.5.2
 
   stumpy_core:
     git: https://github.com/stumpycr/stumpy_core.git
