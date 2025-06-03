@@ -90,7 +90,7 @@ module Crycco
     property name : String
     property symbol : String
     property enclosing_symbol : Array(String) = [] of String
-    property literate : Bool = false
+    property? literate : Bool = false
 
     # This regex is used to identify comment lines.
     # It's derived from `symbol` or can be overridden (e.g., for literate mode).
