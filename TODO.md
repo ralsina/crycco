@@ -14,7 +14,7 @@
   * ✅ markdown
   * nocomments
 * Support custom title? Extract title from doc? Use filename?
-* Enclosing comments (need them for templates!)
+* Enclosing comments (need them for templates! And HTML!)
 * ✅ Use tartrazine for syntax highlighting
 * ✅ Use base16 for themes
 * ✅ Fix regression: code blocks in docs are not highlighted because
@@ -26,6 +26,7 @@
 * Fix bug in sidebar (links are wrong, example in grafito)
 * Add custom CSS support
 * ✅ Packaged crycco is broken
+
 
 ## Things I am *not* doing for now
 
