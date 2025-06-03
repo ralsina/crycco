@@ -21,7 +21,7 @@
   highlighjs is gone. Need to use tartrazine for that.
 * ✅ Make the basic layout look good
 * ✅ Fix padding for inline code
-* Update tooling, automate releases
+* ✅ Update tooling, automate releases
 * ✅ Package for AUR
 * Fix bug in sidebar (links are wrong, example in grafito)
 
