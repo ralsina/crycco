@@ -10,6 +10,7 @@ tasks:
       - shard.lock
       - shard.yml
       - Hacefile.yml
+      - templates
     outputs:
       - bin/{{NAME}}
     commands: |
