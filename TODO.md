@@ -22,6 +22,7 @@
 * ✅ Make the basic layout look good
 * Fix padding for inline code
 * Update tooling, automate releases
+* Package for AUR
 
 ## Things I am *not* doing for now
 
