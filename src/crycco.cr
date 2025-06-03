@@ -233,7 +233,7 @@ module Crycco
       end
 
       raise Exception.new "Unknown language for file #{@path}" \
-         unless LANGUAGES.has_key? key
+        unless LANGUAGES.has_key? key
       @language = LANGUAGES[key].clone
 
       # In the literate versions, everything is doc except
