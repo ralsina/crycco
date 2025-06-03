@@ -82,8 +82,29 @@ module Crycco
   # Each one contains the data required to parse a document in that
   # language, such as the comment symbol and a regex to match it.
 
-  alias Language = Hash(String, String | Regex)
-  LANGUAGES = Hash(String, Language).new
+  # The Language class holds the definition for a programming language.
+  # It's deserialized from the languages.yml file.
+  class Language
+    include YAML::Serializable
+
+    property name : String
+    property symbol : String
+    property enclosing_symbol : Array(String) = [] of String
+    property literate : Bool = false
+
+    # This regex is used to identify comment lines.
+    # It's derived from `symbol` or can be overridden (e.g., for literate mode).
+    # Because it's not serialized in the YAML file we have to say `ignore: true`
+    # and set it to a dummy value. It's properly configured in `after_initialize`
+    @[YAML::Field(ignore: true)]
+    property match : Regex = /.*/
+
+    # This hook is called after properties are set during YAML deserialization
+    # or after `new` with named arguments.
+    def after_initialize
+      @match = /^\s*#{Regex.escape(self.symbol.to_s)}\s?/
+    end
+  end
 
   # The `BakedLanguages` class embeds the languages definition file
   # in the actual binary so we don't have to carry it around.
@@ -92,25 +113,22 @@ module Crycco
     bake_file "languages.yml", {{ read_file "#{__DIR__}/languages.yml" }}
   end
 
+  LANGUAGES = Hash(String, Language).new
+
   # The description of how to parse a language is stored in
   # [a YAML file](languages.yaml.html)
   # which we read here in `Crycco.load_languages`. If no file is given
   # it defaults to the embedded one.
   #
-  # The `match` regex is used to detect if a line is a comment or code.
   def self.load_languages(file : String?)
-    if file.nil?
-      data = YAML.parse(BakedLanguages.get("languages.yml"))
-    else
-      data = YAML.parse(File.read(file))
-    end
-    data.as_h.each do |ext, lang|
-      LANGUAGES[ext.to_s] = {
-        "name"   => lang["name"].to_s,
-        "symbol" => lang["symbol"].to_s,
-        "match"  => /^\s*#{Regex.escape(lang["symbol"].to_s)}\s?/,
-      }
-    end
+    yaml_string = if file.nil?
+                    BakedLanguages.get("languages.yml")
+                  else
+                    File.read(file)
+                  end
+
+    # Merge the data from the file into the LANGUAGES constant
+    LANGUAGES.merge! Hash(String, Language).from_yaml(yaml_string)
   end
 
   # This matches shebangs and things that only LOOK like comments,
@@ -132,7 +150,7 @@ module Crycco
     # On initialization we get the language definition and create a lexer
     # and formatter for code highlighting.
     def initialize(@language : Language)
-      @lexer = Tartrazine.lexer(@language["name"].to_s)
+      @lexer = Tartrazine.lexer(@language.name)
       @formatter = Tartrazine::Html.new
       @formatter.line_numbers = false
       @formatter.wrap_long_lines = false
@@ -158,7 +176,7 @@ module Crycco
     def to_source : String
       lines = [] of String
       docs.rstrip("\n").split("\n").each do |line|
-        lines << "#{language["symbol"]} #{line}"
+        lines << "#{@language.symbol} #{line}"
       end
       lines << code.rstrip("\n")
       lines.join("\n")
@@ -170,7 +188,7 @@ module Crycco
     def to_markdown : String
       lines = [] of String
       lines << docs
-      lines << "```#{language["name"]}"
+      lines << "```#{@language.name}"
       lines << code.rstrip("\n")
       lines << "```"
       lines.join("\n")
@@ -234,12 +252,14 @@ module Crycco
 
       raise Exception.new "Unknown language for file #{@path}" \
         unless LANGUAGES.has_key? key
-      @language = LANGUAGES[key].clone
+      @language = Language.from_yaml(LANGUAGES[key].to_yaml)
 
       # In the literate versions, everything is doc except
       # indented things, which are code. So we change the
       # match regex to match everything except 4 spaces or a tab.
-      @language["match"] = /^(?![ ]{4}|\t).*/ if @literate
+      if @literate
+        @language.match = /^(?![ ]{4}|\t).*/
+      end
       parse(File.read(@path))
     end
 
@@ -256,7 +276,7 @@ module Crycco
       # and decides if the line is a comment or code, and depending
       # on that either starts a new section, or adds to the current
       # one.
-      is_comment = language["match"].as(Regex)
+      is_comment = @language.match
       lines.each do |line|
         if is_comment.match(line) && !NOT_COMMENT.match(line)
           # Break section if we find docs after code
@@ -264,7 +284,7 @@ module Crycco
           # Remove comment markers if it's not literate
           # and stick the line at the end of the current section's
           # docs
-          line = line.sub(language["match"], "") unless @literate
+          line = line.sub(@language.match, "") unless @literate
           @sections[-1].docs += line + "\n"
           # Also break section if we find a line of dashes (HR in markdown)
           @sections << Section.new(language) if /^(---+|===+)$/.match line
@@ -298,7 +318,7 @@ module Crycco
         outf << template.render({
           "title"    => File.basename(path),
           "sections" => sections.map(&.to_h),
-          "language" => language["name"],
+          "language" => @language.name,
         }.merge extra_context)
       end
     end
