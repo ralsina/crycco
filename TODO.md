@@ -23,7 +23,7 @@
 * ✅ Fix padding for inline code
 * ✅ Update tooling, automate releases
 * ✅ Package for AUR
-* Fix bug in sidebar (links are wrong, example in grafito)
+* ✅ Fix bug in sidebar (links are wrong, example in grafito)
 * Add custom CSS support
 * ✅ Packaged crycco is broken
 
