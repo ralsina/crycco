@@ -99,10 +99,23 @@ module Crycco
     @[YAML::Field(ignore: true)]
     property match : Regex = /.*/
 
+    @[YAML::Field(ignore: true)]
+    property match_enclosing_start : Regex = /$^/
+    @[YAML::Field(ignore: true)]
+    property match_enclosing_end : Regex = /$^/
+
     # This hook is called after properties are set during YAML deserialization
     # or after `new` with named arguments.
     def after_initialize
-      @match = /^\s*#{Regex.escape(self.symbol.to_s)}\s?/
+      # We consider lines with spaces and then the comment marker as
+      # comments.
+      @match = /^\s*#{Regex.escape(self.symbol)}\s?/
+      if !@enclosing_symbol.size == 2
+        # If the language supports enclosing comments, then
+        # we set those regexes too.
+        @match_enclosing_start = /^\s*#{Regex.escape(@enclosing_symbol[0])}/
+        @match_enclosing_end = /^\s*#{Regex.escape(@enclosing_symbol[1])}/
+      end
     end
   end
 

@@ -19,7 +19,13 @@ module Tartrazine
       lang = node.@fence_language
       # FIXME: maybe make these module globals
       formatter = Tartrazine::Html.new
-      lexer = Tartrazine.lexer(lang)
+      begin
+        lexer = Tartrazine.lexer(lang)
+      rescue Exception
+        # If the lexer is not found, we just use the default one
+        # which will not highlight the code.
+        lexer = Tartrazine.lexer("text")
+      end
       @output_io << formatter.format(node.text.rstrip, lexer)
     end
   end

@@ -7,6 +7,7 @@ tasks:
     default: true
     dependencies:
       - src
+      - lib
       - shard.lock
       - shard.yml
       - Hacefile.yml
