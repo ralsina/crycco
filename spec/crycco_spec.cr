@@ -46,7 +46,8 @@ describe Crycco do
     it "should convert code to html" do
       section = Crycco::Section.new Crycco::LANGUAGES[".cr"]
       section.code = "code\ncode\n"
-      section.code_html.strip.should eq("<pre class=\"code\"><code class=\"crystal\">code\ncode\n</code></pre>")
+      section.code_html.strip.should eq("<pre class=\"b\" ><code class=\"b\"><span class=\"t\">code</span><span class=\"t\">\n" +
+                                        "</span><span class=\"t\">code</span></code></pre>")
     end
     it "should convert the whole section to code" do
       section = Crycco::Section.new Crycco::LANGUAGES[".cr"]
