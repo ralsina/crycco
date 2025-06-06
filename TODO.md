@@ -26,7 +26,8 @@
 * ✅ Fix bug in sidebar (links are wrong, example in grafito)
 * Add custom CSS support
 * ✅ Packaged crycco is broken
-* Doc blocks are not aligned with code blocks
+* ✅ Doc blocks are not aligned with code blocks
+* ✅ In-doc code blocks should have scrollbars if needed
 
 
 ## Things I am *not* doing for now
