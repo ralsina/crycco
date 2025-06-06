@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.0] - 2025-06-06
+
+### 🚀 Features
+
+- Enclosing comments
+
+### 🎨 Styling
+
+- Better alignment between doc and code sides
+- Fix overflow for in-doc code blocks
+
 ## [0.3.3] - 2025-06-06
 
 ### 🐛 Bug Fixes
