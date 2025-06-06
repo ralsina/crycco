@@ -93,8 +93,7 @@ tasks:
       - shard.lock
       - shard.yml
     commands: |
-      crystal tool format src/*.cr spec/*.cr
-      ameba --fix
+      ameba --fix src spec
     always_run: true
     phony: true
 
