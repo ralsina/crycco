@@ -20,6 +20,13 @@ describe Crycco do
       doc = Crycco::Document.new Path["#{__DIR__}/fixtures/empty.cr"]
       doc.sections.size.should eq(0)
     end
+    it "should handle enclosing comments" do
+      doc = Crycco::Document.new Path["#{__DIR__}/fixtures/enclosing.c"]
+      doc.sections.size.should eq(2)
+      doc.sections[0].docs.should eq("")
+      doc.sections[0].code.should eq("foo=bar;\n\n")
+      doc.sections[1].docs.should eq("comment\nmore comment\n")
+    end
   end
   describe "parse in literate style" do
     it "should split code from comments" do

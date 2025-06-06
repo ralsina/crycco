@@ -51,6 +51,7 @@
 require "./collection"
 require "./markd"
 require "./templates"
+require "enum_state_machine"
 require "file_utils"
 require "html"
 require "tartrazine"
@@ -110,11 +111,11 @@ module Crycco
       # We consider lines with spaces and then the comment marker as
       # comments.
       @match = /^\s*#{Regex.escape(self.symbol)}\s?/
-      if !@enclosing_symbol.size == 2
+      if @enclosing_symbol.size == 2
         # If the language supports enclosing comments, then
         # we set those regexes too.
-        @match_enclosing_start = /^\s*#{Regex.escape(@enclosing_symbol[0])}/
-        @match_enclosing_end = /^\s*#{Regex.escape(@enclosing_symbol[1])}/
+        @match_enclosing_start = /^\s*#{Regex.escape(@enclosing_symbol[0])}\s?/
+        @match_enclosing_end = /^\s*#{Regex.escape(@enclosing_symbol[1])}\s?/
       end
     end
   end
@@ -240,6 +241,9 @@ module Crycco
   # parses its contents and is able to generate whatever
   # output is needed.
   class Document
+    # We include the EnumStateMachine module for the parser
+    include EnumStateMachine
+
     property path : Path
     property sections = Array(Section).new
     property language : Language
@@ -276,35 +280,82 @@ module Crycco
       parse(File.read(@path))
     end
 
-    # Given a string of source code, parse out each block of prose
-    # and the code that follows it — by detecting which is which,
-    # line by line — and then create an individual section for it.
-    # Each section is an object with `docs` and `code` properties,
-    # which can later be converted to HTML.
+    # Documents are parsed using a state machine, these are the states:
+    enum State
+      CommentBlock
+      EnclosingCommentBlock
+      CodeBlock
+    end
+
+    # These are the transitions between states:
+    state_machine State, initial: State::CodeBlock do
+      event :comment, from: [State::CodeBlock], to: State::CommentBlock
+      event :enclosing_comment_start, from: [State::CodeBlock], to: State::EnclosingCommentBlock
+      event :enclosing_comment_end, from: [State::EnclosingCommentBlock], to: State::CodeBlock
+      event :code, from: [State::CommentBlock], to: State::CodeBlock
+    end
+
+    # The `parse` method is the core of the Document class. It scans
+    # the document line by line, checks if the line is a comment or code
+    # and organizes the contents into sections.
+
     def parse(source : String)
       lines = source.split("\n")
-      @sections = [Section.new language]
-
-      # This loop is the core of the parser. It goes line by line
-      # and decides if the line is a comment or code, and depending
-      # on that either starts a new section, or adds to the current
-      # one.
+      @sections = [Section.new(@language)]
+      # Section.new language
       is_comment = @language.match
+      is_enclosing_start = @language.match_enclosing_start
+      is_enclosing_end = @language.match_enclosing_end
+
       lines.each do |line|
+        # If the line starts with a comment marker, tell the state machine
+        processed_line = line.rstrip
+
         if is_comment.match(line) && !NOT_COMMENT.match(line)
-          # Break section if we find docs after code
-          @sections << Section.new(language) unless sections[-1].code.empty?
-          # Remove comment markers if it's not literate
-          # and stick the line at the end of the current section's
-          # docs
-          line = line.sub(@language.match, "") unless @literate
-          @sections[-1].docs += line + "\n"
-          # Also break section if we find a line of dashes (HR in markdown)
-          @sections << Section.new(language) if /^(---+|===+)$/.match line
+          self.comment {
+            # These blocks only execute when transitions are successful.
+            #
+            # So, this block is executed when we are transitioning
+            # to a comment block, which means we are starting
+            # a new section
+            @sections << Section.new(@language)
+          }
+          # Because the docs section is supposed to be markdown, we need
+          # to remove the comment marker from the line.
+          processed_line = processed_line.sub(@language.match, "") unless @literate
+        elsif line.strip.empty?
+          self.code
+        elsif is_enclosing_start.match(line)
+          # If the line starts with an enclosing comment marker
+          self.enclosing_comment_start {
+            # We are transitioning to an enclosing comment block, so it's
+            # a new section too.
+            @sections << Section.new(@language)
+            processed_line = processed_line.sub(@language.@match_enclosing_start, "") unless @literate
+          }
+        elsif is_enclosing_end.match(line)
+          # The end of an enclosing comment block means we are back to code
+          self.enclosing_comment_end
         else
-          @sections[-1].code += "#{line}\n"
+          # Just a normal line.
+          self.code
+        end
+
+        # If we are in a code block, we add the line to the current section's code
+        if state == State::CodeBlock
+          @sections.last.code += "#{processed_line}\n"
+        else
+          # Or, we are in a comment block, and we add the line to the current
+          # section's docs
+          @sections.last.docs += "#{processed_line}\n"
+
+          # But if the line is a HR, we start a new section
+          if /^(---+|===+)$/.match processed_line
+            @sections << Section.new(language)
+          end
         end
       end
+
       # Sections with no code or docs are pointless.
       @sections.reject! { |section| section.code.strip.empty? && section.docs.strip.empty? }
     end

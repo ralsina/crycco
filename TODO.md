@@ -14,7 +14,7 @@
   * ✅ markdown
   * nocomments
 * Support custom title? Extract title from doc? Use filename?
-* Enclosing comments (need them for templates! And HTML!)
+* ✅ Enclosing comments (need them for templates! And HTML!)
 * ✅ Use tartrazine for syntax highlighting
 * ✅ Use base16 for themes
 * ✅ Fix regression: code blocks in docs are not highlighted because
@@ -28,6 +28,7 @@
 * ✅ Packaged crycco is broken
 * ✅ Doc blocks are not aligned with code blocks
 * ✅ In-doc code blocks should have scrollbars if needed
+* ✅ FSM-based parser for robustness
 
 
 ## Things I am *not* doing for now

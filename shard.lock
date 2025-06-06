@@ -16,6 +16,10 @@ shards:
     git: https://github.com/chenkovsky/docopt.cr.git
     version: 0.2.0+git.commit.620fce4f334ff15d7321e5ecb6665ad258fe9297
 
+  enum_state_machine:
+    git: https://github.com/nogginly/enum_state_machine.cr.git
+    version: 0.3.0+git.commit.df6f6a40de373d42cad1b78501186ebbb95b0e3a
+
   markd:
     git: https://github.com/icyleaf/markd.git
     version: 0.5.0
