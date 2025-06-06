@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.3] - 2025-06-06
+
+### 🐛 Bug Fixes
+
+- Handle unknown lexer in code blocks inside markdown
+
+### 🚜 Refactor
+
+- Use YAML::serializable and simplify match property
+- Thinking about enclosing comments
+- Use property? literate, although it seems we are just not using that
+
+### 🎨 Styling
+
+- Favicon
+- Favicon
+
+### 🧪 Testing
+
+- Make test pass with new tartrazine
+
+### Chore
+
+- *(ignore)* Skip chore+ignore commits in changelog
+
 ## [0.3.2] - 2025-06-03
 
 ### 🐛 Bug Fixes
