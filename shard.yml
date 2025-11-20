@@ -14,7 +14,7 @@ dependencies:
   crinja:
     github: straight-shoota/crinja
   docopt:
-    github: chenkovsky/docopt.cr
+    github: ralsina/docopt.cr
   enum_state_machine:
     github: nogginly/enum_state_machine.cr
   markd:
