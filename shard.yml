@@ -13,16 +13,15 @@ dependencies:
     github: ralsina/baked_file_system
   crinja:
     github: straight-shoota/crinja
-  docopt:
-    github: ralsina/docopt.cr
+  docopt-config:
+    github: ralsina/docopt-config
   enum_state_machine:
     github: nogginly/enum_state_machine.cr
   markd:
     github: icyleaf/markd
-  sixteen:
-    github: ralsina/sixteen
   tartrazine:
     github: ralsina/tartrazine
+    branch: main
 
 crystal: ">= 1.13.0"
 
