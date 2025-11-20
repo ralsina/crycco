@@ -102,6 +102,37 @@ export CRYCCO_TEMPLATE="basic"
 crycco src/*.cr
 ```
 
+## Shell Completions
+
+Crycco provides intelligent shell completions for Bash, Fish, and ZSH to make typing commands faster and more convenient.
+
+### Installation
+
+**Bash:**
+```bash
+crycco --completions bash > ~/.local/share/bash-completion/completions/crycco
+source ~/.bashrc
+```
+
+**Fish:**
+```bash
+crycco --completions fish > ~/.config/fish/completions/crycco.fish
+```
+
+**ZSH:**
+```bash
+crycco --completions zsh > ~/.zsh/completions/_crycco
+# Add to ~/.zshrc: fpath=($HOME/.zsh/completions $fpath)
+```
+
+### Features
+
+- Tab-complete all options (`--theme`, `--template`, `--mode`, etc.)
+- File completion for source files and directories
+- Built-in option descriptions
+
+---
+
 It can also be used as a library but not documenting it here just in case
 I want to change it soon. I will be integrating it with
 [Nicolino](https://nicolino.ralsina.me) which should give me clarity on how

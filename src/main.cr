@@ -9,6 +9,7 @@
 
 require "docopt-config"
 require "./collection"
+require "sixteen"
 
 # Crycco is not a very complicated tool, really, so the options are
 # few and simple.
@@ -20,6 +21,7 @@ Usage:
     crycco FILE... [-l <name>][-o <path>][-t <file>][--mode <mode>][--theme <theme>]
     crycco --version
     crycco --help
+    crycco --completions <shell>
 
 Options:
   -v, --version           output the version number
@@ -28,6 +30,7 @@ Options:
   -t, --template <name>   template for doc layout [default: sidebyside]
   --mode <mode>           what to output [default: docs]
   --theme <theme>         theme for the output [default: default-dark]
+  --completions <shell>   generate shell completions (bash, fish, zsh)
   -h, --help              this help message
 
 The available modes are:
@@ -63,6 +66,46 @@ options = Docopt.docopt_config(HELP,
 # Handle version manually
 if options["--version"]
   puts "Crycco #{Crycco::VERSION}"
+  exit 0
+end
+
+# Handle shell completions
+if shell = options["--completions"]?
+  shell = shell.as(String)
+
+  # Get dynamic theme list using Sixteen
+  themes = Sixteen::DataFiles.files.map do |file|
+    File.basename(file.path, ".yaml")
+  end.sort!
+
+  # Create completion options (including self-completion for --completions)
+  # Note: custom_completions expects Hash(String, String), not Hash(String, Array)
+  # Option completions use option names directly ("--theme"), arguments use "commandname_optionname"
+  completions = {
+    "crycco_completions" => "bash fish zsh",
+    "--theme"            => themes.join(" "),
+    "--template"         => "sidebyside basic",
+    "-t"                 => "sidebyside basic",
+    "--mode"             => "docs code markdown literate",
+    "-m"                 => "docs code markdown literate",
+    "--languages"        => "*.yml *.yaml",
+    "-l"                 => "*.yml *.yaml",
+    "--output"           => "*", # Directories
+    "-o"                 => "*", # Directories
+    "FILE"               => "*.cr *.py *.js *.ts *.rb *.go *.java *.c *.cpp *.h *.hpp *.rs *.php *.swift *.kt *.scala *.clj *.hs *.ml *.sh *.bash *.zsh *.fish *.ps1 *.bat *.cmd */",
+  }
+
+  case shell.downcase
+  when "bash"
+    puts Docopt.bash_completion("crycco", HELP, completions)
+  when "fish"
+    puts Docopt.fish_completion("crycco", HELP, completions)
+  when "zsh"
+    puts Docopt.zsh_completion("crycco", HELP, completions)
+  else
+    STDERR.puts "Error: Unsupported shell '#{shell}'. Supported shells: bash, fish, zsh"
+    exit 1
+  end
   exit 0
 end
 
