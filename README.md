@@ -48,6 +48,60 @@ If you use the --code option, the output will be machine-readable
 source code instead of HTML.
 ```
 
+## Configuration
+
+Crycco supports configuration through a `.crycco.yml` file and environment variables, providing flexible ways to set default options without typing them on the command line every time.
+
+### Configuration File
+
+Create a `.crycco.yml` file in your project directory to set default options:
+
+```yaml
+# .crycco.yml
+output: docs/              # --output <path>
+template: sidebyside       # --template <name>
+theme: default-dark        # --theme <theme>
+mode: docs                # --mode <mode>
+languages: custom-langs.yml  # --languages <file>
+```
+
+The configuration file is automatically picked up from the current directory or parent directories.
+
+### Environment Variables
+
+You can also configure Crycco using environment variables with the `CRYCCO_` prefix:
+
+```bash
+export CRYCCO_OUTPUT="documentation/"
+export CRYCCO_TEMPLATE="basic"
+export CRYCCO_THEME="default-dark"
+export CRYCCO_MODE="docs"
+export CRYCCO_LANGUAGES="custom-langs.yml"
+```
+
+### Precedence
+
+Crycco follows this precedence order (highest to lowest):
+1. **Command line arguments** (always override everything)
+2. **Environment variables** (override config file)
+3. **Configuration file** (provides defaults)
+4. **Built-in defaults** (used when nothing else is specified)
+
+### Examples
+
+```bash
+# Use only config file settings
+crycco src/*.cr
+
+# Override just the output directory, keep other config file settings
+crycco --output special-docs/ src/*.cr
+
+# Use environment variables for CI/CD
+export CRYCCO_OUTPUT="docs/"
+export CRYCCO_TEMPLATE="basic"
+crycco src/*.cr
+```
+
 It can also be used as a library but not documenting it here just in case
 I want to change it soon. I will be integrating it with
 [Nicolino](https://nicolino.ralsina.me) which should give me clarity on how

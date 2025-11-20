@@ -7,7 +7,7 @@
 # It parses the arguments based on the actual help message. For
 # more information you can visit [docopt.org](https://docopt.org/).
 
-require "docopt"
+require "docopt-config"
 require "./collection"
 
 # Crycco is not a very complicated tool, really, so the options are
@@ -55,7 +55,10 @@ source code instead of HTML.
 
 HELP
 
-options = Docopt.docopt(HELP, ARGV)
+options = Docopt.docopt_config(HELP,
+  config_file_path: ".crycco.yml",
+  env_prefix: "CRYCCO"
+)
 
 # Handle version manually
 if options["--version"]
