@@ -153,6 +153,7 @@ else
 end
 
 # Auto-generate ctags if tools are available, otherwise warn
+# ameba:disable Metrics/CyclomaticComplexity
 def auto_generate_ctags_if_available(source_files : Array(Path))
   # Check if we have any Crystal files (requires crystal-ctags)
   crystal_files = source_files.select { |file| file.extension == ".cr" }
