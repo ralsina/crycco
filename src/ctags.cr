@@ -130,50 +130,46 @@ module Crycco
 
     # Generate ctags for Crystal files using crystal-ctags
     private def generate_crystal_tags(crystal_files : Array(Path)) : Bool
-      begin
-        # Build command with files as arguments (crystal-ctags is basic and doesn't support -L)
-        file_args = crystal_files.map(&.to_s).join(" ")
-        cmd = "crystal-ctags #{file_args} > #{@ctags_path} 2>&1"
-        result = Process.run(
-          cmd,
-          shell: true,
-          output: Process::Redirect::Pipe,
-          error: Process::Redirect::Pipe
-        )
+      # Build command with files as arguments (crystal-ctags is basic and doesn't support -L)
+      file_args = crystal_files.map(&.to_s).join(" ")
+      cmd = "crystal-ctags #{file_args} > #{@ctags_path} 2>&1"
+      result = Process.run(
+        cmd,
+        shell: true,
+        output: Process::Redirect::Pipe,
+        error: Process::Redirect::Pipe
+      )
 
-        unless result.success?
-          STDERR.puts "Warning: crystal-ctags failed"
-          return false
-        end
-
-        true
-      rescue ex
-        STDERR.puts "Warning: Failed to generate Crystal ctags: #{ex.message}"
-        false
+      unless result.success?
+        STDERR.puts "Warning: crystal-ctags failed"
+        return false
       end
+
+      true
+    rescue ex
+      STDERR.puts "Warning: Failed to generate Crystal ctags: #{ex.message}"
+      false
     end
 
     # Generate ctags for other files using universal ctags
     private def generate_universal_tags(other_files : Array(Path)) : Bool
-      begin
-        cmd = "ctags -f #{@ctags_path} #{other_files.join(" ")}"
-        result = Process.run(
-          cmd,
-          shell: true,
-          output: Process::Redirect::Pipe,
-          error: Process::Redirect::Pipe
-        )
+      cmd = "ctags -f #{@ctags_path} #{other_files.join(" ")}"
+      result = Process.run(
+        cmd,
+        shell: true,
+        output: Process::Redirect::Pipe,
+        error: Process::Redirect::Pipe
+      )
 
-        unless result.success?
-          STDERR.puts "Warning: universal ctags failed"
-          return false
-        end
-
-        true
-      rescue ex
-        STDERR.puts "Warning: Failed to generate universal ctags: #{ex.message}"
-        false
+      unless result.success?
+        STDERR.puts "Warning: universal ctags failed"
+        return false
       end
+
+      true
+    rescue ex
+      STDERR.puts "Warning: Failed to generate universal ctags: #{ex.message}"
+      false
     end
   end
 end
