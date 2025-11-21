@@ -9,10 +9,10 @@ sidebyside
 {% block body %}
 </div>
 {% for section in sections %}
-<div id="section-{{loop.index}}" class="grid">
-    <div class="doc" id="section-{{loop.index}}">
+<div id="{{section.anchor}}" class="grid">
+    <div class="doc" id="{{section.anchor}}">
         <span class="anchor">
-            <a href="#section-{{loop.index}}" class="anchor">↦</a>
+            <a href="#{{section.anchor}}" class="anchor">↦</a>
         </span>
         {{ section.docs_html}}
     </div>

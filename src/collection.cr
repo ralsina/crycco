@@ -19,11 +19,22 @@ module Crycco
                    template : String,
                    mode : String,
                    theme : String = "default-dark")
-      @docs = sources.map { |source|
+      source_paths = sources.map { |source|
         Path[source].expand.normalize
-      }.sort!.map { |source|
+      }.sort!
+
+      @docs = source_paths.map { |source|
         Document.new source, template, mode
       }
+
+      # Setup file tracking for smart references
+      #
+      # The smart file reference system needs to know about all files being
+      # processed so it can resolve references like `[[main.cr]]` or `[[config]]`.
+      # We set up global state here that the Section objects can use when
+      # processing documentation comments.
+      Crycco.all_files = source_paths
+      Crycco.base_dir = Path[common_prefix]
 
       @out_dir = out_dir
       @template = template

@@ -69,7 +69,31 @@ if options["--version"]
   exit 0
 end
 
-# Handle shell completions
+# # Shell Completions
+#
+# Shell completions are a user-friendly feature that allows you to type
+# Crycco commands more quickly by pressing Tab to complete options and file names.
+# Instead of remembering all the available flags like `--template`, `--theme`,
+# or `--output`, you can just type the first few letters and press Tab.
+#
+# For example, instead of typing:
+#   `crycco --template sidebyside --theme phd src/*.cr`
+#
+# You can type:
+#   `crycco --tem[TAB] --th[TAB] phd src/*.cr`
+#
+# And the shell will automatically complete the options for you.
+#
+# To enable shell completions, you generate them once and install them in your
+# shell's completion directory:
+#
+# **Bash:** `crycco --completions bash > ~/.local/share/bash-completion/completions/crycco`
+# **Fish:** `crycco --completions fish > ~/.config/fish/completions/crycco.fish`
+# **ZSH:** `crycco --completions zsh > ~/.zsh/completions/_crycco`
+#
+# This makes Crycco much more pleasant to use regularly and helps you discover
+# available options without constantly consulting the help text.
+#
 if shell = options["--completions"]?
   shell = shell.as(String)
 
@@ -119,8 +143,8 @@ Crycco.load_languages(options["--languages"].try &.as(String))
 # This will create `Document` objects for each source file
 # which are responsible for parsing the source and saving
 # the generated output. You can see the `Collection` class
-# in [collection.cr](collection.cr.html) and the `Document`
-# class in [crycco.cr](crycco.cr.html#document).
+# in [[collection.cr]] and the `Document`
+# class in [[crycco.cr#document]].
 
 Crycco::Collection.new(
   sources: options["FILE"].as(Array(String)),

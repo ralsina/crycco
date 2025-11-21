@@ -8,7 +8,7 @@ basic
 
 {% block body %}
 {% for section in sections %}
-<div id="section-{{loop.index}}">
+<div id="{{section.anchor}}">
     {% if section.doc != "" %}
     <div class="doc">
         {{ section.docs_html}}

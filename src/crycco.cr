@@ -6,7 +6,7 @@
 # It creates HTML output that displays your comments alongside or
 # intermingled with your code. All comments are passed through Markdown
 # so they are nicely formatted and all code goes through a syntax
-# highlighter before being fed to [templates](templates.cr.html).
+# highlighter before being fed to [[templates]].
 #
 # Crycco also supports the "literate" variant of languages, where
 # everything is a comment except things indented 4 spaces or more,
@@ -21,11 +21,11 @@
 #
 # With crycco (or docco, or one of its many offshoots) you can generate
 # a nice HTML file that explains the config file in a much more readable
-# fashion, [**from the YAML itself**](languages.yml.html)
+# fashion, [[languages.yml|**from the YAML itself**]]
 #
 # Crycco also will let you do other manipulations on the code and docs,
 # like generating "literate YAML" out of YAML and viceversa. It says
-# "it will" because [it doesn't yet](TODO.md.html)
+# "it will" because [[TODO.md|it doesn't yet]]
 #
 # One of the best things about Docco in my opinion is that it takes the
 # tradition of literate programming and turns it into its minimal
@@ -36,7 +36,7 @@
 # so if you keep reading we'll see how it works (it's short!).
 #
 # If instead you are interested in the CLI tool, you can check out
-# [main.cr](main.cr.html) which is the entry point for the
+# [[main.cr]] which is the entry point for the
 # command line.
 #
 # ----
@@ -129,8 +129,30 @@ module Crycco
 
   LANGUAGES = Hash(String, Language).new
 
+  # Track all processed files for smart file reference resolution. This
+  # global state allows the smart matching algorithm to work across
+  # all files in the documentation set.
+  @@all_files = [] of Path
+  @@base_dir = Path["."]
+
+  def self.all_files
+    @@all_files
+  end
+
+  def self.all_files=(files : Array(Path))
+    @@all_files = files
+  end
+
+  def self.base_dir
+    @@base_dir
+  end
+
+  def self.base_dir=(dir : Path)
+    @@base_dir = dir
+  end
+
   # The description of how to parse a language is stored in
-  # [a YAML file](languages.yaml.html)
+  # [[languages.yml|a YAML file]]
   # which we read here in `Crycco.load_languages`. If no file is given
   # it defaults to the embedded one.
   #
@@ -158,12 +180,13 @@ module Crycco
     property docs : String = ""
     property code : String = ""
     property language : Language
+    property path : Path
     @lexer : Tartrazine::Lexer
     @formatter : Tartrazine::Html
 
     # On initialization we get the language definition and create a lexer
     # and formatter for code highlighting.
-    def initialize(@language : Language)
+    def initialize(@language : Language, @path : Path)
       @lexer = Tartrazine.lexer(@language.name)
       @formatter = Tartrazine::Html.new
       @formatter.line_numbers = false
@@ -171,12 +194,169 @@ module Crycco
       @formatter.tab_width = 4
     end
 
-    # `docs_html` converts the docs to HTML using the Markd library.
-    # The `md_to_html` is a thin wrapper around Markd that changes
-    # how some specific things are rendered, specifically source code.
-    # You can see the implementation in [markd.cr](markd.cr.html)
+    # Smart File References
+    #
+    # Crycco lets you reference other files with a custom notation.
+    #
+    # For example, you can reference main.cr like this: `[[main.cr]]`,
+    # and it will be converted to a proper HTML link to the documentation.
+    #
+    # For a custom text other than the filename, you can use `[[main.cr|the main file]]`.
+
+    def process_file_references(text : String) : String
+      # First, protect code spans (content between backticks) from processing
+      code_spans = [] of String
+      text = text.gsub(/`[^`]+`/) do |match|
+        code_spans << match
+        "__CODE_SPAN_#{code_spans.size - 1}__"
+      end
+
+      # Process smart references on the text with code spans protected
+      text = text.gsub(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/) do |match|
+        if match.includes?("|")
+          # Has custom display text: [[filename|text]]
+          parts = match[2..-3].split("|", 2)
+          ref_with_fragment = parts[0]
+          display_text = parts[1]? || ref_with_fragment
+        else
+          # Simple reference: [[filename]]
+          ref_with_fragment = match[2..-3]
+          display_text = ref_with_fragment
+        end
+
+        # Separate file reference from fragment
+        if ref_with_fragment.includes?("#")
+          file_ref, fragment = ref_with_fragment.split("#", 2)
+        else
+          file_ref = ref_with_fragment
+          fragment = nil
+        end
+
+        if resolved_path = resolve_file_reference(file_ref)
+          full_path = fragment ? "#{resolved_path}##{fragment}" : resolved_path
+          "[#{display_text}](#{full_path})"
+        else
+          match # Keep original if resolution fails
+        end
+      end
+
+      # Restore the original code spans
+      code_spans.each_with_index do |span, index|
+        text = text.gsub("__CODE_SPAN_#{index}__", span)
+      end
+
+      text
+    rescue ex
+      text
+    end
+
+    # To make it even simpler you don't need to use the exact path. As
+    # long as the filename is unique among all processed files, Crycco
+    # will find it for you.
+
+    def resolve_file_reference(ref_name : String) : String?
+      # First, try as a relative path (already has directory components)
+      if ref_name.includes?("/")
+        candidate = Path.new(ref_name)
+        return html_path_for_file(candidate) if file_exists?(candidate)
+      end
+
+      # Try smart matching against all processed files
+      matches = [] of Path
+
+      Crycco.all_files.each do |file_path|
+        # Exact filename match
+        if file_path.basename.to_s == ref_name
+          matches << file_path
+          # Basename match without extension
+        elsif file_path.stem == ref_name
+          matches << file_path
+        end
+      end
+
+      # Return unique match, or nil if ambiguous/not found
+      case matches.size
+      when 0
+        nil
+      when 1
+        html_path_for_file(matches[0])
+      else
+        # Multiple matches - be smart about prioritization
+        # Prefer files in same directory first
+        same_dir_matches = matches.select { |file_path| file_path.dirname == @path.dirname }
+        if same_dir_matches.size == 1
+          html_path_for_file(same_dir_matches[0])
+        else
+          nil # Ambiguous, don't auto-resolve
+        end
+      end
+    end
+
+    # HTML Path Generation
+    #
+    # Once we've resolved a file reference to an actual file, we need to
+    # convert that file path to the corresponding HTML documentation path.
+
+    def html_path_for_file(file_path : Path) : String
+      relative_path = file_path.relative_to(Crycco.base_dir).to_s
+      # Always append .html to match how dst_path works in Collection
+      # This ensures consistency between where files are saved and where links point
+      relative_path + ".html"
+    end
+
+    # Check if a file exists in the processed files list
+    def file_exists?(file_path : Path) : Bool
+      Crycco.all_files.any? { |processed_file| processed_file.expand == file_path.expand }
+    end
+
+    # Extract the first header from documentation for semantic anchoring
+    def anchor : String
+      # Look for the first header line in the raw documentation text
+      # Headers are lines that start with comment marker + # + header text
+      comment_marker = @language.symbol
+
+      docs.each_line do |line|
+        if line =~ /^\s*#{Regex.escape(comment_marker)}\s*#\s+(.+)$/
+          header_text = $1.strip
+          # Convert header text to a valid URL anchor:
+          # 1. Downcase
+          # 2. Replace non-alphanumeric chars with hyphens
+          # 3. Remove multiple consecutive hyphens
+          # 4. Remove leading/trailing hyphens
+          anchor = header_text.downcase
+            .gsub(/[^a-z0-9\s-]/, "")
+            .gsub(/\s+/, "-")
+            .gsub(/-+/, "-")
+            .gsub(/^-|-$/, "")
+
+          return anchor.empty? ? "section" : anchor
+        end
+      end
+
+      "section" # fallback for sections without headers
+    end
+
+    # Converting Documentation to HTML
+    #
+    # The `docs_html` method is responsible for converting the documentation
+    # portion of each section into final HTML output. This is where the
+    # smart file reference processing happens.
+    #
+    # The process is:
+    # 1. Process any smart file references (convert `[[file]]` to proper links)
+    # 2. Convert the resulting Markdown to HTML using Markd
+    #
+    # This means that writers can use both Markdown syntax AND smart file
+    # references in their documentation comments, and they'll both be handled
+    # correctly in the final output.
+    #
+    # You can see the implementation details of the Markdown processing
+    # in [[markd.cr]] and the smart reference processing in the `process_file_references`
+    # method above.
+    #
     def docs_html
-      Tartrazine.md_to_html(docs)
+      processed_docs = process_file_references(docs)
+      Tartrazine.md_to_html(processed_docs)
     end
 
     # All the code is passed through the formatter to get syntax highlighting
@@ -232,6 +412,7 @@ module Crycco
         "source"    => to_source,
         "markdown"  => to_markdown,
         "literate"  => to_literate,
+        "anchor"    => anchor,
       }
     end
   end
@@ -301,7 +482,7 @@ module Crycco
 
     def parse(source : String)
       lines = source.split("\n")
-      @sections = [Section.new(@language)]
+      @sections = [Section.new(@language, @path)]
       # Section.new language
       is_comment = @language.match
       is_enclosing_start = @language.match_enclosing_start
@@ -318,7 +499,7 @@ module Crycco
             # So, this block is executed when we are transitioning
             # to a comment block, which means we are starting
             # a new section
-            @sections << Section.new(@language)
+            @sections << Section.new(@language, @path)
           }
           # Because the docs section is supposed to be markdown, we need
           # to remove the comment marker from the line.
@@ -330,7 +511,7 @@ module Crycco
           self.enclosing_comment_start {
             # We are transitioning to an enclosing comment block, so it's
             # a new section too.
-            @sections << Section.new(@language)
+            @sections << Section.new(@language, @path)
             processed_line = processed_line.sub(@language.@match_enclosing_start, "") unless @literate
           }
         elsif is_enclosing_end.match(line)
@@ -351,7 +532,7 @@ module Crycco
 
           # But if the line is a HR, we start a new section
           if /^(---+|===+)$/.match processed_line
-            @sections << Section.new(language)
+            @sections << Section.new(language, @path)
           end
         end
       end
@@ -362,7 +543,7 @@ module Crycco
 
     # Save the document to a file using the desired format
     # and template. If you want to learn more about the templates
-    # you can check out [templates.cr](templates.cr.html)
+    # you can check out [[templates.cr]]
     #
     def save(out_file : Path, extra_context)
       FileUtils.mkdir_p(File.dirname(path))

@@ -46,18 +46,18 @@ describe Crycco do
 
   describe "Section" do
     it "should convert docs to html" do
-      section = Crycco::Section.new Crycco::LANGUAGES[".cr"]
+      section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["test.cr"]
       section.docs = "This is a comment\nMore comment\n"
       section.docs_html.should eq("<p>This is a comment\nMore comment</p>\n")
     end
     it "should convert code to html" do
-      section = Crycco::Section.new Crycco::LANGUAGES[".cr"]
+      section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["test.cr"]
       section.code = "code\ncode\n"
       section.code_html.strip.should eq("<pre class=\"b\" ><code class=\"b\"><span class=\"t\">code</span><span class=\"t\">\n" +
                                         "</span><span class=\"t\">code</span></code></pre>")
     end
     it "should convert the whole section to code" do
-      section = Crycco::Section.new Crycco::LANGUAGES[".cr"]
+      section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["test.cr"]
       section.code = "code\ncode\n"
       section.docs = "This is a comment\nMore comment\n"
       section.to_source.strip.should eq(
@@ -72,6 +72,291 @@ describe Crycco do
         eq [Path["out/src/crycco.cr.html"],
             Path["out/TODO.md.html"],
             Path["out/src/languages.yml.html"]].sort
+    end
+  end
+
+  describe "Smart File References" do
+    it "should process simple file references" do
+      Crycco.all_files = [Path["src/main.cr"], Path["README.md"]]
+      Crycco.base_dir = Path["."]
+
+      section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["test.cr"]
+      section.docs = "See [[main.cr]] and [[README]] for details."
+
+      result = section.process_file_references(section.docs)
+      result.should contain("[main.cr](src/main.cr.html)")
+      result.should contain("[README](README.md.html)")
+    end
+
+    it "should handle custom display text" do
+      Crycco.all_files = [Path["src/main.cr"]]
+      Crycco.base_dir = Path["."]
+
+      section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["test.cr"]
+      section.docs = "Check [[main.cr|the main file]]"
+
+      result = section.process_file_references(section.docs)
+      result.should contain("[the main file](src/main.cr.html)")
+    end
+
+    it "should leave unresolved references unchanged" do
+      Crycco.all_files = [Path["src/main.cr"]]
+      Crycco.base_dir = Path["."]
+
+      section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["test.cr"]
+      section.docs = "See [[nonexistent]] for details."
+
+      result = section.process_file_references(section.docs)
+      result.should contain("[[nonexistent]]")
+    end
+
+    it "should match basename without extension" do
+      Crycco.all_files = [Path["src/collection.cr"], Path["README.md"]]
+      Crycco.base_dir = Path["."]
+
+      section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["test.cr"]
+      section.docs = "See [[collection]] for details."
+
+      result = section.process_file_references(section.docs)
+      result.should contain("[collection](src/collection.cr.html)")
+    end
+
+    it "should handle exact filename matches" do
+      Crycco.all_files = [Path["src/main.cr"], Path["test_ref.cr"]]
+      Crycco.base_dir = Path["."]
+
+      section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["test.cr"]
+      section.docs = "See [[test_ref]] for details."
+
+      result = section.process_file_references(section.docs)
+      result.should contain("[test_ref](test_ref.cr.html)")
+    end
+
+    it "should handle relative paths" do
+      Crycco.all_files = [Path["src/main.cr"], Path["src/helpers/config.yml"]]
+      Crycco.base_dir = Path["."]
+
+      section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["src/helpers/config.cr"]
+      section.docs = "See [[config.yml]] for details."
+
+      result = section.process_file_references(section.docs)
+      result.should contain("[config.yml](src/helpers/config.yml.html)")
+    end
+
+    it "should prioritize same directory matches" do
+      Crycco.all_files = [Path["src/collection.cr"], Path["test/collection.cr"]]
+      Crycco.base_dir = Path["."]
+
+      section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["src/main.cr"]
+      section.docs = "See [[collection]] for details."
+
+      result = section.process_file_references(section.docs)
+      # Should link to src/collection.cr.html since it's in the same directory
+      result.should contain("[collection](src/collection.cr.html)")
+    end
+
+    it "should leave ambiguous matches unchanged" do
+      Crycco.all_files = [Path["src/main.cr"], Path["test/main.cr"]]
+      Crycco.base_dir = Path["."]
+
+      section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["other.cr"]
+      section.docs = "See [[main]] for details."
+
+      result = section.process_file_references(section.docs)
+      result.should contain("[[main]]")
+    end
+
+    it "should not process smart references inside backticks" do
+      Crycco.all_files = [Path["src/main.cr"]]
+      Crycco.base_dir = Path["."]
+
+      section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["test.cr"]
+      section.docs = "Use `[[main.cr]]` for the syntax example, but use [[main.cr]] for actual reference."
+
+      result = section.process_file_references(section.docs)
+      result.should contain("`[[main.cr]]`")               # Backticked example stays literal
+      result.should contain("[main.cr](src/main.cr.html)") # Actual reference becomes link
+    end
+
+    it "should handle URL fragments correctly" do
+      Crycco.all_files = [Path["src/crycco.cr"]]
+      Crycco.base_dir = Path["."]
+
+      section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["test.cr"]
+      section.docs = "See [[crycco.cr#document]] for details."
+
+      result = section.process_file_references(section.docs)
+      result.should contain("[crycco.cr#document](src/crycco.cr.html#document)")
+    end
+
+    it "should handle URL fragments with custom display text" do
+      Crycco.all_files = [Path["src/crycco.cr"]]
+      Crycco.base_dir = Path["."]
+
+      section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["test.cr"]
+      section.docs = "Check [[crycco.cr#document|the Document class]] for implementation details."
+
+      result = section.process_file_references(section.docs)
+      result.should contain("[the Document class](src/crycco.cr.html#document)")
+    end
+
+    it "should handle basename references with fragments" do
+      Crycco.all_files = [Path["src/crycco.cr"], Path["src/main.cr"]]
+      Crycco.base_dir = Path["."]
+
+      section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["test.cr"]
+      section.docs = "See [[crycco#section]] and [[main#setup]] for details."
+
+      result = section.process_file_references(section.docs)
+      result.should contain("[crycco#section](src/crycco.cr.html#section)")
+      result.should contain("[main#setup](src/main.cr.html#setup)")
+    end
+
+    it "should preserve fragments in backticks" do
+      Crycco.all_files = [Path["src/crycco.cr"]]
+      Crycco.base_dir = Path["."]
+
+      section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["test.cr"]
+      section.docs = "Use `[[crycco.cr#document]]` as an example, but see [[crycco.cr#document]] for real."
+
+      result = section.process_file_references(section.docs)
+      result.should contain("`[[crycco.cr#document]]`")                          # Backticked stays literal
+      result.should contain("[crycco.cr#document](src/crycco.cr.html#document)") # Actual reference
+    end
+  end
+
+  describe "HTML Path Generation" do
+    it "should generate correct paths for files with extensions" do
+      Crycco.base_dir = Path["."]
+
+      section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["test.cr"]
+
+      # Test .cr files
+      path = section.html_path_for_file(Path["src/main.cr"])
+      path.should eq("src/main.cr.html")
+
+      # Test .yml files
+      path = section.html_path_for_file(Path["languages.yml"])
+      path.should eq("languages.yml.html")
+
+      # Test .md files
+      path = section.html_path_for_file(Path["README.md"])
+      path.should eq("README.md.html")
+    end
+
+    it "should append .html to files without extensions" do
+      Crycco.base_dir = Path["."]
+
+      section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["test.cr"]
+
+      path = section.html_path_for_file(Path["Makefile"])
+      path.should eq("Makefile.html")
+    end
+
+    it "should handle files in subdirectories" do
+      Crycco.base_dir = Path["."]
+
+      section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["test.cr"]
+
+      path = section.html_path_for_file(Path["src/helpers/config.cr"])
+      path.should eq("src/helpers/config.cr.html")
+
+      path = section.html_path_for_file(Path["docs/api.md"])
+      path.should eq("docs/api.md.html")
+    end
+
+    it "should handle relative path calculations from different base directories" do
+      Crycco.base_dir = Path["src"]
+
+      section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["src/test.cr"]
+
+      # When base_dir is "src", a file like "src/main.cr" should become "main.cr.html"
+      path = section.html_path_for_file(Path["src/main.cr"])
+      path.should eq("main.cr.html")
+
+      # Files in subdirectories should maintain their structure
+      path = section.html_path_for_file(Path["src/helpers/config.cr"])
+      path.should eq("helpers/config.cr.html")
+    end
+  end
+
+  describe "Semantic Anchor Generation" do
+    it "should generate anchors from section headers" do
+      section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["test.cr"]
+      section.docs = <<-TEXT
+        # # This module handles configuration
+        Some documentation content here.
+        TEXT
+
+      anchor = section.anchor
+      anchor.should eq("this-module-handles-configuration")
+    end
+
+    it "should handle headers with special characters" do
+      section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["test.cr"]
+      section.docs = <<-TEXT
+        # # Setup & Configuration (v2.0)
+        Some documentation content here.
+        TEXT
+
+      anchor = section.anchor
+      anchor.should eq("setup-configuration-v20")
+    end
+
+    it "should handle headers with multiple spaces and hyphens" do
+      section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["test.cr"]
+      section.docs = <<-TEXT
+        # #   Multiple    spaces   and   hyphens   ---
+        Some documentation content here.
+        TEXT
+
+      anchor = section.anchor
+      anchor.should eq("multiple-spaces-and-hyphens")
+    end
+
+    it "should fall back to 'section' when no header is found" do
+      section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["test.cr"]
+      section.docs = <<-TEXT
+        # This is just documentation without any headers.
+        # Just regular content lines.
+        TEXT
+
+      anchor = section.anchor
+      anchor.should eq("section")
+    end
+
+    it "should handle empty headers" do
+      section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["test.cr"]
+      section.docs = <<-TEXT
+        #
+        # This follows an empty header.
+        TEXT
+
+      anchor = section.anchor
+      anchor.should eq("section")
+    end
+
+    it "should work with different comment styles" do
+      # Test with YAML comment style which is also "#"
+      section = Crycco::Section.new Crycco::LANGUAGES[".yml"], Path["test.yml"]
+      section.docs = <<-TEXT
+        # # YAML Module Documentation
+        # This is YAML configuration.
+        TEXT
+
+      anchor = section.anchor
+      anchor.should eq("yaml-module-documentation")
+    end
+
+    it "should include anchor in section hash for templates" do
+      section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["test.cr"]
+      section.docs = <<-TEXT
+        # # Test Header
+        # Documentation content.
+        TEXT
+
+      section_hash = section.to_h
+      section_hash["anchor"].should eq("test-header")
     end
   end
 end
