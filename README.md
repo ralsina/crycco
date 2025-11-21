@@ -48,6 +48,43 @@ If you use the --code option, the output will be machine-readable
 source code instead of HTML.
 ```
 
+## Smart File References
+
+Crycco supports intelligent file references in documentation comments using double square brackets syntax:
+
+### Basic Syntax
+- `[[filename]]` → Links to `filename.html`
+- `[[filename|custom text]]` → Links with custom display text
+- `[[path/to/file]]` → Relative path references
+
+### Smart Matching
+When you reference a file without extension, Crycco intelligently matches against all files being processed:
+
+```crystal
+# Exact filename match
+[[main.cr]] → main.cr.html
+
+# Basename match without extension
+[[src/main]] → src/main.cr.html
+
+# Unique matches in same directory are prioritized
+[[collection]] → src/collection.cr.html (if unique)
+```
+
+### Error Handling
+- **Ambiguous references**: Left unchanged (no automatic resolution)
+- **Missing files**: Left unchanged with no errors
+- **External files**: Require explicit paths
+
+### Example
+```crystal
+# File: src/main.cr
+# This file handles CLI arguments. See [[collection]] for details.
+# The [[README|project documentation]] has more information.
+```
+
+This makes cross-referencing between files much easier while maintaining link validity when files are reorganized.
+
 ## Configuration
 
 Crycco supports configuration through a `.crycco.yml` file and environment variables, providing flexible ways to set default options without typing them on the command line every time.
