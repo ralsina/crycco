@@ -15,10 +15,11 @@ module Tartrazine
   end
 
   class HTMLRenderer < Markd::HTMLRenderer
+    @@formatter : Tartrazine::Html = Tartrazine::Html.new
+
     def code_block(node : Markd::Node, entering : Bool)
       lang = node.@fence_language
-      # FIXME: maybe make these module globals
-      formatter = Tartrazine::Html.new
+      formatter = @@formatter
       begin
         lexer = Tartrazine.lexer(lang)
       rescue Exception

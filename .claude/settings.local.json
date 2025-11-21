@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(shards build:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(shards update:*)",
+      "Bash(ameba:*)",
+      "Bash(./bin/crycco:*)",
+      "Bash(git add:*)",
+      "Bash(crystal run:*)",
+      "Bash(git checkout:*)",
+      "Bash(git merge:*)",
+      "Bash(git branch:*)",
+      "Bash(find:*)",
+      "Bash(crystal spec:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
