@@ -29,8 +29,6 @@ module Crycco
       @template = template
       @mode = mode
       @base_dir = Path[common_prefix]
-      # FIXME: make the sixteen theme accessible from tartrazine
-      # to avoid setting two themes here.
       @theme = Sixteen.theme(theme)
       @tartrazine_theme = Tartrazine.theme(theme)
       @formatter = Tartrazine::Html.new
