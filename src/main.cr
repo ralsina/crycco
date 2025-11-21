@@ -18,7 +18,7 @@ HELP = <<-HELP
 Crycco, a Crystal version of docco/pycco/etc.
 
 Usage:
-    crycco FILE... [-l <name>][-o <path>][-t <file>][--mode <mode>][--theme <theme>]
+    crycco FILE... [-l <name>][-o <path>][-t <file>][--mode <mode>][--theme <theme>][--ctags <file>]
     crycco --version
     crycco --help
     crycco --completions <shell>
@@ -30,6 +30,7 @@ Options:
   -t, --template <name>   template for doc layout [default: sidebyside]
   --mode <mode>           what to output [default: docs]
   --theme <theme>         theme for the output [default: default-dark]
+  --ctags <file>          use existing ctags file for symbol resolution
   --completions <shell>   generate shell completions (bash, fish, zsh)
   -h, --help              this help message
 
@@ -137,6 +138,83 @@ end
 # whatever is the default.
 
 Crycco.load_languages(options["--languages"].try &.as(String))
+
+# Setup ctags manager with automatic detection
+source_files = options["FILE"].as(Array(String)).map { |file_path| Path[file_path] }
+
+if options["--ctags"]?
+  # Use existing ctags file
+  ctags_path = options["--ctags"].as(String)
+  ctags_manager = Crycco::CtagsManager.instance(source_files, ctags_path)
+  Crycco.ctags_manager = ctags_manager
+else
+  # Auto-generate ctags if tools are available
+  auto_generate_ctags_if_available(source_files)
+end
+
+# Auto-generate ctags if tools are available, otherwise warn
+def auto_generate_ctags_if_available(source_files : Array(Path))
+  # Check if we have any Crystal files (requires crystal-ctags)
+  crystal_files = source_files.select { |file| file.extension == ".cr" }
+  other_files = source_files.reject { |file| file.extension == ".cr" }
+
+  # Check for required tools
+  has_crystal_ctags = system("which crystal-ctags > /dev/null 2>&1")
+  has_universal_ctags = system("which ctags > /dev/null 2>&1")
+
+  # Validate tool availability
+  if crystal_files.empty? && other_files.empty?
+    return # No files to process
+  end
+
+  # Check if we have tools for the files we need to process
+  needs_crystal_ctags = !crystal_files.empty?
+  needs_universal_ctags = !other_files.empty?
+
+  if needs_crystal_ctags && !has_crystal_ctags && needs_universal_ctags && !has_universal_ctags
+    STDERR.puts "Warning: Neither crystal-ctags nor universal ctags found. Symbol resolution disabled."
+    STDERR.puts "         Install crystal-ctags for Crystal files and/or universal ctags for other languages."
+    return
+  elsif needs_crystal_ctags && !has_crystal_ctags
+    STDERR.puts "Warning: crystal-ctags not found. Crystal symbol resolution disabled."
+    STDERR.puts "         Install with: crystal install crystal-ctags"
+    crystal_files = [] of Path # Skip Crystal files
+  elsif needs_universal_ctags && !has_universal_ctags
+    STDERR.puts "Warning: universal ctags not found. Non-Crystal symbol resolution disabled."
+    STDERR.puts "         Install with: apt-get install universal-ctags (Ubuntu) or brew install universal-ctags (macOS)"
+    other_files = [] of Path # Skip non-Crystal files
+  end
+
+  # If we have no tools for any files, return
+  if crystal_files.empty? && other_files.empty?
+    return
+  end
+
+  # Create temporary ctags file
+  temp_ctags = File.tempfile("crycco_ctags", ".tags")
+  ctags_path = temp_ctags.path
+
+  begin
+    # Initialize CtagsManager with temporary file
+    ctags_manager = Crycco::CtagsManager.instance(source_files, ctags_path)
+    Crycco.ctags_manager = ctags_manager
+
+    # Generate ctags
+    if ctags_manager.generate_tags
+      puts "🏷️  Auto-generated ctags for symbol resolution"
+      puts "   Crystal files: #{crystal_files.size}" unless crystal_files.empty?
+      puts "   Other files: #{other_files.size}" unless other_files.empty?
+    else
+      STDERR.puts "Warning: Failed to auto-generate ctags"
+    end
+  rescue ex
+    STDERR.puts "Error generating ctags: #{ex.message}"
+  ensure
+    # temp_ctags will be cleaned up automatically when garbage collected
+    # but we want to keep it until Crycco finishes processing
+    at_exit { File.delete(ctags_path) if File.exists?(ctags_path) }
+  end
+end
 
 # We create a `Collection` object with the given options
 # casted to the right types.

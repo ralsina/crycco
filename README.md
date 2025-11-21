@@ -22,18 +22,32 @@ $ bin/crycco --help
 Crycco, a Crystal version of docco/pycco/etc.
 
 Usage:
-    crycco FILE... [-L <file>][-l <name>][-o <path>][-c <file>]
-                     [-t <file>] [--doc|--code]
-    crycco -v
-    cryco --help
+    crycco FILE... [-l <name>][-o <path>][-t <file>][--mode <mode>][--theme <theme>][--ctags <file>]
+    crycco --version
+    crycco --help
+    crycco --completions <shell>
 
 Options:
   -v, --version           output the version number
   -l, --languages <file>  use a custom languages.yml file
   -o, --output <path>     output to a given folder [default: docs/]
   -t, --template <name>   template for doc layout [default: sidebyside]
-  --code                  output source code instead of HTML [default: false]
+  --mode <mode>           what to output [default: docs]
+  --theme <theme>         theme for the output [default: default-dark]
+  --ctags <file>          use existing ctags file for symbol resolution
+  --completions <shell>   generate shell completions (bash, fish, zsh)
   -h, --help              this help message
+
+The available modes are:
+
+* docs (default)
+  Generates HTML documentation.
+* code
+  Generates source code with comments
+* markdown
+  Generates markdown files with the code in fenced code blocks
+* literate
+  Generates markdown files with the code in indented blocks
 
 Crycco comes with two templates for HTML documents which you can
 use in the -t option when generating docs:
@@ -48,16 +62,17 @@ If you use the --code option, the output will be machine-readable
 source code instead of HTML.
 ```
 
-## Smart File References
+## Smart File and Symbol References
 
-Crycco supports intelligent file references in documentation comments using double square brackets syntax:
+Crycco supports intelligent file and symbol references in documentation comments using double square brackets syntax:
 
 ### Basic Syntax
-- `[[filename]]` → Links to `filename.html`
+- `[[filename]]` → Links to `filename.html` (file reference)
+- `[[SymbolName]]` → Links to symbol definition at line number (symbol reference)
 - `[[filename|custom text]]` → Links with custom display text
 - `[[path/to/file]]` → Relative path references
 
-### Smart Matching
+### Smart File Matching
 When you reference a file without extension, Crycco intelligently matches against all files being processed:
 
 ```crystal
@@ -71,19 +86,83 @@ When you reference a file without extension, Crycco intelligently matches agains
 [[collection]] → src/collection.cr.html (if unique)
 ```
 
+### Symbol Resolution with Ctags
+When a reference doesn't match any files, Crycco can resolve it as a symbol using ctags:
+
+```crystal
+# Links to class definition
+[[MyClass]] → src/myclass.cr.html#line-15
+
+# Links to method definition
+[[process_data]] → src/processor.cr.html#line-42
+
+# Links to function in current file (priority)
+[[helper_function]] → current_file.html#line-8
+```
+
+### Automatic Symbol Resolution
+Crycco automatically detects and uses ctags tools for symbol resolution when available. No special flags needed!
+
+```bash
+# Just run crycco normally - symbol resolution works automatically
+crycco src/**/*.cr src/**/*.py
+
+# Use existing ctags file if you have one
+crycco --ctags existing_tags src/*.cr
+```
+
+#### How It Works
+When you run Crycco, it automatically:
+
+1. **Detects available tools**:
+   - **crystal-ctags** for `.cr` files
+   - **universal ctags** for other languages (.py, .js, .ts, .rb, .go, etc.)
+
+2. **Generates ctags** if tools are found
+3. **Gracefully degrades** if tools are missing (shows helpful warnings)
+
+#### Installation (Optional)
+For the best experience, install the appropriate ctags tools:
+
+```bash
+# For Crystal files
+crystal install crystal-ctags
+
+# For other files (Ubuntu/Debian)
+sudo apt-get install universal-ctags
+
+# For other files (macOS)
+brew install universal-ctags
+```
+
+**Note**: Crycco works perfectly without ctags - you just won't get symbol resolution.
+
+### Resolution Priority
+1. **File references** (exact and basename matches)
+2. **Symbols in current file** (highest priority)
+3. **Unique symbols across all files**
+4. **Unresolved references** left unchanged
+
 ### Error Handling
 - **Ambiguous references**: Left unchanged (no automatic resolution)
-- **Missing files**: Left unchanged with no errors
+- **Missing files/symbols**: Left unchanged with warnings
 - **External files**: Require explicit paths
 
 ### Example
 ```crystal
 # File: src/main.cr
-# This file handles CLI arguments. See [[collection]] for details.
-# The [[README|project documentation]] has more information.
+# This file handles CLI arguments. See [[Collection]] for details.
+# The [[process_args]] method validates input parameters.
+# Check [[README|project documentation]] for more information.
 ```
 
-This makes cross-referencing between files much easier while maintaining link validity when files are reorganized.
+### Line Number Anchors
+Symbol links create line-number anchors in the generated HTML, enabling precise navigation to symbol definitions:
+- `[[ClassName]]` → `src/classname.cr.html#line-25`
+- Links jump directly to the line where the symbol is defined
+- Works with classes, methods, functions, and other language constructs
+
+This makes cross-referencing between files and symbols much easier while maintaining link validity when code is reorganized.
 
 ## Configuration
 

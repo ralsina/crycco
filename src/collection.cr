@@ -29,8 +29,8 @@ module Crycco
 
       # Setup file tracking for smart references
       #
-      # The smart file reference system needs to know about all files being
-      # processed so it can resolve references like `[[main.cr]]` or `[[config]]`.
+      # The smart file and symbol reference system needs to know about all files being
+      # processed so it can resolve references like `[[main.cr]]`, `[[config]]`, or `[[ClassName]]`.
       # We set up global state here that the Section objects can use when
       # processing documentation comments.
       Crycco.all_files = source_paths

@@ -53,8 +53,12 @@ describe Crycco do
     it "should convert code to html" do
       section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["test.cr"]
       section.code = "code\ncode\n"
-      section.code_html.strip.should eq("<pre class=\"b\" ><code class=\"b\"><span class=\"t\">code</span><span class=\"t\">\n" +
-                                        "</span><span class=\"t\">code</span></code></pre>")
+      result = section.code_html.strip
+      # Should contain syntax highlighting and line anchors
+      result.should contain("<pre class=\"b\" ><code class=\"b\">")
+      result.should contain("<span class=\"t\">code</span>")
+      result.should contain("<span id=\"line-")
+      result.should contain("</code></pre>")
     end
     it "should convert the whole section to code" do
       section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["test.cr"]
@@ -357,6 +361,87 @@ describe Crycco do
 
       section_hash = section.to_h
       section_hash["anchor"].should eq("test-header")
+    end
+  end
+
+  describe "Ctags Symbol Resolution" do
+    before_each do
+      # Reset ctags manager for each test
+      Crycco::CtagsManager.reset
+    end
+
+    it "should add line number anchors to code HTML" do
+      section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["test.cr"]
+      section.code = <<-CODE
+        def test_method
+          puts "hello"
+        end
+        CODE
+
+      result = section.code_html
+      # Should contain line anchors - at least line 1 and 3 should be there
+      result.should contain("<span id=\"line-1\">")
+      result.should contain("<span id=\"line-3\">")
+      # The formatter may combine lines, so we check that anchors exist
+    end
+
+    it "should handle empty code gracefully" do
+      section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["test.cr"]
+      section.code = ""
+
+      result = section.code_html
+      result.should eq("")
+    end
+
+    it "should handle single line code" do
+      section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["test.cr"]
+      section.code = "puts 'hello world'"
+
+      result = section.code_html
+      result.should contain("<span id=\"line-1\">")
+      result.should contain("hello world")
+    end
+
+    it "should preserve code formatting while adding anchors" do
+      section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["test.cr"]
+      section.code = "class Test\n  def method\n    true\n  end\nend"
+
+      result = section.code_html
+      # Should contain all line anchors
+      result.should contain("<span id=\"line-1\">")
+      result.should contain("<span id=\"line-2\">")
+      result.should contain("<span id=\"line-3\">")
+      result.should contain("<span id=\"line-4\">")
+      result.should contain("<span id=\"line-5\">")
+      # Should still contain syntax-highlighted content
+      result.should contain("Test")
+      result.should contain("method")
+    end
+
+    it "should fall back to symbol resolution when no files match" do
+      # Setup with no files for file resolution
+      Crycco.all_files = [] of Path
+      Crycco.base_dir = Path["."]
+      Crycco.ctags_manager = nil
+
+      section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["test.cr"]
+
+      # Since there's no ctags manager, this should leave unchanged
+      result = section.process_file_references("See [[SomeSymbol]] for details")
+      result.should contain("[[SomeSymbol]]")
+    end
+
+    it "should integrate ctags resolution with existing functionality" do
+      Crycco.all_files = [Path["src/main.cr"]]
+      Crycco.base_dir = Path["."]
+      Crycco.ctags_manager = nil
+
+      section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["test.cr"]
+
+      # Should work with file resolution
+      result = section.process_file_references("See [[main]] and [[NonExistentSymbol]]")
+      result.should contain("[main](src/main.cr.html)")
+      result.should contain("[[NonExistentSymbol]]")
     end
   end
 end

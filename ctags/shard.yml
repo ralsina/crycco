@@ -1,0 +1,15 @@
+name: ctags
+version: 0.1.0
+
+authors:
+  - Roberto Alsina <roberto.alsina@gmail.com>
+
+description: |
+  A pure Crystal ctags parser that handles extended ctags format with line numbers and fields
+
+dependencies:
+  # None - pure Crystal implementation
+
+crystal: ">= 1.13.0"
+
+license: MIT

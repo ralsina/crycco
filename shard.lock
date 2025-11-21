@@ -12,6 +12,10 @@ shards:
     git: https://github.com/straight-shoota/crinja.git
     version: 0.8.1
 
+  ctags:
+    path: ctags
+    version: 0.1.0
+
   docopt:
     git: https://github.com/ralsina/docopt.cr.git
     version: 0.3.1

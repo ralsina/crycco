@@ -11,6 +11,8 @@ targets:
 dependencies:
   baked_file_system:
     github: ralsina/baked_file_system
+  ctags:
+    path: ctags
   crinja:
     github: straight-shoota/crinja
   docopt-config:

@@ -51,6 +51,7 @@
 require "./collection"
 require "./markd"
 require "./templates"
+require "./ctags"
 require "enum_state_machine"
 require "file_utils"
 require "html"
@@ -135,6 +136,10 @@ module Crycco
   @@all_files = [] of Path
   @@base_dir = Path["."]
 
+  # Crycco supports ctags to find where a symbol like a class or
+  # function is defined, for easy linking to it.
+  @@ctags_manager : CtagsManager?
+
   def self.all_files
     @@all_files
   end
@@ -149,6 +154,14 @@ module Crycco
 
   def self.base_dir=(dir : Path)
     @@base_dir = dir
+  end
+
+  def self.ctags_manager
+    @@ctags_manager
+  end
+
+  def self.ctags_manager=(manager : CtagsManager?)
+    @@ctags_manager = manager
   end
 
   # The description of how to parse a language is stored in
@@ -252,7 +265,8 @@ module Crycco
 
     # To make it even simpler you don't need to use the exact path. As
     # long as the filename is unique among all processed files, Crycco
-    # will find it for you.
+    # will find it for you. It will also match symbols, such as classes
+    # and functions, if you have ctags data available.
 
     def resolve_file_reference(ref_name : String) : String?
       # First, try as a relative path (already has directory components)
@@ -277,7 +291,8 @@ module Crycco
       # Return unique match, or nil if ambiguous/not found
       case matches.size
       when 0
-        nil
+        # No file matches - try symbol resolution
+        resolve_symbol_reference(ref_name)
       when 1
         html_path_for_file(matches[0])
       else
@@ -287,8 +302,33 @@ module Crycco
         if same_dir_matches.size == 1
           html_path_for_file(same_dir_matches[0])
         else
-          nil # Ambiguous, don't auto-resolve
+          # Ambiguous file matches - try symbol resolution
+          resolve_symbol_reference(ref_name)
         end
+      end
+    end
+
+    # Symbol Resolution
+    #
+    # This method handles symbol resolution using ctags. When a reference
+    # doesn't match any files, it tries to resolve it as a symbol using
+    # the CtagsManager. This enables references like [[ClassName]] or
+    # [[method_name]] to link directly to the symbol definition.
+    #
+    # Symbol resolution follows this priority:
+    # 1. Symbols in the current file
+    # 2. Unique symbols across all files
+    # 3. Returns nil if ambiguous or not found
+
+    def resolve_symbol_reference(symbol_name : String) : String?
+      return nil unless ctags_manager = Crycco.ctags_manager
+
+      if result = ctags_manager.resolve_symbol(symbol_name, @path)
+        file_path, line_number = result
+        html_path = html_path_for_file(file_path)
+        "#{html_path}#line-#{line_number}"
+      else
+        nil
       end
     end
 
@@ -343,10 +383,10 @@ module Crycco
     # smart file reference processing happens.
     #
     # The process is:
-    # 1. Process any smart file references (convert `[[file]]` to proper links)
+    # 1. Process any smart file and symbol references (convert `[[file]]` and `[[Symbol]]` to proper links)
     # 2. Convert the resulting Markdown to HTML using Markd
     #
-    # This means that writers can use both Markdown syntax AND smart file
+    # This means that writers can use both Markdown syntax AND smart file/symbol
     # references in their documentation comments, and they'll both be handled
     # correctly in the final output.
     #
@@ -361,7 +401,21 @@ module Crycco
 
     # All the code is passed through the formatter to get syntax highlighting
     def code_html
-      @formatter.format(code.strip("\n"), @lexer)
+      if code.strip("\n").empty?
+        return ""
+      end
+
+      formatted_code = @formatter.format(code.strip("\n"), @lexer)
+
+      # Add line number anchors for symbol linking
+      # We wrap each line in a span with an id that can be referenced
+      lines = formatted_code.split('\n')
+      lines_with_anchors = lines.map_with_index do |line, index|
+        line_number = index + 1
+        "<span id=\"line-#{line_number}\">#{line}</span>"
+      end
+
+      lines_with_anchors.join('\n')
     end
 
     # `to_source` regenerates valid source code out of the section. This way if
