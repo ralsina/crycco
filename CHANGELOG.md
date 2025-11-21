@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.0] - 2025-11-21
+
+### 🚀 Features
+
+- Implement smart file references with semantic anchors
+- Implement automatic ctags symbol resolution
+
+### 🚜 Refactor
+
+- Remove redundant begin blocks from ctags generation methods
+
+### 📚 Documentation
+
+- Add smart file references documentation to README
+
+### 🎨 Styling
+
+- Ignore ameba cyclomatic complexity for auto_generate_ctags_if_available
+
 ## [0.4.0] - 2025-06-06
 
 ### 🚀 Features
