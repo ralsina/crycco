@@ -126,7 +126,8 @@ For the best experience, install the appropriate ctags tools:
 
 ```bash
 # For Crystal files
-crystal install crystal-ctags
+git clone https://github.com/ralsina/crystal-ctags.git
+cd crystal-ctags && shards build && cp bin/crystal-ctags ~/.local/bin
 
 # For other files (Ubuntu/Debian)
 sudo apt-get install universal-ctags
