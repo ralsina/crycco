@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.1] - 2025-12-10
+
+### 📚 Documentation
+
+- Fix install instructions for crystal-ctags
+
 ## [0.5.0] - 2025-11-21
 
 ### 🚀 Features
