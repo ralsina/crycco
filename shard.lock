@@ -38,7 +38,7 @@ shards:
 
   sixteen:
     git: https://github.com/ralsina/sixteen.git
-    version: 0.5.2
+    version: 0.6.0
 
   stumpy_core:
     git: https://github.com/stumpycr/stumpy_core.git
@@ -54,4 +54,4 @@ shards:
 
   tartrazine:
     git: https://github.com/ralsina/tartrazine.git
-    version: 0.14.0+git.commit.d1476d6283bd441007718f33a905040feca35e25
+    version: 0.16.0+git.commit.f98fbcc5e21705632090dd897a9d2cd3eebea12b
