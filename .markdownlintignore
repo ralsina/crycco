@@ -1,0 +1,10 @@
+# Generated documentation output and vendored trees
+docs/
+content/
+aur-crycco/
+lib/
+ctags/
+coverage/
+
+# Test fixture that is intentionally not a normal markdown document
+spec/fixtures/1.cr.md

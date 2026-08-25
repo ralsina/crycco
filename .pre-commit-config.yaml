@@ -10,16 +10,19 @@ repos:
           - id: check-yaml
           - id: check-added-large-files
           - id: check-merge-conflict
-    - repo: https://github.com/jumanjihouse/pre-commit-hooks
-      rev: 3.0.0
+    - repo: local
       hooks:
-          - id: shellcheck
           - id: markdownlint
-            exclude: |
-              (?x)^(
-                ^content|
-                ^spec/fixtures/1.cr.md
-              )$
+            name: markdownlint
+            entry: markdownlint --config .markdownlint.yml
+            language: system
+            types: [markdown]
+            exclude: spec/fixtures/1.cr.md
+          - id: shellcheck
+            name: shellcheck
+            entry: shellcheck
+            language: system
+            types: [shell]
     - repo: https://github.com/mrtazz/checkmake
       rev: 0.2.2
       hooks:

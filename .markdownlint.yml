@@ -1,0 +1,25 @@
+# markdownlint-cli configuration
+# https://github.com/igorshubovych/markdownlint-cli#configuration
+# Ignored paths live in .markdownlintignore
+#
+# Rules are relaxed to match the style already used across this repo's
+# markdown (README, CLAUDE.md, generated CHANGELOGs): long prose lines,
+# compact headings/lists/fences, mixed list markers. Structural rules
+# stay on.
+
+# Inline HTML is used in templates/examples
+MD033: false
+# 3-space indent for nested lists in TODO.md
+MD005: false
+# Generated changelogs repeat headings between releases
+MD024: false
+# Long prose lines, tables and URLs are the norm here
+MD013: false
+# Compact style: headings/lists/fences without surrounding blanks
+MD022: false
+MD031: false
+MD032: false
+# Both - and * bullets are used
+MD004: false
+MD007:
+  indent: 2
