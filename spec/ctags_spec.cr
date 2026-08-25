@@ -15,8 +15,8 @@ def write_tags_file(path : String) : String
   two = fixture_tags_path("2.cr")
   empty = fixture_tags_path("empty.cr")
   lines = [
-    # Current-file symbol
-    "Frobnicator\t#{one}\t/^class Frobnicator$/;\"\tline:3\tkind:c",
+    # Current-file symbol, on a line that actually holds code in 1.cr
+    "Frobnicator\t#{one}\t/^class Frobnicator$/;\"\tline:4\tkind:c",
     # Unique symbol in another file
     "UniqueHelper\t#{two}\t/^def unique_helper$/;\"\tline:5\tkind:f",
     # Ambiguous: same name in two files, neither of them the current one
@@ -85,7 +85,7 @@ describe Crycco::CtagsManager do
     tags = write_tags_file(File.tempname("crycco", ".tags"))
     manager = Crycco::CtagsManager.new([one, two], tags)
 
-    manager.resolve_symbol("Frobnicator", one).should eq({one, 3})
+    manager.resolve_symbol("Frobnicator", one).should eq({one, 4})
   end
 
   it "should resolve a unique symbol defined in another file" do
@@ -129,7 +129,7 @@ describe Crycco::CtagsManager do
     section.docs = "See [[Frobnicator]] for details."
 
     result = section.process_file_references(section.docs)
-    result.should contain("[Frobnicator](1.cr.html#line-3)")
+    result.should contain("[Frobnicator](1.cr.html#line-4)")
   end
 
   it "should leave unknown symbol references unchanged" do
@@ -145,21 +145,26 @@ describe Crycco::CtagsManager do
   # Regression specs for open bugs. They assert the *expected* behavior
   # so the fix for each issue turns them regular (remove the `pending`).
 
-  # Issue #2: symbol links use absolute file line numbers, but the
-  # generated anchors restart per section, so the targets don't exist.
-  pending "symbol link targets should exist in the rendered HTML (issue #2)" do
+  # Issue #2: symbol links use the absolute line numbers of the source
+  # file, and the line anchors in the rendered HTML must match them.
+  it "symbol link targets should exist in the rendered HTML" do
     one = setup_ctags_context
 
-    section = Crycco::Section.new Crycco::LANGUAGES[".cr"], one
+    # Parse the real document: its first section's code sits at lines
+    # 4 and 5 of 1.cr
+    document = Crycco::Document.new one
+    section = document.sections.first
     section.docs = "See [[Frobnicator]] for details."
+
     match_data = section.process_file_references(section.docs)
       .match(/\]\((.*?)\)/)
 
     match_data.should_not be_nil
     link_target = match_data ? match_data[1] : ""
-    anchor = link_target.split("#")[1]?
-    anchor.should_not be_nil
-    section.code_html.should contain(%(id="#{anchor}"))
+    link_target.should eq("1.cr.html#line-4")
+    section.code_html.should contain(%(id="line-4"))
+    section.code_html.should contain(%(id="line-5"))
+    section.code_html.should_not contain(%(id="line-1"))
   end
 
   describe "generate_tags" do

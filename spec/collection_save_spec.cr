@@ -65,6 +65,16 @@ describe "Collection.save" do
     html.should contain("This is a comment")
   end
 
+  it "should not emit duplicate id attributes in the generated HTML" do
+    render_collection("docs")
+
+    ["1.cr.html", "2.cr.html", "enclosing.c.html"].each do |name|
+      html = File.read(Path[SPEC_OUT] / name)
+      ids = html.scan(/id="([^"]*)"/).map &.[1]
+      ids.size.should eq(ids.uniq.size)
+    end
+  end
+
   it "should keep enclosing comments as docs in the rendered HTML" do
     render_collection("docs")
     html = File.read(Path[SPEC_OUT] / "enclosing.c.html")

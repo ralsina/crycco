@@ -60,6 +60,20 @@ describe Crycco do
       result.should contain("<span id=\"line-")
       result.should contain("</code></pre>")
     end
+
+    it "should number line anchors with the source file's line numbers" do
+      document = Crycco::Document.new Path["#{__DIR__}/fixtures/3.cr"]
+
+      # The two code snippets in 3.cr sit at source lines 5 and 11,
+      # not at 1 and 2 of each section
+      first_code = document.sections[0].code_html
+      first_code.should contain(%(id="line-5"))
+      first_code.should_not contain(%(id="line-1"))
+
+      second_code = document.sections[1].code_html
+      second_code.should contain(%(id="line-11"))
+      second_code.should_not contain(%(id="line-1"))
+    end
     it "should convert the whole section to code" do
       section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["test.cr"]
       section.code = "code\ncode\n"

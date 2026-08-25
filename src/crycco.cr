@@ -200,6 +200,11 @@ module Crycco
     # Appended to the anchor when another section in the same
     # document produced the same header slug.
     property anchor_suffix : Int32 = 0
+    # Line in the source file where this section's code begins. Used
+    # to make the line anchors in the HTML match the file's real line
+    # numbers, so ctags symbol links land on the right lines. Zero
+    # means unknown and is treated as line 1.
+    property code_start_line : Int32 = 0
     @lexer : Tartrazine::Lexer
     @formatter : Tartrazine::Html
 
@@ -414,11 +419,18 @@ module Crycco
 
       formatted_code = @formatter.format(code.strip("\n"), @lexer)
 
-      # Add line number anchors for symbol linking
+      # Add line number anchors for symbol linking. The numbers are the
+      # line numbers of the ORIGINAL source file, so that links built
+      # from ctags data (absolute file lines) land on the right lines.
+      # Leading blank lines were stripped above, so account for the
+      # offset they introduce.
+      start_line = @code_start_line > 0 ? @code_start_line : 1
+      leading_blank_lines = code.size - code.lstrip("\n").size
+
       # We wrap each line in a span with an id that can be referenced
       lines = formatted_code.split('\n')
       lines_with_anchors = lines.map_with_index do |line, index|
-        line_number = index + 1
+        line_number = start_line + leading_blank_lines + index
         "<span id=\"line-#{line_number}\">#{line}</span>"
       end
 
@@ -549,7 +561,7 @@ module Crycco
       is_enclosing_start = @language.match_enclosing_start
       is_enclosing_end = @language.match_enclosing_end
 
-      lines.each do |line|
+      lines.each_with_index(offset: 1) do |line, line_number|
         # If the line starts with a comment marker, tell the state machine
         processed_line = line.rstrip
 
@@ -585,7 +597,11 @@ module Crycco
 
         # If we are in a code block, we add the line to the current section's code
         if state == State::CodeBlock
-          @sections.last.code += "#{processed_line}\n"
+          current_section = @sections.last
+          # Remember where in the source file this section's code starts,
+          # so line anchors can use the file's real line numbers.
+          current_section.code_start_line = line_number if current_section.code_start_line == 0
+          current_section.code += "#{processed_line}\n"
         else
           # Or, we are in a comment block, and we add the line to the current
           # section's docs
