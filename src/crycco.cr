@@ -111,7 +111,7 @@ module Crycco
     def after_initialize
       # We consider lines with spaces and then the comment marker as
       # comments.
-      @match = /^\s*#{Regex.escape(self.symbol)}\s?/
+      @match = /^\s*#{Regex.escape(symbol)}\s?/
       if @enclosing_symbol.size == 2
         # If the language supports enclosing comments, then
         # we set those regexes too.
@@ -259,7 +259,7 @@ module Crycco
       end
 
       text
-    rescue ex
+    rescue
       text
     end
 
@@ -321,14 +321,12 @@ module Crycco
     # 3. Returns nil if ambiguous or not found
 
     def resolve_symbol_reference(symbol_name : String) : String?
-      return nil unless ctags_manager = Crycco.ctags_manager
+      return unless ctags_manager = Crycco.ctags_manager
 
       if result = ctags_manager.resolve_symbol(symbol_name, @path)
         file_path, line_number = result
         html_path = html_path_for_file(file_path)
         "#{html_path}#line-#{line_number}"
-      else
-        nil
       end
     end
 
@@ -547,33 +545,33 @@ module Crycco
         processed_line = line.rstrip
 
         if is_comment.match(line) && !NOT_COMMENT.match(line)
-          self.comment {
+          comment do
             # These blocks only execute when transitions are successful.
             #
             # So, this block is executed when we are transitioning
             # to a comment block, which means we are starting
             # a new section
             @sections << Section.new(@language, @path)
-          }
+          end
           # Because the docs section is supposed to be markdown, we need
           # to remove the comment marker from the line.
           processed_line = processed_line.sub(@language.match, "") unless @literate
         elsif line.strip.empty?
-          self.code
+          code
         elsif is_enclosing_start.match(line)
           # If the line starts with an enclosing comment marker
-          self.enclosing_comment_start {
+          enclosing_comment_start do
             # We are transitioning to an enclosing comment block, so it's
             # a new section too.
             @sections << Section.new(@language, @path)
             processed_line = processed_line.sub(@language.@match_enclosing_start, "") unless @literate
-          }
+          end
         elsif is_enclosing_end.match(line)
           # The end of an enclosing comment block means we are back to code
-          self.enclosing_comment_end
+          enclosing_comment_end
         else
           # Just a normal line.
-          self.code
+          code
         end
 
         # If we are in a code block, we add the line to the current section's code

@@ -1,5 +1,9 @@
 version: 2.0
 shards:
+  ameba:
+    git: https://github.com/crystal-ameba/ameba.git
+    version: 1.7.0-dev+git.commit.f53fcd3382553121239c8f144aec5e27aeadbed8
+
   baked_file_system:
     git: https://github.com/ralsina/baked_file_system.git
     version: 0.10.0+git.commit.beb373124c7a235cfb9cd94e36849d8168eaa04b

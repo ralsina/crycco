@@ -39,7 +39,7 @@ module Templates
 
   def get(name : String) : Crinja::Template
     Env.get_template(name)
-  rescue ex : Crinja::TemplateNotFoundError
+  rescue Crinja::TemplateNotFoundError
     Env.get_template(name + ".j2")
   end
 end

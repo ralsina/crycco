@@ -19,13 +19,13 @@ module Crycco
                    template : String,
                    mode : String,
                    theme : String = "default-dark")
-      source_paths = sources.map { |source|
+      source_paths = sources.map do |source|
         Path[source].expand.normalize
-      }.sort!
+      end.sort!
 
-      @docs = source_paths.map { |source|
+      @docs = source_paths.map do |source|
         Document.new source, template, mode
-      }
+      end
 
       # Setup file tracking for smart references
       #

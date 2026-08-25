@@ -82,10 +82,10 @@ module Crycco
 
     # Find symbol in specific file
     private def find_symbol_in_file(symbol_name : String, file_path : Path) : {Path, Int32}?
-      return nil unless @tag_file
+      return unless @tag_file
 
       entries = find_entries(symbol_name)
-      return nil if entries.empty?
+      return if entries.empty?
 
       # Look for entries in the specified file
       entries.each do |entry|
@@ -99,11 +99,11 @@ module Crycco
 
     # Find unique symbol across all files
     private def find_unique_symbol(symbol_name : String) : {Path, Int32}?
-      return nil unless @tag_file
+      return unless @tag_file
 
       entries = find_entries(symbol_name)
-      return nil if entries.empty?
-      return nil if entries.size > 1 # Ambiguous
+      return if entries.empty?
+      return if entries.size > 1 # Ambiguous
 
       entry = entries.first
       {Path[entry.file], entry.line_number}

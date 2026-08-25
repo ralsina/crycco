@@ -15,49 +15,49 @@ require "sixteen"
 # few and simple.
 
 HELP = <<-HELP
-Crycco, a Crystal version of docco/pycco/etc.
+  Crycco, a Crystal version of docco/pycco/etc.
 
-Usage:
-    crycco FILE... [-l <name>][-o <path>][-t <file>][--mode <mode>][--theme <theme>][--ctags <file>]
-    crycco --version
-    crycco --help
-    crycco --completions <shell>
+  Usage:
+      crycco FILE... [-l <name>][-o <path>][-t <file>][--mode <mode>][--theme <theme>][--ctags <file>]
+      crycco --version
+      crycco --help
+      crycco --completions <shell>
 
-Options:
-  -v, --version           output the version number
-  -l, --languages <file>  use a custom languages.yml file
-  -o, --output <path>     output to a given folder [default: docs/]
-  -t, --template <name>   template for doc layout [default: sidebyside]
-  --mode <mode>           what to output [default: docs]
-  --theme <theme>         theme for the output [default: default-dark]
-  --ctags <file>          use existing ctags file for symbol resolution
-  --completions <shell>   generate shell completions (bash, fish, zsh)
-  -h, --help              this help message
+  Options:
+    -v, --version           output the version number
+    -l, --languages <file>  use a custom languages.yml file
+    -o, --output <path>     output to a given folder [default: docs/]
+    -t, --template <name>   template for doc layout [default: sidebyside]
+    --mode <mode>           what to output [default: docs]
+    --theme <theme>         theme for the output [default: default-dark]
+    --ctags <file>          use existing ctags file for symbol resolution
+    --completions <shell>   generate shell completions (bash, fish, zsh)
+    -h, --help              this help message
 
-The available modes are:
+  The available modes are:
 
-* docs (default)
-  Generates HTML documentation.
-* code
-  Generates source code with comments
-* markdown
-  Generates markdown files with the code in fenced code blocks
-* literate
-  Generates markdown files with the code in indented blocks
+  * docs (default)
+    Generates HTML documentation.
+  * code
+    Generates source code with comments
+  * markdown
+    Generates markdown files with the code in fenced code blocks
+  * literate
+    Generates markdown files with the code in indented blocks
 
-Crycco comes with two templates for HTML documents which you can
-use in the -t option when generating docs:
+  Crycco comes with two templates for HTML documents which you can
+  use in the -t option when generating docs:
 
-sidebyside (default)
-  Shows the docs and code in two columns, matching docs to the code
-  they are about.
-basic
-  Single columns, docs then code, then docs then code.
+  sidebyside (default)
+    Shows the docs and code in two columns, matching docs to the code
+    they are about.
+  basic
+    Single columns, docs then code, then docs then code.
 
-If you use the --code option, the output will be machine-readable
-source code instead of HTML.
+  If you use the --code option, the output will be machine-readable
+  source code instead of HTML.
 
-HELP
+  HELP
 
 options = Docopt.docopt_config(HELP,
   config_file_path: ".crycco.yml",

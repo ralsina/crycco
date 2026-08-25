@@ -25,6 +25,13 @@ dependencies:
     github: ralsina/tartrazine
     branch: main
 
+development_dependencies:
+  ameba:
+    git: https://github.com/crystal-ameba/ameba.git
+    # The latest release (1.6.4) does not build with Crystal >= 1.21,
+    # so track master until the next release.
+    branch: master
+
 crystal: ">= 1.13.0"
 
 license: MIT
