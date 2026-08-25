@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: crystal-lang/install-crystal@v6
+        with:
+          crystal: latest
+      - name: Install shards
+        run: shards install
+      - name: Check formatting
+        run: crystal tool format --check src spec
+      - name: Run tests
+        run: crystal spec --error-trace
+      - name: Build
+        run: shards build
+      - name: Smoke test (self-documentation)
+        run: |
+          bin/crycco src/*.cr src/languages.yml -o /tmp/crycco-docs
+          test -f /tmp/crycco-docs/crycco.cr.html
+          test -f /tmp/crycco-docs/languages.yml.html
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: crystal-lang/install-crystal@v6
+        with:
+          crystal: latest
+      - name: Install shards
+        run: shards install
+      - name: Build ameba
+        run: crystal build lib/ameba/src/cli.cr -o bin/ameba
+      - name: Run ameba
+        run: bin/ameba src spec
