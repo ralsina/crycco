@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: crystal-lang/install-crystal@v6
+      - uses: crystal-lang/install-crystal@v1.9.2
         with:
           crystal: latest
       - name: Install shards
@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: crystal-lang/install-crystal@v6
+      - uses: crystal-lang/install-crystal@v1.9.2
         with:
           crystal: latest
       - name: Install shards
