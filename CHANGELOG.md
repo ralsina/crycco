@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - Avoid shell injection in ctags generation
 - Eliminate duplicate HTML anchors and make header anchors work
 - Use source file line numbers for code anchors so symbol links resolve
+- Pin markd to 0.5.x for reproducible static builds
 
 ### 📚 Documentation
 
@@ -17,6 +18,10 @@ All notable changes to this project will be documented in this file.
 ### 🧪 Testing
 
 - Add coverage for output rendering, templates and CtagsManager
+
+### Bump
+
+- Release v0.5.3
 
 ### Ci
 
