@@ -160,8 +160,8 @@ def auto_generate_ctags_if_available(source_files : Array(Path))
   other_files = source_files.reject { |file| file.extension == ".cr" }
 
   # Check for required tools
-  has_crystal_ctags = system("which crystal-ctags > /dev/null 2>&1")
-  has_universal_ctags = system("which ctags > /dev/null 2>&1")
+  has_crystal_ctags = !Process.find_executable("crystal-ctags").nil?
+  has_universal_ctags = !Process.find_executable("ctags").nil?
 
   # Validate tool availability
   if crystal_files.empty? && other_files.empty?
@@ -211,8 +211,7 @@ def auto_generate_ctags_if_available(source_files : Array(Path))
   rescue ex
     STDERR.puts "Error generating ctags: #{ex.message}"
   ensure
-    # temp_ctags will be cleaned up automatically when garbage collected
-    # but we want to keep it until Crycco finishes processing
+    # Keep the temporary tags file until processing finishes, then remove it
     at_exit { File.delete(ctags_path) if File.exists?(ctags_path) }
   end
 end

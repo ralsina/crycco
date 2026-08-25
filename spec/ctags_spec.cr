@@ -36,6 +36,41 @@ def setup_ctags_context
   one
 end
 
+# Creates a unique temporary directory (Crystal has no Dir.mkdtemp)
+def temp_dir(prefix : String) : Path
+  path = Path[File.tempname(prefix, ".dir")]
+  Dir.mkdir(path)
+  path
+end
+
+# Puts a fake executable named `name` first on PATH for the duration of
+# the block. Used to exercise the tag generation code paths without
+# depending on real ctags tools. See issue #4.
+def with_fake_tool(name : String, script_body : String, &)
+  bin_dir = temp_dir("crycco-fakebin")
+  script = Path[bin_dir] / name
+  File.write(script, script_body)
+  File.chmod(script.to_s, File::Permissions.new(0o755))
+  original_path = ENV["PATH"]
+  ENV["PATH"] = "#{bin_dir}:#{original_path}"
+  yield
+ensure
+  ENV["PATH"] = original_path if original_path
+  FileUtils.rm_rf(bin_dir.to_s)
+end
+
+# Creates a scratch directory with files whose names are hostile to
+# shell-based command construction, and removes it afterwards. If shell
+# injection ever happens, the injected `touch PWNED` would create a
+# marker in the current directory, which is also cleaned up.
+def with_hostile_files(&)
+  workdir = temp_dir("crycco-hostile")
+  yield workdir
+ensure
+  FileUtils.rm_rf(workdir.to_s)
+  File.delete("PWNED") if File.exists?("PWNED")
+end
+
 describe Crycco::CtagsManager do
   after_each do
     Crycco.ctags_manager = nil
@@ -133,5 +168,84 @@ describe Crycco::CtagsManager do
     document = Crycco::Document.new Path[fixture_tags_path("2.cr")]
     anchors = document.sections.map &.anchor
     anchors.size.should eq(anchors.uniq.size)
+  end
+
+  describe "generate_tags" do
+    it "should pass hostile filenames as single arguments without a shell" do
+      with_hostile_files do |workdir|
+        space_file = workdir / "space name.cr"
+        inject_file = workdir / "evil$(touch PWNED).cr"
+        File.write(space_file, "class FakeSymbol\nend\n")
+        File.write(inject_file, "class FakeSymbol\nend\n")
+
+        tags_path = File.tempname("crycco", ".tags")
+        args_path = File.tempname("crycco", ".args")
+        fake_tool = <<-'SCRIPT'
+          #!/bin/sh
+          printf '%s\n' "$@" > ARGS_PATH
+          printf 'FakeSymbol\t%s\t/^class FakeSymbol$/;"\tline:1\tkind:c\n' 'SYMBOL_FILE'
+          SCRIPT
+          .gsub("ARGS_PATH", args_path)
+          .gsub("SYMBOL_FILE", space_file.to_s)
+
+        with_fake_tool("crystal-ctags", fake_tool) do
+          manager = Crycco::CtagsManager.new([space_file, inject_file], tags_path)
+          manager.generate_tags.should be_true
+        end
+
+        # Each filename arrived as exactly one argument, un-mangled
+        File.read(args_path).lines.should eq(
+          [space_file.to_s, inject_file.to_s])
+
+        # The command substitution in the filename was NOT executed
+        File.exists?("PWNED").should be_false
+
+        # The tool's stdout became the tags file and is usable
+        File.read(tags_path).should contain("FakeSymbol")
+        manager = Crycco::CtagsManager.new([space_file, inject_file], tags_path)
+        manager.resolve_symbol("FakeSymbol", space_file).should eq({space_file, 1})
+      end
+    end
+
+    it "should pass -f and filenames safely to universal ctags" do
+      with_hostile_files do |workdir|
+        yml_file = workdir / "weird config.yml"
+        File.write(yml_file, "# config\n")
+
+        tags_path = File.tempname("crycco", ".tags")
+        fake_tool = <<-'SCRIPT'
+          #!/bin/sh
+          # Invoked as: ctags -f TAGSFILE FILE...
+          printf 'OtherSymbol\t%s\t/^def other$/;"\tline:2\tkind:f\n' "$3" > "$2"
+          SCRIPT
+
+        with_fake_tool("ctags", fake_tool) do
+          manager = Crycco::CtagsManager.new([yml_file], tags_path)
+          manager.generate_tags.should be_true
+        end
+
+        File.read(tags_path).should contain("OtherSymbol")
+        manager = Crycco::CtagsManager.new([yml_file], tags_path)
+        manager.resolve_symbol("OtherSymbol", yml_file).should eq({yml_file, 2})
+      end
+    end
+
+    it "should return false when the tool is not available" do
+      with_hostile_files do |workdir|
+        source = workdir / "missing_tool.cr"
+        File.write(source, "class Nothing\nend\n")
+
+        empty_bin = temp_dir("crycco-emptybin")
+        begin
+          original_path = ENV["PATH"]
+          ENV["PATH"] = empty_bin.to_s
+          manager = Crycco::CtagsManager.new([source], File.tempname("crycco", ".tags"))
+          manager.generate_tags.should be_false
+        ensure
+          ENV["PATH"] = original_path
+          FileUtils.rm_rf(empty_bin.to_s)
+        end
+      end
+    end
   end
 end

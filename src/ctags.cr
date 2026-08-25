@@ -128,21 +128,22 @@ module Crycco
       end
     end
 
-    # Generate ctags for Crystal files using crystal-ctags
+    # Generate ctags for Crystal files using crystal-ctags.
+    #
+    # The filenames are passed as individual arguments and the tool's
+    # stdout goes straight into the tags file, so no shell is involved
+    # and names with spaces or shell metacharacters are handled safely.
     private def generate_crystal_tags(crystal_files : Array(Path)) : Bool
-      # Build command with files as arguments (crystal-ctags is basic and doesn't support -L)
-      file_args = crystal_files.map(&.to_s).join(" ")
-      cmd = "crystal-ctags #{file_args} > #{@ctags_path} 2>&1"
-      result = Process.run(
-        cmd,
-        shell: true,
-        output: Process::Redirect::Pipe,
-        error: Process::Redirect::Pipe
-      )
-
-      unless result.success?
-        STDERR.puts "Warning: crystal-ctags failed"
-        return false
+      args = crystal_files.map(&.to_s)
+      File.open(@ctags_path, "w") do |tags_file|
+        status = Process.run("crystal-ctags", args,
+          output: tags_file,
+          error: Process::Redirect::Inherit
+        )
+        unless status.success?
+          STDERR.puts "Warning: crystal-ctags failed"
+          return false
+        end
       end
 
       true
@@ -151,17 +152,18 @@ module Crycco
       false
     end
 
-    # Generate ctags for other files using universal ctags
+    # Generate ctags for other files using universal ctags.
+    #
+    # Like the Crystal variant, arguments are passed without a shell:
+    # the output file is selected with -f instead of a redirection.
     private def generate_universal_tags(other_files : Array(Path)) : Bool
-      cmd = "ctags -f #{@ctags_path} #{other_files.join(" ")}"
-      result = Process.run(
-        cmd,
-        shell: true,
-        output: Process::Redirect::Pipe,
-        error: Process::Redirect::Pipe
+      args = ["-f", @ctags_path] + other_files.map(&.to_s)
+      status = Process.run("ctags", args,
+        output: Process::Redirect::Inherit,
+        error: Process::Redirect::Inherit
       )
 
-      unless result.success?
+      unless status.success?
         STDERR.puts "Warning: universal ctags failed"
         return false
       end
