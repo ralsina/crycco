@@ -2,7 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
-## [unreleased]
+## [0.5.3] - 2026-08-25
+
+### 🐛 Bug Fixes
+
+- Avoid shell injection in ctags generation
+- Eliminate duplicate HTML anchors and make header anchors work
+- Use source file line numbers for code anchors so symbol links resolve
+
+### 📚 Documentation
+
+- Fix stale literate comments (round-trip exists, autolinks done)
 
 ### 🧪 Testing
 

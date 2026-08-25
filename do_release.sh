@@ -1,5 +1,5 @@
 #!/bin/bash
-set e
+set -e
 
 PKGNAME=$(basename "$PWD")
 VERSION=$(git cliff --bumped-version --unreleased |cut -dv -f2)
@@ -7,7 +7,7 @@ VERSION=$(git cliff --bumped-version --unreleased |cut -dv -f2)
 sed "s/^version:.*$/version: $VERSION/g" -i shard.yml
 git add shard.yml
 hace lint test
-git cliff --bump -u -p CHANGELOG.md
+git cliff --bump > CHANGELOG.md
 git commit -a -m "bump: Release v$VERSION"
 hace static
 git tag "v$VERSION"
