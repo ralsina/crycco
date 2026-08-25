@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.0] - 2026-08-25
+
+### 🚀 Features
+
+- Render pure markdown files as prose in documentation sets
+
 ## [0.5.3] - 2026-08-25
 
 ### 🐛 Bug Fixes
