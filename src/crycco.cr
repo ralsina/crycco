@@ -23,9 +23,9 @@
 # a nice HTML file that explains the config file in a much more readable
 # fashion, [[languages.yml|**from the YAML itself**]]
 #
-# Crycco also will let you do other manipulations on the code and docs,
-# like generating "literate YAML" out of YAML and viceversa. It says
-# "it will" because [[TODO.md|it doesn't yet]]
+# Crycco also lets you do other manipulations on the code and docs,
+# like generating "literate YAML" out of YAML and viceversa: see the
+# `--mode` option in [[main.cr]]
 #
 # One of the best things about Docco in my opinion is that it takes the
 # tradition of literate programming and turns it into its minimal
@@ -556,7 +556,6 @@ module Crycco
     def parse(source : String)
       lines = source.split("\n")
       @sections = [Section.new(@language, @path)]
-      # Section.new language
       is_comment = @language.match
       is_enclosing_start = @language.match_enclosing_start
       is_enclosing_end = @language.match_enclosing_end

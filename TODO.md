@@ -6,13 +6,10 @@
 * ✅ Support generating code out of literate files
 * ✅ Add a page index
 * ✅ Add a sidebar
-* Autolinks to other pages?
+* ✅ Autolinks to other pages? (smart references, see README)
 * Other layouts?
-* Support other outputs
-  * ✅ source code
-  * ✅ literate version
-  * ✅ markdown
-  * nocomments
+* Support other outputs: ✅ source code, ✅ literate version,
+  ✅ markdown, nocomments pending
 * Support custom title? Extract title from doc? Use filename?
 * ✅ Enclosing comments (need them for templates! And HTML!)
 * ✅ Use tartrazine for syntax highlighting
@@ -29,7 +26,6 @@
 * ✅ Doc blocks are not aligned with code blocks
 * ✅ In-doc code blocks should have scrollbars if needed
 * ✅ FSM-based parser for robustness
-
 
 ## Things I am *not* doing for now
 
