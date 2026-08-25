@@ -17,7 +17,8 @@ repos:
             entry: markdownlint --config .markdownlint.yml
             language: system
             types: [markdown]
-            exclude: spec/fixtures/1.cr.md
+            # Test fixtures intentionally use unusual markdown
+            exclude: spec/fixtures/
           - id: shellcheck
             name: shellcheck
             entry: shellcheck

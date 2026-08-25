@@ -1,0 +1,60 @@
+{% extends "sidebar.j2" %}
+{% extends "base16.j2" %}
+{% extends "page.j2" %}
+
+{% block layoutname %}
+markdown-page
+{% endblock %}
+
+{% block body %}
+{% for section in sections %}
+<article class="prose" id="{{section.anchor}}">
+    {{ section.docs_html}}
+</article>
+{% endfor %}
+{% endblock %}
+
+{% block contentcss %}
+<style>
+    html * {
+        font-family: Chivo, sans-serif;
+        font-weight: 300;
+        overflow: visible;
+    }
+
+    body {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    article.prose {
+        max-width: 60rem;
+        width: 100%;
+        margin: 0 auto;
+        padding-bottom: 2rem;
+    }
+
+    footer {
+        text-align: center;
+        border-top: solid 1px #{{base04_hex}};
+        background-color: #{{base00_hex}};
+        margin-top: auto;
+    }
+
+    code, div.prose>pre>code {
+        font-family: 'Chivo Mono', monospace !important;
+        padding: .15rem;
+        background-color: #{{base01_hex}} !important;
+    }
+
+    code>span {
+        font-family: 'Chivo Mono', monospace !important;
+    }
+
+    article.prose>pre>code {
+        overflow-x: auto !important;
+        display: block;
+    }
+</style>
+{% endblock %}

@@ -60,7 +60,26 @@ basic
 
 If you use the --code option, the output will be machine-readable
 source code instead of HTML.
+
 ```
+
+## Pure Markdown Files
+
+Plain markdown files (a README, design notes, a tutorial) can be
+included in a documentation set alongside source files:
+
+```bash
+crycco README.md src/*.cr
+```
+
+Since they contain no code, they are rendered as a single prose
+column instead of the side-by-side layout. Everything that works in
+source docs works there too: markdown formatting, syntax-highlighted
+fenced code blocks, smart references like `[[main.cr]]` and the
+sidebar with links to the rest of the documents.
+
+In the other output modes (code, markdown, literate) pure markdown
+files are copied through verbatim.
 
 ## Smart File and Symbol References
 

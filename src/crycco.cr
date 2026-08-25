@@ -12,6 +12,10 @@
 # everything is a comment except things indented 4 spaces or more,
 # which are code. Those files should have a double `.ext.md` extension.
 #
+# Pure markdown files (like this project's README.md) can be part of
+# a documentation set too: since they have no code of their own they
+# are rendered as a single prose column instead of side by side.
+#
 # It's a very simple tool but it can be used to good effect in a number
 # of situations. Consider a tool that uses a YAML file as configuration.
 #
@@ -494,6 +498,15 @@ module Crycco
   # A Document takes a path as input and reads the file,
   # parses its contents and is able to generate whatever
   # output is needed.
+  #
+  # Documents come in three flavors:
+  #
+  # * Regular source files, split into docs and code sections
+  #   and shown side by side.
+  # * Literate source files (`.cr.md` and friends), where the
+  #   markdown IS the source and indented blocks are code.
+  # * Pure markdown files (a `README.md`), which contain no code
+  #   of their own and are rendered as prose, not side by side.
   class Document
     # We include the EnumStateMachine module for the parser
     include EnumStateMachine
@@ -502,6 +515,7 @@ module Crycco
     property sections = Array(Section).new
     property language : Language
     @literate : Bool = false
+    @pure_markdown : Bool = false
     @template : String
     @mode : String
 
@@ -509,6 +523,9 @@ module Crycco
     # language. Also, if rather than a `.yml` file we have a `.yml.md`
     # we consider that "literate YAML" and tweak the language
     # definition a bit.
+    #
+    # A plain `.md` or `.markdown` file that is not a literate variant
+    # is "pure markdown": it is kept verbatim and rendered as prose.
     def initialize(@path : Path,
                    @template : String = "sidebyside",
                    @mode : String = "docs")
@@ -518,12 +535,19 @@ module Crycco
         if LANGUAGES.has_key?(lang_key)
           key = lang_key
           @literate = true
+        else
+          @pure_markdown = true
         end
       end
-
-      raise Exception.new "Unknown language for file #{@path}" \
-        unless LANGUAGES.has_key? key
-      @language = Language.from_yaml(LANGUAGES[key].to_yaml)
+      # Not in the language list and not pure markdown? Error.
+      unless @pure_markdown || LANGUAGES.has_key?(key)
+        raise Exception.new "Unknown language for file #{@path}"
+      end
+      # Pure markdown documents reuse the markdown language
+      # definition (for code blocks inside the docs, if any) but
+      # their parsing is special-cased, see `parse`.
+      language_key = @pure_markdown ? ".md" : key
+      @language = Language.from_yaml(LANGUAGES[language_key].to_yaml)
 
       # In the literate versions, everything is doc except
       # indented things, which are code. So we change the
@@ -552,8 +576,27 @@ module Crycco
     # The `parse` method is the core of the Document class. It scans
     # the document line by line, checks if the line is a comment or code
     # and organizes the contents into sections.
+    #
+    # Pure markdown documents are the exception: since they contain no
+    # code, the whole file is a single section of docs, kept verbatim
+    # so that nested lists and indented code blocks survive untouched.
 
+    # Parsing of pure markdown documents: the file contains no code of
+    # its own, so the whole thing is a single section of docs, kept
+    # verbatim so nested lists and indented code blocks survive.
+    private def parse_pure_markdown(source : String)
+      section = Section.new(@language, @path)
+      section.docs = source
+      section.index = 0
+      @sections = [section]
+    end
+
+    # ameba:disable Metrics/CyclomaticComplexity
     def parse(source : String)
+      if @pure_markdown
+        return parse_pure_markdown(source)
+      end
+
       lines = source.split("\n")
       @sections = [Section.new(@language, @path)]
       is_comment = @language.match
@@ -631,8 +674,25 @@ module Crycco
     # and template. If you want to learn more about the templates
     # you can check out [[templates.cr]]
     #
+    # Save the document to a file using the desired format
+    # and template. If you want to learn more about the templates
+    # you can check out [[templates.cr]]
+    #
+    # Pure markdown documents are special again: in docs mode they
+    # always use the markdown-page template, which renders prose
+    # instead of the side-by-side layout (there is no code column to
+    # fill). In the other modes the file is copied through verbatim:
+    # there are no comments to strip or add, so the input IS the output.
     def save(out_file : Path, extra_context)
       FileUtils.mkdir_p(File.dirname(path))
+
+      if @pure_markdown && @mode != "docs"
+        # Verbatim pass-through of the original contents
+        FileUtils.mkdir_p(File.dirname(out_file))
+        File.copy(path, out_file)
+        return
+      end
+
       case @mode
       when "markdown"
         template = Templates.get("markdown")
@@ -640,6 +700,8 @@ module Crycco
         template = Templates.get("source")
       when "literate"
         template = Templates.get("literate")
+      when "docs"
+        template = @pure_markdown ? Templates.get("markdown-page") : Templates.get(@template)
       else
         template = Templates.get(@template)
       end

@@ -87,7 +87,13 @@ module Crycco
       when "literate"
         dst += ".md"
       end
+      # Literate sources (foo.cr.md) get their code-mode name back
+      # (foo.cr), and pure markdown files must not become foo.md.md
+      # in literate mode.
       if doc.@literate && File.extname(dst) == ".md"
+        dst = dst[...-3]
+      end
+      if doc.@pure_markdown && @mode == "literate"
         dst = dst[...-3]
       end
       Path[dst]
