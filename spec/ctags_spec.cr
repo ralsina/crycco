@@ -162,14 +162,6 @@ describe Crycco::CtagsManager do
     section.code_html.should contain(%(id="#{anchor}"))
   end
 
-  # Issue #3: sections without headers all share the "section" fallback
-  # anchor, producing duplicated ids in the generated HTML.
-  pending "section anchors should be unique (issue #3)" do
-    document = Crycco::Document.new Path[fixture_tags_path("2.cr")]
-    anchors = document.sections.map &.anchor
-    anchors.size.should eq(anchors.uniq.size)
-  end
-
   describe "generate_tags" do
     it "should pass hostile filenames as single arguments without a shell" do
       with_hostile_files do |workdir|
@@ -248,4 +240,7 @@ describe Crycco::CtagsManager do
       end
     end
   end
+
+  # Issue #3 (duplicate section anchors) is covered in crycco_spec.cr
+  # by the anchor uniqueness specs.
 end

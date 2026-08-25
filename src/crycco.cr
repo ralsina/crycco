@@ -194,6 +194,12 @@ module Crycco
     property code : String = ""
     property language : Language
     property path : Path
+    # Position of the section inside its document, used to keep
+    # fallback anchors unique.
+    property index : Int32 = 0
+    # Appended to the anchor when another section in the same
+    # document produced the same header slug.
+    property anchor_suffix : Int32 = 0
     @lexer : Tartrazine::Lexer
     @formatter : Tartrazine::Html
 
@@ -347,31 +353,34 @@ module Crycco
       Crycco.all_files.any? { |processed_file| processed_file.expand == file_path.expand }
     end
 
-    # Extract the first header from documentation for semantic anchoring
+    # Extract the first header from documentation for semantic anchoring.
+    #
+    # The docs are marker-stripped markdown, so any markdown H1 line
+    # (`# Header`) is a candidate, regardless of the source language's
+    # comment symbol. Sections without a header fall back to a unique
+    # positional anchor, and repeated headers get a numeric suffix.
     def anchor : String
-      # Look for the first header line in the raw documentation text
-      # Headers are lines that start with comment marker + # + header text
-      comment_marker = @language.symbol
+      base = anchor_base
+      @anchor_suffix > 0 ? "#{base}-#{@anchor_suffix}" : base
+    end
 
+    # The section anchor before deduplication is applied. Used by
+    # Document to make sure no two sections in a document share one.
+    protected def anchor_base : String
       docs.each_line do |line|
-        if line =~ /^\s*#{Regex.escape(comment_marker)}\s*#\s+(.+)$/
-          header_text = $1.strip
-          # Convert header text to a valid URL anchor:
-          # 1. Downcase
-          # 2. Replace non-alphanumeric chars with hyphens
-          # 3. Remove multiple consecutive hyphens
-          # 4. Remove leading/trailing hyphens
-          anchor = header_text.downcase
+        if header_text = line.match(/^\s*#\s+(.+)$/)
+          slug = header_text[1].strip.downcase
             .gsub(/[^a-z0-9\s-]/, "")
             .gsub(/\s+/, "-")
             .gsub(/-+/, "-")
             .gsub(/^-|-$/, "")
 
-          return anchor.empty? ? "section" : anchor
+          return "section-#{@index}" if slug.empty?
+          return slug
         end
       end
 
-      "section" # fallback for sections without headers
+      "section-#{@index}"
     end
 
     # Converting Documentation to HTML
@@ -591,6 +600,16 @@ module Crycco
 
       # Sections with no code or docs are pointless.
       @sections.reject! { |section| section.code.strip.empty? && section.docs.strip.empty? }
+
+      # Give each section its position and make sure no two sections
+      # in the document produce the same anchor: fallback anchors get
+      # the section index, repeated headers get a numeric suffix.
+      seen = Hash(String, Int32).new(0)
+      @sections.each_with_index do |section, index|
+        section.index = index
+        seen[section.anchor_base] += 1
+        section.anchor_suffix = seen[section.anchor_base] - 1
+      end
     end
 
     # Save the document to a file using the desired format

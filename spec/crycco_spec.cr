@@ -318,26 +318,26 @@ describe Crycco do
       anchor.should eq("multiple-spaces-and-hyphens")
     end
 
-    it "should fall back to 'section' when no header is found" do
+    it "should fall back to a positional anchor when no header is found" do
       section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["test.cr"]
       section.docs = <<-TEXT
-        # This is just documentation without any headers.
-        # Just regular content lines.
+        This is just documentation without any headers.
+        Just regular content lines.
         TEXT
 
       anchor = section.anchor
-      anchor.should eq("section")
+      anchor.should eq("section-0")
     end
 
     it "should handle empty headers" do
       section = Crycco::Section.new Crycco::LANGUAGES[".cr"], Path["test.cr"]
       section.docs = <<-TEXT
         #
-        # This follows an empty header.
+        This follows an empty header.
         TEXT
 
       anchor = section.anchor
-      anchor.should eq("section")
+      anchor.should eq("section-0")
     end
 
     it "should work with different comment styles" do
@@ -361,6 +361,18 @@ describe Crycco do
 
       section_hash = section.to_h
       section_hash["anchor"].should eq("test-header")
+    end
+
+    it "should generate unique anchors across a document's sections" do
+      document = Crycco::Document.new Path["#{__DIR__}/fixtures/2.cr"]
+      anchors = document.sections.map &.anchor
+      anchors.size.should eq(anchors.uniq.size)
+    end
+
+    it "should suffix repeated headers to keep anchors unique" do
+      document = Crycco::Document.new Path["#{__DIR__}/fixtures/3.cr"]
+      anchors = document.sections.map &.anchor
+      anchors.should eq(["setup", "setup-1"])
     end
   end
 

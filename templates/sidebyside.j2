@@ -10,7 +10,7 @@ sidebyside
 </div>
 {% for section in sections %}
 <div id="{{section.anchor}}" class="grid">
-    <div class="doc" id="{{section.anchor}}">
+    <div class="doc">
         <span class="anchor">
             <a href="#{{section.anchor}}" class="anchor">↦</a>
         </span>
@@ -71,11 +71,6 @@ sidebyside
         left: -1.2em;
         opacity: 0;
         -webkit-transition: opacity 0.2s linear;
-
-            {
-            # font-size: 150%;
-            #
-        }
     }
 
     div.doc:hover .anchor {
