@@ -21,9 +21,11 @@ dependencies:
     github: nogginly/enum_state_machine.cr
   markd:
     github: icyleaf/markd
+  sixteen:
+    github: ralsina/sixteen
   tartrazine:
     github: ralsina/tartrazine
-    branch: main
+    version: ~> 0.21.1
 
 development_dependencies:
   ameba:
