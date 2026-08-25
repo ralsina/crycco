@@ -42,7 +42,7 @@ shards:
 
   sixteen:
     git: https://github.com/ralsina/sixteen.git
-    version: 0.7.0
+    version: 0.9.0
 
   tartrazine:
     git: https://github.com/ralsina/tartrazine.git
